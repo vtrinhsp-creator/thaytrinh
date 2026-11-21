@@ -326,6 +326,85 @@
       padding: 8px !important;
     }
 
+    /* ===================================================================== */
+    /* TỐI ƯU HÓA GIAO DIỆN HIỆN ĐẠI, MƯỢT MÀ & THÂN THIỆN DI ĐỘNG          */
+    /* ===================================================================== */
+    body {
+      background-color: #f1f5f9;
+      background-image: radial-gradient(at 0% 0%, rgba(37, 99, 235, 0.05) 0px, transparent 50%),
+                        radial-gradient(at 100% 0%, rgba(79, 70, 229, 0.04) 0px, transparent 45%);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    /* Chống nhảy số cho đồng hồ, KPI và điểm số */
+    #exam-timer-text,
+    #result-score-big,
+    #kpi-in-progress, #kpi-submitted, #kpi-avg-score, #kpi-total-students,
+    #rep-kpi-total, #rep-kpi-attended, #rep-kpi-absent, #rep-kpi-violated, #rep-kpi-exits, #rep-kpi-avg {
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Ẩn thanh cuộn nhưng vẫn vuốt mượt cho thanh tab mobile */
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* Hiệu ứng chuyển tab mượt mà */
+    @keyframes panelFadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .admin-tab-panel:not(.hidden),
+    #student-subview-lobby:not(.hidden),
+    #student-subview-runner:not(.hidden),
+    #student-subview-result:not(.hidden) {
+      animation: panelFadeIn 0.22s ease-out;
+    }
+
+    /* Bóng đổ tinh tế cho thẻ và bảng dữ liệu */
+    .ui-card-lift {
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    }
+    .ui-card-lift:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 24px -8px rgba(15, 23, 42, 0.10);
+    }
+
+    /* Cố định tiêu đề bảng & cột đầu tiên khi cuộn báo cáo dài */
+    .sticky-table-wrap {
+      max-height: 540px;
+      overflow: auto;
+    }
+    .sticky-table-wrap thead {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      box-shadow: 0 1px 0 #e2e8f0;
+    }
+    td.sticky, th.sticky {
+      box-shadow: 2px 0 6px -3px rgba(15, 23, 42, 0.08);
+    }
+
+    /* Thanh điều hướng câu hỏi cố định đáy trên điện thoại khi thi Word */
+    @media (max-width: 1023px) {
+      .mobile-sticky-exam-nav {
+        position: sticky;
+        bottom: 0.5rem;
+        z-index: 25;
+        background: rgba(255, 255, 255, 0.94);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        padding: 0.55rem 0.65rem;
+        border-radius: 1rem;
+        border: 1px solid #cbd5e1;
+        box-shadow: 0 10px 28px -6px rgba(15, 23, 42, 0.18);
+      }
+      button, select, input[type="text"], input[type="password"], input[type="number"] {
+        touch-action: manipulation;
+      }
+    }
+
     /* Chế độ in báo cáo sạch đẹp */
     @media print {
       header, nav, .no-print, #toast-container, #custom-modal-backdrop, #image-lightbox {
@@ -351,6 +430,11 @@
   <!-- VÙNG THÔNG BÁO TOAST & MODAL TÙY CHỈNH (KHÔNG DÙNG ALERT) -->
   <!-- ========================================================= -->
   <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2 max-w-sm w-[calc(100%-2rem)] pointer-events-none"></div>
+
+  <!-- NÚT CUỘN NHANH LÊN ĐẦU TRANG -->
+  <button id="btn-back-to-top" type="button" onclick="window.scrollTo({top:0, behavior:'smooth'})" title="Lên đầu trang" class="hidden fixed bottom-5 right-5 z-40 w-10 h-10 rounded-full bg-brand-700 hover:bg-brand-800 text-white shadow-lg flex items-center justify-center transition active:scale-95 no-print">
+    <i data-lucide="arrow-up" class="w-5 h-5"></i>
+  </button>
 
   <!-- BANNER TỰ ĐỘNG CẬP NHẬT PHIÊN BẢN MỚI NHẤT TỪ GITHUB PAGES -->
   <div id="github-update-banner" class="hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-50 max-w-xl w-[calc(100%-1.5rem)] bg-slate-900 text-white px-4 py-3 rounded-2xl shadow-2xl border border-blue-400/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -423,20 +507,20 @@
   <!-- ========================================================= -->
   <section id="view-login" class="hidden flex-1 flex items-center justify-center p-4 sm:p-6 bg-gradient-to-br from-brand-900 via-brand-800 to-slate-900">
     <div class="w-full max-w-4xl grid grid-cols-1 md:grid-cols-12 bg-white rounded-3xl shadow-2xl overflow-hidden border border-white/10">
-      <!-- Cột trái: Giới thiệu -->
-      <div class="md:col-span-5 bg-gradient-to-br from-brand-700 to-brand-900 text-white p-8 flex flex-col justify-between">
+      <!-- Cột trái: Giới thiệu (Gọn trên điện thoại, đầy đủ trên máy tính) -->
+      <div class="md:col-span-5 bg-gradient-to-br from-brand-700 via-brand-800 to-indigo-950 text-white p-5 sm:p-8 flex flex-col justify-between">
         <div>
-          <div class="inline-flex items-center gap-2.5 bg-white/15 backdrop-blur px-3.5 py-2 rounded-xl mb-6">
-            <i data-lucide="graduation-cap" class="w-6 h-6 text-blue-200"></i>
-            <span class="font-bold tracking-tight text-lg">HỌC CÙNG THẦY TRỊNH</span>
+          <div class="inline-flex items-center gap-2.5 bg-white/15 backdrop-blur px-3.5 py-2 rounded-xl mb-3 md:mb-6 border border-white/10">
+            <i data-lucide="graduation-cap" class="w-5 h-5 sm:w-6 sm:h-6 text-blue-200"></i>
+            <span class="font-extrabold tracking-tight text-base sm:text-lg">HỌC CÙNG THẦY TRỊNH</span>
           </div>
-          <h1 class="text-2xl sm:text-3xl font-extrabold leading-tight mb-4">
+          <h1 class="text-xl sm:text-2xl md:text-3xl font-extrabold leading-tight mb-2 md:mb-4">
             Hệ thống Thi Trắc nghiệm Trực tuyến Thông minh
           </h1>
-          <p class="text-blue-100/90 text-sm leading-relaxed mb-6">
+          <p class="hidden md:block text-blue-100/90 text-sm leading-relaxed mb-6">
             Nạp đề Word giữ nguyên hình ảnh &amp; công thức, tự động nhận diện đáp án gạch chân, đảo đề &amp; đáp án độc lập, hiển thị câu hỏi dạng ảnh chống sao chép và giám sát trực tiếp từng câu làm bài.
           </p>
-          <ul class="space-y-3 text-sm text-blue-50">
+          <ul class="hidden md:block space-y-3 text-sm text-blue-50">
             <li class="flex items-center gap-2.5">
               <span class="w-6 h-6 rounded-full bg-emerald-400/20 text-emerald-300 flex items-center justify-center shrink-0">
                 <i data-lucide="check" class="w-3.5 h-3.5"></i>
@@ -462,7 +546,7 @@
             <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
             Đồng bộ Cloud trực tiếp
           </span>
-          <span id="app-version-label">Phiên bản 2026.11.21-v13</span>
+          <span id="app-version-label">Phiên bản 2026.11.21-v16</span>
         </div>
       </div>
 
@@ -496,7 +580,10 @@
             <label class="block text-sm font-semibold text-slate-700 mb-1.5">Mật khẩu</label>
             <div class="relative">
               <i data-lucide="lock" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
-              <input id="login-password" type="password" required="" autocomplete="current-password" placeholder="Nhập mật khẩu" class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-300 focus:border-brand-600 focus:ring-2 focus:ring-brand-500/20 outline-none transition text-sm">
+              <input id="login-password" type="password" required="" autocomplete="current-password" placeholder="Nhập mật khẩu" class="w-full pl-10 pr-11 py-3 rounded-xl border border-slate-300 focus:border-brand-600 focus:ring-2 focus:ring-brand-500/20 outline-none transition text-sm">
+              <button type="button" onclick="toggleLoginPasswordVisibility()" title="Hiện / Ẩn mật khẩu" class="absolute right-2.5 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition">
+                <i id="login-pass-eye-icon" data-lucide="eye" class="w-4 h-4"></i>
+              </button>
             </div>
           </div>
 
@@ -544,31 +631,31 @@
           </div>
           <div>
             <div class="font-bold text-base leading-tight">HỌC CÙNG THẦY TRỊNH</div>
-            <div class="text-[11px] text-blue-200">Bảng điều khiển Giáo viên (Admin)</div>
+            <div id="admin-header-subtitle" class="text-[11px] text-blue-200">Bảng điều khiển Giáo viên (Admin)</div>
           </div>
         </div>
 
-        <!-- Tabs điều hướng trên Desktop -->
-        <nav class="hidden md:flex items-center gap-1 bg-white/10 p-1 rounded-xl">
-          <button onclick="switchAdminTab('dashboard')" data-admin-tab="dashboard" class="admin-nav-btn px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2 bg-white text-brand-900">
-            <i data-lucide="activity" class="w-4 h-4"></i> Giám sát trực tiếp
+        <!-- Tabs điều hướng trên Desktop (Tối ưu khoảng cách, không bị xuống dòng) -->
+        <nav class="hidden md:flex items-center gap-1 bg-white/10 p-1 rounded-xl overflow-x-auto no-scrollbar max-w-full">
+          <button onclick="switchAdminTab('dashboard')" data-admin-tab="dashboard" class="admin-nav-btn shrink-0 whitespace-nowrap px-3 py-1.5 rounded-lg text-xs lg:text-sm font-semibold transition flex items-center gap-1.5 bg-white text-brand-900 shadow-sm">
+            <i data-lucide="activity" class="w-4 h-4"></i> Giám sát
           </button>
-          <button onclick="switchAdminTab('exams')" data-admin-tab="exams" class="admin-nav-btn px-3.5 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-1.5 text-blue-100 hover:bg-white/10">
+          <button onclick="switchAdminTab('exams')" data-admin-tab="exams" class="admin-nav-btn shrink-0 whitespace-nowrap px-3 py-1.5 rounded-lg text-xs lg:text-sm font-semibold transition flex items-center gap-1.5 text-blue-100 hover:bg-white/10">
             <i data-lucide="file-text" class="w-4 h-4"></i> Nạp đề
           </button>
-          <button onclick="switchAdminTab('bank')" data-admin-tab="bank" class="admin-nav-btn px-3.5 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-1.5 text-blue-100 hover:bg-white/10">
+          <button onclick="switchAdminTab('bank')" data-admin-tab="bank" class="admin-nav-btn shrink-0 whitespace-nowrap px-3 py-1.5 rounded-lg text-xs lg:text-sm font-semibold transition flex items-center gap-1.5 text-blue-100 hover:bg-white/10">
             <i data-lucide="sparkles" class="w-4 h-4"></i> Ngân hàng &amp; AI
           </button>
-          <button onclick="switchAdminTab('students')" data-admin-tab="students" class="admin-nav-btn px-3.5 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-1.5 text-blue-100 hover:bg-white/10">
-            <i data-lucide="users" class="w-4 h-4"></i> Học sinh
+          <button onclick="switchAdminTab('students')" data-admin-tab="students" class="admin-nav-btn shrink-0 whitespace-nowrap px-3 py-1.5 rounded-lg text-xs lg:text-sm font-semibold transition flex items-center gap-1.5 text-blue-100 hover:bg-white/10">
+            <i data-lucide="users" class="w-4 h-4"></i> Tài khoản
           </button>
-          <button onclick="switchAdminTab('announcements')" data-admin-tab="announcements" class="admin-nav-btn px-3.5 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-1.5 text-blue-100 hover:bg-white/10">
+          <button onclick="switchAdminTab('announcements')" data-admin-tab="announcements" class="admin-nav-btn shrink-0 whitespace-nowrap px-3 py-1.5 rounded-lg text-xs lg:text-sm font-semibold transition flex items-center gap-1.5 text-blue-100 hover:bg-white/10">
             <i data-lucide="megaphone" class="w-4 h-4"></i> Thông báo
           </button>
-          <button onclick="switchAdminTab('reports')" data-admin-tab="reports" class="admin-nav-btn px-3.5 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-1.5 text-blue-100 hover:bg-white/10">
+          <button onclick="switchAdminTab('reports')" data-admin-tab="reports" class="admin-nav-btn shrink-0 whitespace-nowrap px-3 py-1.5 rounded-lg text-xs lg:text-sm font-semibold transition flex items-center gap-1.5 text-blue-100 hover:bg-white/10">
             <i data-lucide="bar-chart-3" class="w-4 h-4"></i> Báo cáo
           </button>
-          <button onclick="switchAdminTab('sync')" data-admin-tab="sync" class="admin-nav-btn px-3.5 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-1.5 text-blue-100 hover:bg-white/10">
+          <button onclick="switchAdminTab('sync')" data-admin-tab="sync" class="admin-nav-btn shrink-0 whitespace-nowrap px-3 py-1.5 rounded-lg text-xs lg:text-sm font-semibold transition flex items-center gap-1.5 text-blue-100 hover:bg-white/10">
             <i data-lucide="cloud-cog" class="w-4 h-4"></i> Đồng bộ
           </button>
         </nav>
@@ -586,27 +673,27 @@
         </div>
       </div>
 
-      <!-- Tabs điều hướng trên Mobile -->
-      <div class="md:hidden border-t border-white/10 px-2 py-1.5 flex justify-around gap-1 bg-brand-900/95">
-        <button onclick="switchAdminTab('dashboard')" data-admin-tab="dashboard" class="admin-nav-btn flex-1 py-2 px-2 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 bg-white text-brand-900">
+      <!-- Tabs điều hướng trên Mobile (Vuốt ngang mượt, chữ rõ ràng, dễ bấm) -->
+      <div class="md:hidden border-t border-white/10 px-2.5 py-2 flex items-center gap-1.5 overflow-x-auto no-scrollbar bg-brand-900/95">
+        <button onclick="switchAdminTab('dashboard')" data-admin-tab="dashboard" class="admin-nav-btn shrink-0 whitespace-nowrap py-1.5 px-3 rounded-xl text-xs font-bold flex items-center gap-1.5 bg-white text-brand-900 shadow-sm">
           <i data-lucide="activity" class="w-3.5 h-3.5"></i> Giám sát
         </button>
-        <button onclick="switchAdminTab('exams')" data-admin-tab="exams" class="admin-nav-btn flex-1 py-2 px-1 rounded-lg text-[11px] font-semibold flex items-center justify-center gap-1 text-blue-100">
-          <i data-lucide="file-text" class="w-3.5 h-3.5"></i> Đề
+        <button onclick="switchAdminTab('exams')" data-admin-tab="exams" class="admin-nav-btn shrink-0 whitespace-nowrap py-1.5 px-3 rounded-xl text-xs font-semibold flex items-center gap-1.5 text-blue-100 hover:bg-white/10">
+          <i data-lucide="file-text" class="w-3.5 h-3.5"></i> Nạp đề
         </button>
-        <button onclick="switchAdminTab('bank')" data-admin-tab="bank" class="admin-nav-btn flex-1 py-2 px-1 rounded-lg text-[11px] font-semibold flex items-center justify-center gap-1 text-blue-100">
-          <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> AI/NH
+        <button onclick="switchAdminTab('bank')" data-admin-tab="bank" class="admin-nav-btn shrink-0 whitespace-nowrap py-1.5 px-3 rounded-xl text-xs font-semibold flex items-center gap-1.5 text-blue-100 hover:bg-white/10">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Ngân hàng &amp; AI
         </button>
-        <button onclick="switchAdminTab('students')" data-admin-tab="students" class="admin-nav-btn flex-1 py-2 px-1.5 rounded-lg text-[11px] font-semibold flex items-center justify-center gap-1 text-blue-100">
-          <i data-lucide="users" class="w-3.5 h-3.5"></i> HS
+        <button onclick="switchAdminTab('students')" data-admin-tab="students" class="admin-nav-btn shrink-0 whitespace-nowrap py-1.5 px-3 rounded-xl text-xs font-semibold flex items-center gap-1.5 text-blue-100 hover:bg-white/10">
+          <i data-lucide="users" class="w-3.5 h-3.5"></i> Tài khoản
         </button>
-        <button onclick="switchAdminTab('announcements')" data-admin-tab="announcements" class="admin-nav-btn flex-1 py-2 px-1 rounded-lg text-[11px] font-semibold flex items-center justify-center gap-1 text-blue-100">
-          <i data-lucide="megaphone" class="w-3.5 h-3.5"></i> TB
+        <button onclick="switchAdminTab('announcements')" data-admin-tab="announcements" class="admin-nav-btn shrink-0 whitespace-nowrap py-1.5 px-3 rounded-xl text-xs font-semibold flex items-center gap-1.5 text-blue-100 hover:bg-white/10">
+          <i data-lucide="megaphone" class="w-3.5 h-3.5"></i> Thông báo
         </button>
-        <button onclick="switchAdminTab('reports')" data-admin-tab="reports" class="admin-nav-btn flex-1 py-2 px-1.5 rounded-lg text-[11px] font-semibold flex items-center justify-center gap-1 text-blue-100">
+        <button onclick="switchAdminTab('reports')" data-admin-tab="reports" class="admin-nav-btn shrink-0 whitespace-nowrap py-1.5 px-3 rounded-xl text-xs font-semibold flex items-center gap-1.5 text-blue-100 hover:bg-white/10">
           <i data-lucide="bar-chart-3" class="w-3.5 h-3.5"></i> Báo cáo
         </button>
-        <button onclick="switchAdminTab('sync')" data-admin-tab="sync" class="admin-nav-btn flex-1 py-2 px-1.5 rounded-lg text-[11px] font-semibold flex items-center justify-center gap-1 text-blue-100">
+        <button onclick="switchAdminTab('sync')" data-admin-tab="sync" class="admin-nav-btn shrink-0 whitespace-nowrap py-1.5 px-3 rounded-xl text-xs font-semibold flex items-center gap-1.5 text-blue-100 hover:bg-white/10">
           <i data-lucide="cloud-cog" class="w-3.5 h-3.5"></i> Đồng bộ
         </button>
       </div>
@@ -716,6 +803,12 @@
                 <button onclick="resetExamBuilder()" class="text-xs px-3 py-1.5 rounded-lg bg-brand-50 text-brand-700 font-semibold hover:bg-brand-100 transition flex items-center gap-1">
                   <i data-lucide="plus" class="w-3.5 h-3.5"></i> Tạo đề mới
                 </button>
+              </div>
+              <div class="mb-3">
+                <select id="admin-exam-subject-filter" onchange="renderAdminExamList()" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs font-bold text-slate-700 outline-none focus:border-brand-600">
+                  <option value="ALL">Tất cả đề thi &amp; môn học</option>
+                  <option value="MINE">Chỉ đề thi do tôi tạo</option>
+                </select>
               </div>
               <div id="admin-exam-list" class="space-y-3 max-h-[600px] overflow-y-auto pr-1"></div>
             </div>
@@ -1047,7 +1140,23 @@ a) D b) S c) S d) D" class="w-full p-2.5 rounded-xl border border-slate-300 bg-w
       <!-- ADMIN TAB 3: QUẢN LÝ TÀI KHOẢN HỌC SINH                 -->
       <!-- ======================================================= -->
       <div id="admin-tab-students" class="admin-tab-panel hidden space-y-6">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Thanh chuyển đổi Quản lý Học sinh / Quản lý Giáo viên (Admin) -->
+        <div id="accounts-subtab-bar" class="bg-white p-2 rounded-2xl shadow-sm border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div class="grid grid-cols-2 gap-1.5 flex-1 max-w-xl">
+            <button type="button" id="acc-subtab-btn-students" onclick="switchAccountsSubTab('students')" class="py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 bg-brand-700 text-white shadow-sm">
+              <i data-lucide="users" class="w-4 h-4"></i> Tài khoản Học sinh (<span id="subtab-stu-count">0</span>)
+            </button>
+            <button type="button" id="acc-subtab-btn-admins" onclick="switchAccountsSubTab('admins')" class="py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 text-slate-600 hover:bg-slate-100">
+              <i data-lucide="shield-check" class="w-4 h-4"></i> Tài khoản Giáo viên / Admin (<span id="subtab-adm-count">1</span>)
+            </button>
+          </div>
+          <div class="text-xs text-slate-500 px-2 flex items-center gap-1.5">
+            <i data-lucide="school" class="w-4 h-4 text-brand-600"></i>
+            <span>Hỗ trợ nhiều thầy cô giảng dạy nhiều môn học</span>
+          </div>
+        </div>
+
+        <div id="accounts-subpanel-students" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
           <!-- Form thêm học sinh -->
           <div class="lg:col-span-4 space-y-4">
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
@@ -1118,6 +1227,90 @@ Lê Minh Quân, 12A2, hs06, 123456" class="w-full p-3 rounded-xl border border-s
                     </tr>
                   </thead>
                   <tbody id="student-table-body" class="divide-y divide-slate-100 text-sm"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SUB-PANEL: QUẢN LÝ TÀI KHOẢN GIÁO VIÊN (MULTI-ADMIN NHIỀU MÔN HỌC) -->
+        <div id="accounts-subpanel-admins" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div class="lg:col-span-4 space-y-4">
+            <div id="admin-account-permission-note" class="hidden p-4 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-900 leading-relaxed">
+              <b>Lưu ý phân quyền:</b> Bạn đang đăng nhập bằng tài khoản Giáo viên bộ môn. Chỉ tài khoản <b>Quản trị gốc (admin)</b> hoặc <b>Quản trị toàn quyền</b> mới có thể cấp mới hoặc xóa tài khoản giáo viên khác.
+            </div>
+
+            <div id="add-admin-card" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+              <h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                <i data-lucide="user-cog" class="w-4 h-4 text-brand-600"></i> Cấp tài khoản Giáo viên (Admin) mới
+              </h3>
+              <form id="add-admin-form" class="space-y-3">
+                <div>
+                  <label class="block text-xs font-bold text-slate-600 mb-1">Họ và tên Giáo viên</label>
+                  <input id="adm-name" type="text" required="" placeholder="VD: Cô Nguyễn Thị Lan" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm outline-none focus:border-brand-600">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-slate-600 mb-1">Môn học phụ trách</label>
+                  <input id="adm-subject" list="subject-suggestions" type="text" required="" placeholder="VD: Toán học, Công nghệ, Vật lí..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm outline-none focus:border-brand-600">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="block text-xs font-bold text-slate-600 mb-1">Tên đăng nhập</label>
+                    <input id="adm-username" type="text" required="" placeholder="VD: gv_toan" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm outline-none focus:border-brand-600">
+                  </div>
+                  <div>
+                    <label class="block text-xs font-bold text-slate-600 mb-1">Mật khẩu</label>
+                    <input id="adm-password" type="text" required="" value="123456" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm outline-none focus:border-brand-600">
+                  </div>
+                </div>
+                <label class="flex items-center gap-2 cursor-pointer bg-slate-50 px-3 py-2 rounded-xl border border-slate-200">
+                  <input id="adm-is-super" type="checkbox" class="w-4 h-4 accent-brand-700 rounded">
+                  <span class="text-xs font-semibold text-slate-700">Cấp quyền Quản trị viên (được phép tạo/xóa tài khoản GV khác)</span>
+                </label>
+                <button type="submit" class="w-full py-2.5 rounded-xl bg-brand-700 hover:bg-brand-800 text-white text-sm font-bold transition flex items-center justify-center gap-2">
+                  <i data-lucide="shield-plus" class="w-4 h-4"></i> Tạo tài khoản Giáo viên
+                </button>
+              </form>
+            </div>
+
+            <div id="bulk-admin-card" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+              <h3 class="font-bold text-slate-800 mb-2 flex items-center gap-2">
+                <i data-lucide="file-spreadsheet" class="w-4 h-4 text-emerald-600"></i> Tạo hàng loạt Giáo viên (Excel/CSV)
+              </h3>
+              <p class="text-xs text-slate-500 mb-3">Mỗi dòng 1 giáo viên: <code>Họ tên, Môn học, Tên đăng nhập, Mật khẩu</code></p>
+              <textarea id="bulk-admins-input" rows="4" placeholder="Thầy Đặng Minh Hiến, Công nghệ, gv_hien, 123456
+Cô Trần Thu Hà, Vật lí, gv_ha, 123456" class="w-full p-3 rounded-xl border border-slate-300 text-xs font-mono outline-none focus:border-brand-600 mb-3"></textarea>
+              <button type="button" onclick="handleBulkAddAdmins()" class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold transition flex items-center justify-center gap-2">
+                <i data-lucide="users" class="w-4 h-4"></i> Nhập danh sách Giáo viên
+              </button>
+            </div>
+          </div>
+
+          <div class="lg:col-span-8">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+              <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <h3 class="font-bold text-slate-800 flex items-center gap-2">
+                  <i data-lucide="shield-check" class="w-4 h-4 text-brand-600"></i> Danh sách tài khoản Giáo viên / Admin (<span id="admin-accounts-total-count">1</span>)
+                </h3>
+                <div class="relative">
+                  <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+                  <input id="admin-accounts-search" oninput="renderAdminAccountsTable()" type="text" placeholder="Tìm tên GV, môn học, tài khoản..." class="pl-9 pr-3 py-2 rounded-xl border border-slate-300 text-xs sm:text-sm outline-none focus:border-brand-600 w-full sm:w-64">
+                </div>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                  <thead class="bg-slate-50 text-xs uppercase font-bold text-slate-600 border-b border-slate-200">
+                    <tr>
+                      <th class="py-3 px-4">STT</th>
+                      <th class="py-3 px-4">Họ và tên Giáo viên</th>
+                      <th class="py-3 px-4">Môn học</th>
+                      <th class="py-3 px-4">Tài khoản</th>
+                      <th class="py-3 px-4">Mật khẩu</th>
+                      <th class="py-3 px-4 text-center">Trạng thái</th>
+                      <th class="py-3 px-4 text-right">Thao tác</th>
+                    </tr>
+                  </thead>
+                  <tbody id="admin-accounts-tbody" class="divide-y divide-slate-100 text-sm"></tbody>
                 </table>
               </div>
             </div>
@@ -1372,6 +1565,77 @@ Lê Minh Quân, 12A2, hs06, 123456" class="w-full p-3 rounded-xl border border-s
       <!-- ADMIN TAB 5: BÁO CÁO & THỐNG KÊ KẾT QUẢ THI             -->
       <!-- ======================================================= -->
       <div id="admin-tab-reports" class="admin-tab-panel hidden space-y-6">
+        <!-- THỐNG KÊ TỔNG HỢP THEO GIÁO VIÊN & THEO MÔN HỌC (CHỈ HIỂN THỊ VỚI TÀI KHOẢN ADMIN) -->
+        <div id="admin-global-stats-section" class="hidden space-y-5">
+          <div class="bg-gradient-to-r from-brand-900 via-brand-800 to-indigo-900 text-white rounded-2xl p-5 shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <div class="text-xs font-bold uppercase tracking-wider text-blue-200 flex items-center gap-1.5">
+                <i data-lucide="shield-check" class="w-4 h-4 text-emerald-300"></i> Chế độ Quản trị viên (Admin)
+              </div>
+              <h2 class="text-lg sm:text-xl font-extrabold mt-0.5">Thống kê Toàn hệ thống theo Giáo viên &amp; Môn học</h2>
+              <p class="text-xs text-blue-100/90 mt-0.5">Tổng hợp đầy đủ kho dữ liệu (đề thi, học sinh, ngân hàng câu hỏi, kết quả thi) do các giáo viên đưa lên.</p>
+            </div>
+            <button type="button" onclick="exportGlobalAdminStatsCSV()" class="no-print shrink-0 px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs sm:text-sm font-extrabold shadow-sm transition flex items-center gap-1.5">
+              <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Xuất Thống kê GV &amp; Môn (CSV)
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 xl:grid-cols-12 gap-5">
+            <!-- Bảng thống kê theo Giáo viên -->
+            <div class="xl:col-span-7 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+              <div class="px-5 py-3.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+                <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                  <i data-lucide="user-check" class="w-4 h-4 text-brand-600"></i> Thống kê theo từng Giáo viên
+                </h3>
+                <span id="admin-stats-teacher-count" class="text-xs font-bold text-brand-700 bg-brand-50 px-2.5 py-0.5 rounded-full">0 GV</span>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                  <thead class="bg-slate-50 text-[11px] uppercase font-bold text-slate-600 border-b border-slate-200">
+                    <tr>
+                      <th class="py-2.5 px-3">Giáo viên</th>
+                      <th class="py-2.5 px-3">Môn</th>
+                      <th class="py-2.5 px-2.5 text-center">HS</th>
+                      <th class="py-2.5 px-2.5 text-center">Đề</th>
+                      <th class="py-2.5 px-2.5 text-center">Câu NH</th>
+                      <th class="py-2.5 px-2.5 text-center">Lượt thi</th>
+                      <th class="py-2.5 px-2.5 text-center">Điểm TB</th>
+                      <th class="py-2.5 px-2.5 text-center">Đạt ≥5</th>
+                    </tr>
+                  </thead>
+                  <tbody id="admin-stats-by-teacher-tbody" class="divide-y divide-slate-100"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Bảng thống kê theo Môn học -->
+            <div class="xl:col-span-5 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+              <div class="px-5 py-3.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+                <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                  <i data-lucide="book-marked" class="w-4 h-4 text-indigo-600"></i> Thống kê theo Môn học
+                </h3>
+                <span id="admin-stats-subject-count" class="text-xs font-bold text-indigo-700 bg-indigo-50 px-2.5 py-0.5 rounded-full">0 môn</span>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                  <thead class="bg-slate-50 text-[11px] uppercase font-bold text-slate-600 border-b border-slate-200">
+                    <tr>
+                      <th class="py-2.5 px-3">Môn học</th>
+                      <th class="py-2.5 px-2 text-center">GV</th>
+                      <th class="py-2.5 px-2 text-center">Đề</th>
+                      <th class="py-2.5 px-2 text-center">Câu NH</th>
+                      <th class="py-2.5 px-2 text-center">Lượt thi</th>
+                      <th class="py-2.5 px-2 text-center">Điểm TB</th>
+                      <th class="py-2.5 px-2 text-center">Đạt</th>
+                    </tr>
+                  </thead>
+                  <tbody id="admin-stats-by-subject-tbody" class="divide-y divide-slate-100"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Thanh bộ lọc & nút xuất báo cáo -->
         <div class="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col lg:flex-row lg:items-center justify-between gap-4 no-print">
           <div class="flex flex-col sm:flex-row sm:items-center gap-3 flex-1">
@@ -1564,7 +1828,7 @@ Lê Minh Quân, 12A2, hs06, 123456" class="w-full p-3 rounded-xl border border-s
           </div>
           <!-- Tóm tắt gợi ý điều tiết dạy học -->
           <div id="report-pedagogy-summary" class="p-4 sm:p-5 bg-slate-50/70 border-b border-slate-200 grid grid-cols-1 md:grid-cols-3 gap-3"></div>
-          <div class="overflow-x-auto">
+          <div class="sticky-table-wrap">
             <table class="w-full text-left border-collapse text-xs sm:text-sm">
               <thead class="bg-slate-50 text-[11px] uppercase font-bold text-slate-600 border-b border-slate-200">
                 <tr>
@@ -1599,7 +1863,7 @@ Lê Minh Quân, 12A2, hs06, 123456" class="w-full p-3 rounded-xl border border-s
               <span class="px-2 py-0.5 rounded bg-rose-100 text-rose-700">Đỏ: Sai</span>
             </div>
           </div>
-          <div class="overflow-x-auto">
+          <div class="sticky-table-wrap">
             <table class="w-full text-left border-collapse text-xs">
               <thead id="report-student-answers-thead" class="bg-slate-50 text-[11px] font-bold text-slate-700 border-b border-slate-200"></thead>
               <tbody id="report-student-answers-tbody" class="divide-y divide-slate-100"></tbody>
@@ -2013,19 +2277,22 @@ Lê Minh Quân, 12A2, hs06, 123456" class="w-full p-3 rounded-xl border border-s
             </div>
           </div>
 
-          <!-- Điều hướng Câu trước / Câu sau -->
-          <div class="flex items-center justify-between pt-2">
-            <button id="btn-prev-q" onclick="navigateQuestion(-1)" class="px-5 py-3 rounded-xl bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold text-sm shadow-sm transition flex items-center gap-2 disabled:opacity-40">
+          <!-- Điều hướng Câu trước / Câu sau (Cố định đáy trên điện thoại, hỗ trợ phím mũi tên trên máy tính) -->
+          <div class="mobile-sticky-exam-nav flex items-center justify-between gap-2 pt-2">
+            <button id="btn-prev-q" onclick="navigateQuestion(-1)" class="px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold text-xs sm:text-sm shadow-sm transition flex items-center gap-1.5 disabled:opacity-40">
               <i data-lucide="chevron-left" class="w-4 h-4"></i> Câu trước
             </button>
-            <button id="btn-next-q" onclick="navigateQuestion(1)" class="px-5 py-3 rounded-xl bg-brand-700 hover:bg-brand-800 text-white font-bold text-sm shadow-sm transition flex items-center gap-2">
+            <button type="button" onclick="scrollToQuestionPalette()" class="lg:hidden px-3 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center gap-1.5 transition">
+              <i data-lucide="grid" class="w-3.5 h-3.5 text-brand-600"></i> DS Câu
+            </button>
+            <button id="btn-next-q" onclick="navigateQuestion(1)" class="px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl bg-brand-700 hover:bg-brand-800 text-white font-bold text-xs sm:text-sm shadow-sm transition flex items-center gap-1.5">
               Câu tiếp theo <i data-lucide="chevron-right" class="w-4 h-4"></i>
             </button>
           </div>
         </div>
 
         <!-- Cột phải: Bảng danh sách số câu hỏi -->
-        <aside class="lg:col-span-3 bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-5 sticky top-20">
+        <aside id="runner-palette-aside" class="lg:col-span-3 bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-5 sticky top-20">
           <div class="flex items-center justify-between mb-3">
             <h3 class="font-bold text-slate-800 text-sm">Danh sách câu hỏi</h3>
             <span id="runner-progress-text" class="text-xs font-bold text-brand-700 bg-brand-50 px-2.5 py-1 rounded-full">0/0</span>
@@ -2172,7 +2439,7 @@ Lê Minh Quân, 12A2, hs06, 123456" class="w-full p-3 rounded-xl border border-s
     const EMBEDDED_FIREBASE_CONFIG = /*__EMBEDDED_FIREBASE_CONFIG__*/{"apiKey":"AIzaSyAK4osCrc_vtzPd3SWBSIoCg99W5vqab9g","authDomain":"toanthaytrinh-af1c8.firebaseapp.com","projectId":"toanthaytrinh-af1c8","storageBucket":"toanthaytrinh-af1c8.firebasestorage.app","messagingSenderId":"797090111064","appId":"1:797090111064:web:bad5dae3a6cab29fad342d","measurementId":"G-TWN1BMQH3N"}/*__END_EMBEDDED_FIREBASE_CONFIG__*/;
     const EMBEDDED_APP_ID = /*__EMBEDDED_APP_ID__*/"hoctoan-pro"/*__END_EMBEDDED_APP_ID__*/;
     const EMBEDDED_ADMIN_PASSWORD = /*__EMBEDDED_ADMIN_PASSWORD__*/"123456"/*__END_EMBEDDED_ADMIN_PASSWORD__*/;
-    const APP_BUILD_VERSION = /*__APP_BUILD_VERSION__*/"2026.11.21-v13"/*__END_APP_BUILD_VERSION__*/;
+    const APP_BUILD_VERSION = /*__APP_BUILD_VERSION__*/"2026.11.21-v16"/*__END_APP_BUILD_VERSION__*/;
 
     const LS_KEYS = {
       FB_CONFIG: 'eduexam_custom_fb_config_v2',
@@ -2202,6 +2469,7 @@ Lê Minh Quân, 12A2, hs06, 123456" class="w-full p-3 rounded-xl border border-s
       currentUser: null,
       loginRoleTab: 'student',
       students: [],
+      admins: [],
       exams: [],
       sessions: [],
       question_bank: [],
@@ -2483,10 +2751,10 @@ Lê Minh Quân, 12A2, hs06, 123456" class="w-full p-3 rounded-xl border border-s
     // =========================================================================
     function openLocalIDB() {
       return new Promise((resolve, reject) => {
-        const req = indexedDB.open('EduExamPro_LocalDB_v2', 4);
+        const req = indexedDB.open('EduExamPro_LocalDB_v2', 5);
         req.onupgradeneeded = (e) => {
           const idb = e.target.result;
-          ['students', 'exams', 'sessions', 'exam_pages', 'question_bank', 'announcements'].forEach(store => {
+          ['students', 'admins', 'exams', 'sessions', 'exam_pages', 'question_bank', 'announcements'].forEach(store => {
             if (!idb.objectStoreNames.contains(store)) {
               idb.createObjectStore(store, { keyPath: 'id' });
             }
@@ -2533,6 +2801,7 @@ Lê Minh Quân, 12A2, hs06, 123456" class="w-full p-3 rounded-xl border border-s
 
     async function loadLocalDataAndSeed() {
       let students = await idbGetAll('students');
+      let admins = await idbGetAll('admins');
       let exams = await idbGetAll('exams');
       let sessions = await idbGetAll('sessions');
       let qBank = await idbGetAll('question_bank');
@@ -2549,6 +2818,7 @@ Lê Minh Quân, 12A2, hs06, 123456" class="w-full p-3 rounded-xl border border-s
       }
 
       state.students = students.sort((a, b) => (a.username || '').localeCompare(b.username || ''));
+      state.admins = admins.sort((a, b) => (a.username || '').localeCompare(b.username || ''));
       state.exams = exams.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
       state.sessions = sessions;
       state.question_bank = qBank.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
@@ -2576,6 +2846,7 @@ Lê Minh Quân, 12A2, hs06, 123456" class="w-full p-3 rounded-xl border border-s
         else arr.push(payload);
         if (colName === 'exams') state.exams.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
         if (colName === 'students') state.students.sort((a, b) => (a.username || '').localeCompare(b.username || ''));
+        if (colName === 'admins') state.admins.sort((a, b) => (a.username || '').localeCompare(b.username || ''));
         if (colName === 'announcements') state.announcements.sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0) || (b.createdAt || 0) - (a.createdAt || 0));
         if (localSyncChannel) localSyncChannel.postMessage({ type: 'LOCAL_DB_UPDATED', colName });
         onDataChanged(colName);
@@ -2594,11 +2865,12 @@ Lê Minh Quân, 12A2, hs06, 123456" class="w-full p-3 rounded-xl border border-s
     }
 
     function onDataChanged(colName) {
-      if (state.currentUser?.role === 'admin') {
+      if (isStaffUser()) {
         if (colName === 'students') {
           renderStudentTable();
           populateAnnouncementClassSelects();
         }
+        if (colName === 'admins') renderAdminAccountsTable();
         if (colName === 'exams') renderAdminExamList();
         if (colName === 'question_bank') renderQuestionBank();
         if (colName === 'announcements') renderAdminAnnouncements();
@@ -2849,9 +3121,9 @@ Lê Minh Quân, 12A2, hs06, 123456" class="w-full p-3 rounded-xl border border-s
 
     window.openChangePasswordModal = function() {
       if (!state.currentUser) return;
-      const isAdmin = state.currentUser.role === 'admin';
+      const isAdmin = isStaffUser();
       const roleLabel = isAdmin
-        ? 'Giáo viên (Admin)'
+        ? `Giáo viên ${escapeHtml(state.currentUser.name)} (${escapeHtml(state.currentUser.username)})${state.currentUser.subject ? ' • ' + escapeHtml(state.currentUser.subject) : ''}`
         : `Học sinh ${escapeHtml(state.currentUser.name)} (${escapeHtml(state.currentUser.username)})`;
 
       openModal({
@@ -2895,10 +3167,23 @@ Lê Minh Quân, 12A2, hs06, 123456" class="w-full p-3 rounded-xl border border-s
               if (newPass === oldPass) return showErr('Mật khẩu mới phải khác mật khẩu hiện tại!');
 
               if (isAdmin) {
-                if (oldPass !== ADMIN_ACCOUNT.password) return showErr('Mật khẩu hiện tại của Admin không chính xác!');
-                await persistAdminPassword(newPass);
-                closeModal();
-                showToast('Đổi mật khẩu Admin thành công!' + (useCloudMode ? ' Đã đồng bộ lên Cloud.' : ''), 'success');
+                if (state.currentUser.username === 'admin') {
+                  if (oldPass !== ADMIN_ACCOUNT.password) return showErr('Mật khẩu hiện tại của Admin gốc không chính xác!');
+                  await persistAdminPassword(newPass);
+                  closeModal();
+                  showToast('Đổi mật khẩu Admin gốc thành công!' + (useCloudMode ? ' Đã đồng bộ lên Cloud.' : ''), 'success');
+                } else {
+                  const adm = state.admins.find(a => (a.username || '').toLowerCase() === (state.currentUser.username || '').toLowerCase());
+                  if (!adm) return showErr('Không tìm thấy hồ sơ tài khoản Giáo viên trong hệ thống!');
+                  if (oldPass !== adm.password) return showErr('Mật khẩu hiện tại không chính xác!');
+                  try {
+                    await saveDocData('admins', adm.id, { ...adm, password: newPass, passwordUpdatedAt: Date.now() });
+                    closeModal();
+                    showToast('Đổi mật khẩu Giáo viên thành công! Hãy dùng mật khẩu mới cho lần đăng nhập sau.', 'success');
+                  } catch (err) {
+                    showErr('Lỗi lưu mật khẩu mới: ' + err.message);
+                  }
+                }
               } else {
                 const stu = state.students.find(s => (s.username || '').toLowerCase() === (state.currentUser.username || '').toLowerCase());
                 if (!stu) return showErr('Không tìm thấy hồ sơ tài khoản học sinh trong hệ thống!');
@@ -3131,7 +3416,15 @@ Lê Minh Quân, 12A2, hs06, 123456" class="w-full p-3 rounded-xl border border-s
           console.warn('Không đọc được settings/admin_auth:', err);
         });
 
-        activeUnsubscribers.push(unsub1, unsub2, unsub3, unsub4, unsub5, unsub6);
+        const unsub7 = onSnapshot(getColRef('admins'), (snap) => {
+          state.admins = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+            .sort((a, b) => (a.username || '').localeCompare(b.username || ''));
+          onDataChanged('admins');
+        }, (err) => {
+          console.error('Lỗi onSnapshot admins:', err);
+        });
+
+        activeUnsubscribers.push(unsub1, unsub2, unsub3, unsub4, unsub5, unsub6, unsub7);
       });
     }
 
@@ -3169,11 +3462,38 @@ Lê Minh Quân, 12A2, hs06, 123456" class="w-full p-3 rounded-xl border border-s
       const errText = document.getElementById('login-error-text');
       errBox.classList.add('hidden');
 
-      // Tự động nhận diện tài khoản Admin
+      // 1. Kiểm tra tài khoản Quản trị gốc (admin)
       if (username.toLowerCase() === ADMIN_ACCOUNT.username && password === ADMIN_ACCOUNT.password) {
-        state.currentUser = { role: 'admin', username: 'admin', name: ADMIN_ACCOUNT.name };
+        state.currentUser = {
+          role: 'admin',
+          username: 'admin',
+          name: ADMIN_ACCOUNT.name,
+          subject: 'Quản trị hệ thống',
+          isSuperAdmin: true
+        };
         enterAdminPortal();
-        showToast('Chào mừng Giáo viên đăng nhập hệ thống!', 'success');
+        showToast('Chào mừng Quản trị viên gốc đăng nhập hệ thống!', 'success');
+        return;
+      }
+
+      // 2. Kiểm tra danh sách tài khoản Giáo viên (Admin nhiều môn học)
+      const adminAcc = state.admins.find(a => (a.username || '').toLowerCase() === username.toLowerCase() && a.password === password);
+      if (adminAcc) {
+        if (adminAcc.active === false) {
+          errText.textContent = 'Tài khoản Giáo viên này hiện đang bị khóa. Vui lòng liên hệ Quản trị gốc!';
+          errBox.classList.remove('hidden');
+          return;
+        }
+        state.currentUser = {
+          role: adminAcc.isSuperAdmin ? 'admin' : 'teacher',
+          id: adminAcc.id,
+          username: adminAcc.username,
+          name: adminAcc.name,
+          subject: adminAcc.subject || 'Giáo viên bộ môn',
+          isSuperAdmin: !!adminAcc.isSuperAdmin
+        };
+        enterAdminPortal();
+        showToast(`Chào mừng ${adminAcc.name} (${adminAcc.isSuperAdmin ? 'Admin' : 'Giáo viên'} • Môn ${adminAcc.subject || 'Chung'})!`, 'success');
         return;
       }
 
@@ -3184,7 +3504,8 @@ Lê Minh Quân, 12A2, hs06, 123456" class="w-full p-3 rounded-xl border border-s
           role: 'student',
           username: student.username,
           name: student.name,
-          className: student.className || 'Chưa phân lớp'
+          className: student.className || 'Chưa phân lớp',
+          ownerUsername: student.ownerUsername || 'admin'
         };
         enterStudentPortal();
         showToast(`Xin chào ${student.name} (${student.className})!`, 'success');
@@ -3216,8 +3537,21 @@ Lê Minh Quân, 12A2, hs06, 123456" class="w-full p-3 rounded-xl border border-s
       document.getElementById('view-login').classList.add('hidden');
       document.getElementById('view-student').classList.add('hidden');
       document.getElementById('view-admin').classList.remove('hidden');
+      const isAdm = isSystemAdmin();
+      const subEl = document.getElementById('admin-header-subtitle');
+      if (subEl && state.currentUser) {
+        subEl.textContent = `${isAdm ? 'Quản trị (Admin)' : 'Giáo viên'} • ${state.currentUser.name} • ${state.currentUser.subject || 'Chung'} (${state.currentUser.username})`;
+      }
+      // Ẩn tab Đồng bộ & thanh quản lý GV khác khi đăng nhập bằng tài khoản Giáo viên
+      document.querySelectorAll('[data-admin-tab="sync"]').forEach(b => b.classList.toggle('hidden', !isAdm));
+      const syncBadge = document.getElementById('admin-sync-badge');
+      if (syncBadge) syncBadge.classList.toggle('sm:inline-flex', isAdm);
+      const subtabBar = document.getElementById('accounts-subtab-bar');
+      if (subtabBar) subtabBar.classList.toggle('hidden', !isAdm);
+      if (!isAdm) switchAccountsSubTab('students');
       switchAdminTab('dashboard');
       renderStudentTable();
+      renderAdminAccountsTable();
       renderAdminExamList();
       renderAdminDashboard();
       updateSyncStatusUI();
@@ -3245,7 +3579,10 @@ Lê Minh Quân, 12A2, hs06, 123456" class="w-full p-3 rounded-xl border border-s
         renderQuestionBank();
         renderAiLoadedDocs();
       }
-      if (tabName === 'students') renderStudentTable();
+      if (tabName === 'students') {
+        renderStudentTable();
+        renderAdminAccountsTable();
+      }
       if (tabName === 'announcements') {
         populateAnnouncementClassSelects();
         renderAdminAnnouncements();
@@ -3281,6 +3618,9 @@ Lê Minh Quân, 12A2, hs06, 123456" class="w-full p-3 rounded-xl border border-s
           password,
           name,
           className: className || 'Chưa phân lớp',
+          ownerUsername: state.currentUser?.username || 'admin',
+          ownerName: state.currentUser?.name || 'Admin',
+          ownerSubject: state.currentUser?.subject || 'Chung',
           createdAt: Date.now()
         });
         document.getElementById('add-student-form').reset();
@@ -3317,6 +3657,9 @@ Lê Minh Quân, 12A2, hs06, 123456" class="w-full p-3 rounded-xl border border-s
           password,
           name,
           className,
+          ownerUsername: state.currentUser?.username || 'admin',
+          ownerName: state.currentUser?.name || 'Admin',
+          ownerSubject: state.currentUser?.subject || 'Chung',
           createdAt: Date.now() + added
         });
         added++;
@@ -3331,14 +3674,18 @@ Lê Minh Quân, 12A2, hs06, 123456" class="w-full p-3 rounded-xl border border-s
     };
 
     window.renderStudentTable = function() {
+      const visibleStudents = getVisibleStudents();
       const keyword = (document.getElementById('student-search-input')?.value || '').trim().toLowerCase();
-      const filtered = state.students.filter(s =>
+      const filtered = visibleStudents.filter(s =>
         (s.name || '').toLowerCase().includes(keyword) ||
         (s.className || '').toLowerCase().includes(keyword) ||
-        (s.username || '').toLowerCase().includes(keyword)
+        (s.username || '').toLowerCase().includes(keyword) ||
+        (s.ownerName || '').toLowerCase().includes(keyword)
       );
 
-      document.getElementById('student-total-count').textContent = state.students.length;
+      document.getElementById('student-total-count').textContent = visibleStudents.length;
+      const subStu = document.getElementById('subtab-stu-count');
+      if (subStu) subStu.textContent = visibleStudents.length;
       const tbody = document.getElementById('student-table-body');
       if (filtered.length === 0) {
         tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-400">Không có tài khoản học sinh nào phù hợp.</td></tr>`;
@@ -3348,7 +3695,10 @@ Lê Minh Quân, 12A2, hs06, 123456" class="w-full p-3 rounded-xl border border-s
       tbody.innerHTML = filtered.map((s, idx) => `
         <tr class="hover:bg-slate-50 transition">
           <td class="py-3 px-4 text-slate-400 font-medium">${idx + 1}</td>
-          <td class="py-3 px-4 font-semibold text-slate-800">${escapeHtml(s.name)}</td>
+          <td class="py-3 px-4">
+            <div class="font-semibold text-slate-800">${escapeHtml(s.name)}</div>
+            ${isSystemAdmin() && s.ownerName ? `<div class="text-[10px] text-indigo-700 font-semibold">GV: ${escapeHtml(s.ownerName)}${s.ownerSubject ? ' (' + escapeHtml(s.ownerSubject) + ')' : ''}</div>` : ''}
+          </td>
           <td class="py-3 px-4"><span class="px-2.5 py-0.5 rounded-full bg-blue-50 text-brand-700 text-xs font-bold">${escapeHtml(s.className)}</span></td>
           <td class="py-3 px-4 font-mono text-xs font-bold text-slate-700">${escapeHtml(s.username)}</td>
           <td class="py-3 px-4 font-mono text-xs text-slate-500">${escapeHtml(s.password)}</td>
@@ -4450,6 +4800,9 @@ ${extractedPdfText.slice(0, 12000)}` : ''}`;
       const examData = {
         id: examId,
         mode: 'word',
+        subject: state.currentUser?.subject || 'Chung',
+        createdBy: state.currentUser?.username || 'admin',
+        createdByName: state.currentUser?.name || 'Giáo viên',
         title,
         duration,
         maxScore,
@@ -4476,12 +4829,40 @@ ${extractedPdfText.slice(0, 12000)}` : ''}`;
 
     window.renderAdminExamList = function() {
       const container = document.getElementById('admin-exam-list');
-      if (state.exams.length === 0) {
-        container.innerHTML = `<div class="text-center py-8 text-xs text-slate-400">Chưa có đề thi nào. Hãy nạp đề Word hoặc thử nạp đề mẫu!</div>`;
+      const filterEl = document.getElementById('admin-exam-subject-filter');
+      let selectedFilter = 'ALL';
+
+      const visibleExams = getVisibleExams();
+      if (filterEl) {
+        if (!isSystemAdmin()) {
+          filterEl.classList.add('hidden');
+        } else {
+          filterEl.classList.remove('hidden');
+          selectedFilter = filterEl.value || 'ALL';
+          const subjects = [...new Set(visibleExams.map(e => e.subject).filter(Boolean))].sort();
+          const creators = [...new Set(visibleExams.map(e => e.createdBy || 'admin'))];
+          filterEl.innerHTML = `<option value="ALL">Tất cả kho đề (${visibleExams.length})</option>` +
+            `<option value="MINE">Chỉ đề do tôi tạo</option>` +
+            subjects.map(s => `<option value="SUBJ:${escapeHtml(s)}">Môn: ${escapeHtml(s)}</option>`).join('') +
+            creators.map(u => `<option value="USER:${escapeHtml(u)}">GV: ${escapeHtml(getStaffDisplayName(u))}</option>`).join('');
+          if ([...filterEl.options].some(o => o.value === selectedFilter)) filterEl.value = selectedFilter;
+          else selectedFilter = 'ALL';
+        }
+      }
+
+      const filteredExams = visibleExams.filter(ex => {
+        if (selectedFilter === 'MINE') return (ex.createdBy || 'admin') === (state.currentUser?.username || 'admin');
+        if (selectedFilter.startsWith('SUBJ:')) return (ex.subject || '') === selectedFilter.slice(5);
+        if (selectedFilter.startsWith('USER:')) return (ex.createdBy || 'admin') === selectedFilter.slice(5);
+        return true;
+      });
+
+      if (filteredExams.length === 0) {
+        container.innerHTML = `<div class="text-center py-8 text-xs text-slate-400">Không có đề thi nào phù hợp bộ lọc hiện tại.</div>`;
         return;
       }
 
-      container.innerHTML = state.exams.map(ex => {
+      container.innerHTML = filteredExams.map(ex => {
         const qCount = ex.questions?.length || 0;
         const sessionCount = state.sessions.filter(s => s.examId === ex.id).length;
         return `
@@ -4499,6 +4880,7 @@ ${extractedPdfText.slice(0, 12000)}` : ''}`;
               <span><i data-lucide="help-circle" class="w-3.5 h-3.5 inline"></i> ${qCount} câu</span>
               <span><i data-lucide="clock" class="w-3.5 h-3.5 inline"></i> ${ex.duration} phút</span>
               <span><i data-lucide="users" class="w-3.5 h-3.5 inline"></i> ${sessionCount} lượt thi</span>
+              ${ex.subject && ex.subject !== 'Quản trị hệ thống' ? `<span class="text-indigo-700 font-semibold"><i data-lucide="book-open" class="w-3.5 h-3.5 inline"></i> ${escapeHtml(ex.subject)}${ex.createdByName ? ' • ' + escapeHtml(ex.createdByName) : ''}</span>` : ''}
               ${ex.requirePassScore ? `<span class="text-amber-700 font-bold"><i data-lucide="target" class="w-3.5 h-3.5 inline"></i> Đạt ≥ ${ex.passScore ?? 5}đ</span>` : ''}
             </div>
             <div class="flex flex-wrap items-center gap-1.5 pt-1">
@@ -4746,24 +5128,26 @@ ${extractedPdfText.slice(0, 12000)}` : ''}`;
       const classSelect = document.getElementById('dashboard-class-filter');
       if (!examSelect) return;
 
+      const visibleExams = getVisibleExams();
+      const visibleStudents = getVisibleStudents();
       const prevExamId = examSelect.value;
-      examSelect.innerHTML = state.exams.length
-        ? state.exams.map(e => `<option value="${escapeHtml(e.id)}">${escapeHtml(e.title)} (${e.questions?.length || 0} câu)</option>`).join('')
+      examSelect.innerHTML = visibleExams.length
+        ? visibleExams.map(e => `<option value="${escapeHtml(e.id)}">${escapeHtml(e.title)} (${e.questions?.length || 0} câu)${isSystemAdmin() && e.createdByName ? ' — ' + escapeHtml(e.createdByName) : ''}</option>`).join('')
         : `<option value="">-- Chưa có đề thi --</option>`;
-      if (prevExamId && state.exams.some(e => e.id === prevExamId)) {
+      if (prevExamId && visibleExams.some(e => e.id === prevExamId)) {
         examSelect.value = prevExamId;
       }
 
       // Cập nhật bộ lọc lớp
-      const classes = [...new Set(state.students.map(s => s.className || 'Chưa phân lớp'))].sort();
+      const classes = [...new Set(visibleStudents.map(s => s.className || 'Chưa phân lớp'))].sort();
       const prevClass = classSelect.value || 'ALL';
-      classSelect.innerHTML = `<option value="ALL">Tất cả các lớp (${state.students.length} HS)</option>` +
+      classSelect.innerHTML = `<option value="ALL">Tất cả các lớp (${visibleStudents.length} HS)</option>` +
         classes.map(c => `<option value="${escapeHtml(c)}">Lớp ${escapeHtml(c)}</option>`).join('');
       if (prevClass === 'ALL' || classes.includes(prevClass)) classSelect.value = prevClass;
 
-      const selectedExam = state.exams.find(e => e.id === examSelect.value);
+      const selectedExam = visibleExams.find(e => e.id === examSelect.value);
       const selectedClass = classSelect.value;
-      const studentsFiltered = state.students.filter(s => selectedClass === 'ALL' || (s.className || 'Chưa phân lớp') === selectedClass);
+      const studentsFiltered = visibleStudents.filter(s => selectedClass === 'ALL' || (s.className || 'Chưa phân lớp') === selectedClass);
 
       document.getElementById('kpi-total-students').textContent = studentsFiltered.length;
 
@@ -4992,7 +5376,12 @@ ${extractedPdfText.slice(0, 12000)}` : ''}`;
 
     function renderStudentLobby() {
       const container = document.getElementById('student-exam-cards');
-      const openExams = state.exams.filter(e => e.active);
+      const stuOwner = state.currentUser?.ownerUsername || 'admin';
+      const openExams = state.exams.filter(e => {
+        if (!e.active) return false;
+        const exOwner = e.createdBy || 'admin';
+        return exOwner === 'admin' || exOwner === stuOwner;
+      });
 
       if (openExams.length === 0) {
         container.innerHTML = `
@@ -5044,7 +5433,8 @@ ${extractedPdfText.slice(0, 12000)}` : ''}`;
                 </div>
                 ${badgeHtml}
               </div>
-              <h3 class="font-extrabold text-slate-800 text-base leading-snug mb-2">${escapeHtml(ex.title)}</h3>
+              <h3 class="font-extrabold text-slate-800 text-base leading-snug mb-1.5">${escapeHtml(ex.title)}</h3>
+              ${ex.subject && ex.subject !== 'Quản trị hệ thống' ? `<div class="text-[11px] font-bold text-indigo-700 mb-2">Môn ${escapeHtml(ex.subject)}${ex.createdByName ? ' • ' + escapeHtml(ex.createdByName) : ''}</div>` : ''}
               <div class="flex flex-wrap gap-3 text-xs text-slate-500">
                 <span class="inline-flex items-center gap-1"><i data-lucide="clock" class="w-3.5 h-3.5 text-brand-600"></i> ${ex.duration} phút</span>
                 <span class="inline-flex items-center gap-1"><i data-lucide="list" class="w-3.5 h-3.5 text-brand-600"></i> ${mcqCount} ABCD${tfCount ? ` • ${tfCount} Đ/S` : ''}${shortCount ? ` • ${shortCount} TL ngắn` : ''}</span>
@@ -6575,6 +6965,9 @@ ${(state.pdfBuilder.keyText || '').slice(0, 12000)}`;
         const examData = {
           id: examId,
           mode: 'pdf',
+          subject: state.currentUser?.subject || 'Chung',
+          createdBy: state.currentUser?.username || 'admin',
+          createdByName: state.currentUser?.name || 'Giáo viên',
           examCode,
           title,
           duration,
@@ -7134,25 +7527,28 @@ ${(state.pdfBuilder.keyText || '').slice(0, 12000)}`;
       const classSel = document.getElementById('report-class-filter');
       if (!examSel || !classSel) return null;
 
+      const visibleExams = getVisibleExams();
+      const visibleStudents = getVisibleStudents();
       const prevExam = examSel.value;
-      examSel.innerHTML = state.exams.length
-        ? state.exams.map(e => `<option value="${escapeHtml(e.id)}">${escapeHtml(e.title)}</option>`).join('')
+      examSel.innerHTML = visibleExams.length
+        ? visibleExams.map(e => `<option value="${escapeHtml(e.id)}">${escapeHtml(e.title)}${isSystemAdmin() && e.createdByName ? ' — ' + escapeHtml(e.createdByName) : ''}</option>`).join('')
         : `<option value="">-- Chưa có đề thi --</option>`;
-      if (prevExam && state.exams.some(e => e.id === prevExam)) examSel.value = prevExam;
+      if (prevExam && visibleExams.some(e => e.id === prevExam)) examSel.value = prevExam;
 
-      const classes = [...new Set(state.students.map(s => s.className || 'Chưa phân lớp'))].sort();
+      const classes = [...new Set(visibleStudents.map(s => s.className || 'Chưa phân lớp'))].sort();
       const prevClass = classSel.value || 'ALL';
-      classSel.innerHTML = `<option value="ALL">Tất cả các lớp (${state.students.length} HS)</option>` +
+      classSel.innerHTML = `<option value="ALL">Tất cả các lớp (${visibleStudents.length} HS)</option>` +
         classes.map(c => `<option value="${escapeHtml(c)}">Lớp ${escapeHtml(c)}</option>`).join('');
       if (prevClass === 'ALL' || classes.includes(prevClass)) classSel.value = prevClass;
 
-      const exam = state.exams.find(e => e.id === examSel.value) || null;
+      const exam = visibleExams.find(e => e.id === examSel.value) || null;
       const cls = classSel.value;
-      const students = state.students.filter(s => cls === 'ALL' || (s.className || 'Chưa phân lớp') === cls);
+      const students = visibleStudents.filter(s => cls === 'ALL' || (s.className || 'Chưa phân lớp') === cls);
       return { exam, cls, students };
     }
 
     window.renderAdminReports = function() {
+      renderAdminGlobalStats();
       const ctx = getReportContext();
       if (!ctx || !ctx.exam) return;
       const { exam, cls, students } = ctx;
@@ -7878,6 +8274,8 @@ ${sourceText.slice(0, 32000)}`;
           sourceDoc: q.sourceDoc || '',
           promptHtml: q.promptHtml,
           explanation: q.explanation || '',
+          createdBy: state.currentUser?.username || 'admin',
+          createdByName: state.currentUser?.name || 'Admin',
           createdAt: Date.now() + saved
         };
         if (q.type === 'mcq') {
@@ -7954,7 +8352,7 @@ ${sourceText.slice(0, 32000)}`;
     }
 
     window.renderQuestionBank = function() {
-      const bank = state.question_bank || [];
+      const bank = getVisibleQuestionBank();
       const pill = document.getElementById('bank-total-pill');
       if (pill) pill.textContent = bank.length;
 
@@ -8255,6 +8653,8 @@ ${sourceText.slice(0, 32000)}`;
           priority,
           pinned,
           author: state.currentUser?.name || 'Giáo viên',
+          createdBy: existing?.createdBy || state.currentUser?.username || 'admin',
+          createdBySubject: existing?.createdBySubject || state.currentUser?.subject || 'Chung',
           createdAt: existing?.createdAt || Date.now(),
           updatedAt: Date.now()
         };
@@ -8335,7 +8735,7 @@ ${sourceText.slice(0, 32000)}`;
       if (!listEl) return;
 
       const filterCls = document.getElementById('ann-filter-class')?.value || 'ALL';
-      const all = [...(state.announcements || [])].sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0) || (b.createdAt || 0) - (a.createdAt || 0));
+      const all = [...getVisibleAnnouncements()].sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0) || (b.createdAt || 0) - (a.createdAt || 0));
       const filtered = all.filter(a => {
         if (filterCls === 'ALL') return true;
         if (filterCls === 'ONLY_ALL') return (a.targetClass || 'ALL') === 'ALL';
@@ -9477,6 +9877,547 @@ ${sourceText.slice(0, 32000)}`;
         }
       });
     }
+
+    // =========================================================================
+    // 22. QUẢN LÝ NHIỀU TÀI KHOẢN GIÁO VIÊN / ADMIN (ĐA MÔN HỌC)
+    // =========================================================================
+    window.switchAccountsSubTab = function(sub) {
+      const stuPanel = document.getElementById('accounts-subpanel-students');
+      const admPanel = document.getElementById('accounts-subpanel-admins');
+      const stuBtn = document.getElementById('acc-subtab-btn-students');
+      const admBtn = document.getElementById('acc-subtab-btn-admins');
+      if (!stuPanel || !admPanel) return;
+
+      if (sub === 'admins') {
+        stuPanel.classList.add('hidden');
+        admPanel.classList.remove('hidden');
+        admBtn.className = 'py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 bg-brand-700 text-white shadow-sm';
+        stuBtn.className = 'py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 text-slate-600 hover:bg-slate-100';
+        renderAdminAccountsTable();
+      } else {
+        admPanel.classList.add('hidden');
+        stuPanel.classList.remove('hidden');
+        stuBtn.className = 'py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 bg-brand-700 text-white shadow-sm';
+        admBtn.className = 'py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 text-slate-600 hover:bg-slate-100';
+        renderStudentTable();
+      }
+      lucide.createIcons();
+    };
+
+    function canManageAdminAccounts() {
+      return state.currentUser?.role === 'admin' && (state.currentUser.username === 'admin' || !!state.currentUser.isSuperAdmin);
+    }
+
+    document.getElementById('add-admin-form')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!canManageAdminAccounts()) {
+        return showToast('Chỉ Quản trị gốc (admin) hoặc Quản trị viên toàn quyền mới được cấp tài khoản Giáo viên!', 'warning');
+      }
+      const name = document.getElementById('adm-name').value.trim();
+      const subject = document.getElementById('adm-subject').value.trim();
+      const username = document.getElementById('adm-username').value.trim().toLowerCase().replace(/\s+/g, '');
+      const password = document.getElementById('adm-password').value.trim();
+      const isSuperAdmin = !!document.getElementById('adm-is-super').checked;
+
+      if (!name || !subject || !username || !password) return;
+      if (username === 'admin') {
+        return showToast('Không thể đặt trùng tên đăng nhập với tài khoản gốc "admin"!', 'error');
+      }
+      if (state.students.some(s => (s.username || '').toLowerCase() === username)) {
+        return showToast(`Tên đăng nhập "${username}" đang trùng với một tài khoản Học sinh!`, 'error');
+      }
+
+      try {
+        await saveDocData('admins', username, {
+          id: username,
+          username,
+          password,
+          name,
+          subject,
+          isSuperAdmin,
+          active: true,
+          createdBy: state.currentUser?.username || 'admin',
+          createdAt: Date.now()
+        });
+        document.getElementById('add-admin-form').reset();
+        document.getElementById('adm-password').value = '123456';
+        showToast(`Đã cấp tài khoản Giáo viên cho ${name} (${username} • Môn ${subject})!`, 'success');
+      } catch (err) {
+        showToast('Lỗi lưu tài khoản Giáo viên: ' + err.message, 'error');
+      }
+    });
+
+    window.handleBulkAddAdmins = async function() {
+      if (!canManageAdminAccounts()) {
+        return showToast('Chỉ Quản trị gốc hoặc Quản trị toàn quyền mới được nhập danh sách Giáo viên!', 'warning');
+      }
+      const raw = (document.getElementById('bulk-admins-input')?.value || '').trim();
+      if (!raw) return showToast('Vui lòng dán danh sách Giáo viên vào ô nhập!', 'warning');
+
+      const lines = raw.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+      let added = 0;
+
+      for (const line of lines) {
+        const parts = line.includes('\t') ? line.split('\t') : line.split(/[,;]/);
+        if (parts.length < 3) continue;
+        const name = parts[0].trim();
+        const subject = (parts[1] || 'Chung').trim();
+        const username = parts[2].trim().toLowerCase().replace(/\s+/g, '');
+        const password = (parts[3] || '123456').trim();
+
+        if (!name || !username || username === 'admin') continue;
+        if (state.students.some(s => (s.username || '').toLowerCase() === username)) continue;
+
+        await saveDocData('admins', username, {
+          id: username,
+          username,
+          password,
+          name,
+          subject,
+          isSuperAdmin: false,
+          active: true,
+          createdBy: state.currentUser?.username || 'admin',
+          createdAt: Date.now() + added
+        });
+        added++;
+      }
+
+      if (added > 0) {
+        document.getElementById('bulk-admins-input').value = '';
+        showToast(`Đã tạo thành công ${added} tài khoản Giáo viên (Admin)!`, 'success');
+      } else {
+        showToast('Không nhận diện được dòng hợp lệ. Định dạng: Họ tên, Môn học, Tên đăng nhập, Mật khẩu', 'error');
+      }
+    };
+
+    window.renderAdminAccountsTable = function() {
+      const totalAll = 1 + state.admins.length;
+      const totalEl = document.getElementById('admin-accounts-total-count');
+      const subPill = document.getElementById('subtab-adm-count');
+      if (totalEl) totalEl.textContent = totalAll;
+      if (subPill) subPill.textContent = totalAll;
+
+      const canManage = canManageAdminAccounts();
+      const noteEl = document.getElementById('admin-account-permission-note');
+      const addCard = document.getElementById('add-admin-card');
+      const bulkCard = document.getElementById('bulk-admin-card');
+      if (noteEl) noteEl.classList.toggle('hidden', canManage);
+      if (addCard) addCard.classList.toggle('hidden', !canManage);
+      if (bulkCard) bulkCard.classList.toggle('hidden', !canManage);
+
+      const tbody = document.getElementById('admin-accounts-tbody');
+      if (!tbody) return;
+
+      const kw = (document.getElementById('admin-accounts-search')?.value || '').trim().toLowerCase();
+      const primaryRow = {
+        id: 'admin',
+        username: 'admin',
+        password: '••••••••',
+        name: ADMIN_ACCOUNT.name,
+        subject: 'Quản trị gốc',
+        isSuperAdmin: true,
+        isRoot: true,
+        active: true
+      };
+
+      const allAdmins = [primaryRow, ...state.admins].filter(a =>
+        !kw ||
+        (a.name || '').toLowerCase().includes(kw) ||
+        (a.subject || '').toLowerCase().includes(kw) ||
+        (a.username || '').toLowerCase().includes(kw)
+      );
+
+      tbody.innerHTML = allAdmins.map((a, idx) => {
+        const isActive = a.active !== false;
+        const passDisplay = a.isRoot
+          ? '<span class="text-slate-400 italic">Bảo mật</span>'
+          : (canManage || a.username === state.currentUser?.username ? escapeHtml(a.password) : '••••••');
+
+        const actionsHtml = a.isRoot
+          ? '<span class="text-[11px] font-bold text-brand-700 bg-brand-50 px-2 py-1 rounded-lg">Tài khoản gốc</span>'
+          : (canManage
+              ? `
+                <button onclick="toggleAdminAccountActive('${escapeHtml(a.id)}')" class="p-1.5 rounded-lg ${isActive ? 'text-amber-600 hover:bg-amber-50' : 'text-emerald-600 hover:bg-emerald-50'} transition mr-0.5" title="${isActive ? 'Khóa tài khoản' : 'Mở khóa tài khoản'}">
+                  <i data-lucide="${isActive ? 'lock' : 'unlock'}" class="w-4 h-4"></i>
+                </button>
+                <button onclick="openEditAdminAccountModal('${escapeHtml(a.id)}')" class="p-1.5 rounded-lg text-brand-600 hover:bg-brand-50 transition mr-0.5" title="Sửa">
+                  <i data-lucide="pencil" class="w-4 h-4"></i>
+                </button>
+                <button onclick="confirmDeleteAdminAccount('${escapeHtml(a.id)}', '${escapeHtml(a.name)}')" class="p-1.5 rounded-lg text-rose-600 hover:bg-rose-50 transition" title="Xóa">
+                  <i data-lucide="trash-2" class="w-4 h-4"></i>
+                </button>
+              `
+              : '<span class="text-xs text-slate-300">--</span>');
+
+        return `
+          <tr class="hover:bg-slate-50 transition">
+            <td class="py-3 px-4 text-slate-400 font-medium">${idx + 1}</td>
+            <td class="py-3 px-4">
+              <div class="font-semibold text-slate-800">${escapeHtml(a.name)}</div>
+              ${a.isSuperAdmin && !a.isRoot ? '<span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-800">Toàn quyền</span>' : ''}
+            </td>
+            <td class="py-3 px-4">
+              <span class="px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700 text-xs font-bold">${escapeHtml(a.subject || 'Chung')}</span>
+              <div class="text-[10px] text-slate-500 mt-1 font-medium">
+                ${state.students.filter(s => (s.ownerUsername || 'admin') === a.username).length} HS •
+                ${state.exams.filter(e => (e.createdBy || 'admin') === a.username).length} Đề •
+                ${state.question_bank.filter(q => (q.createdBy || 'admin') === a.username).length} Câu NH
+              </div>
+            </td>
+            <td class="py-3 px-4 font-mono text-xs font-bold text-slate-700">${escapeHtml(a.username)}</td>
+            <td class="py-3 px-4 font-mono text-xs text-slate-500">${passDisplay}</td>
+            <td class="py-3 px-4 text-center">
+              <span class="px-2 py-0.5 rounded-full text-[11px] font-bold ${isActive ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}">
+                ${isActive ? 'Hoạt động' : 'Đang khóa'}
+              </span>
+            </td>
+            <td class="py-3 px-4 text-right whitespace-nowrap">${actionsHtml}</td>
+          </tr>
+        `;
+      }).join('');
+      lucide.createIcons({ nodes: [tbody] });
+    };
+
+    window.toggleAdminAccountActive = async function(admId) {
+      if (!canManageAdminAccounts()) return;
+      const adm = state.admins.find(a => a.id === admId);
+      if (!adm) return;
+      if (adm.username === state.currentUser?.username) {
+        return showToast('Không thể tự khóa tài khoản đang đăng nhập!', 'warning');
+      }
+      const nextActive = adm.active === false;
+      await saveDocData('admins', adm.id, { ...adm, active: nextActive });
+      showToast(`Đã ${nextActive ? 'mở khóa' : 'khóa'} tài khoản Giáo viên "${adm.name}".`, 'info');
+    };
+
+    window.openEditAdminAccountModal = function(admId) {
+      if (!canManageAdminAccounts()) return;
+      const adm = state.admins.find(a => a.id === admId);
+      if (!adm) return;
+
+      openModal({
+        title: `Chỉnh sửa tài khoản Giáo viên: ${adm.username}`,
+        bodyHtml: `
+          <div class="space-y-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">Họ và tên Giáo viên</label>
+              <input id="edit-adm-name" type="text" value="${escapeHtml(adm.name)}" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">Môn học phụ trách</label>
+              <input id="edit-adm-subject" list="subject-suggestions" type="text" value="${escapeHtml(adm.subject || '')}" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">Mật khẩu</label>
+              <input id="edit-adm-pass" type="text" value="${escapeHtml(adm.password)}" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm font-mono" />
+            </div>
+            <label class="flex items-center gap-2 cursor-pointer bg-slate-50 px-3 py-2 rounded-xl border border-slate-200">
+              <input id="edit-adm-super" type="checkbox" ${adm.isSuperAdmin ? 'checked' : ''} class="w-4 h-4 accent-brand-700 rounded" />
+              <span class="text-xs font-semibold text-slate-700">Cấp quyền Quản trị viên (được tạo/xóa tài khoản GV khác)</span>
+            </label>
+          </div>
+        `,
+        buttons: [
+          { label: 'Hủy', className: 'px-4 py-2 rounded-xl bg-slate-100 text-slate-700 text-sm font-semibold', onClick: closeModal },
+          {
+            label: 'Lưu thay đổi',
+            className: 'px-5 py-2 rounded-xl bg-brand-700 hover:bg-brand-800 text-white text-sm font-bold',
+            onClick: async () => {
+              const name = document.getElementById('edit-adm-name').value.trim();
+              const subject = document.getElementById('edit-adm-subject').value.trim();
+              const password = document.getElementById('edit-adm-pass').value.trim();
+              const isSuperAdmin = !!document.getElementById('edit-adm-super').checked;
+              if (!name || !subject || !password) return;
+              await saveDocData('admins', adm.id, { ...adm, name, subject, password, isSuperAdmin });
+              closeModal();
+              showToast('Đã cập nhật tài khoản Giáo viên!', 'success');
+            }
+          }
+        ]
+      });
+    };
+
+    window.confirmDeleteAdminAccount = function(admId, name) {
+      if (!canManageAdminAccounts()) return;
+      if (admId === state.currentUser?.username) {
+        return showToast('Không thể tự xóa tài khoản đang đăng nhập!', 'warning');
+      }
+      openModal({
+        title: 'Xác nhận xóa tài khoản Giáo viên',
+        bodyHtml: `<p>Bạn có chắc chắn muốn xóa tài khoản Giáo viên <b>${escapeHtml(name)}</b> (${escapeHtml(admId)}) không? Các đề thi đã tạo vẫn được giữ nguyên.</p>`,
+        buttons: [
+          { label: 'Hủy', className: 'px-4 py-2 rounded-xl bg-slate-100 text-slate-700 text-sm font-semibold', onClick: closeModal },
+          {
+            label: 'Xóa tài khoản',
+            className: 'px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-sm font-semibold',
+            onClick: async () => {
+              await deleteDocData('admins', admId);
+              closeModal();
+              showToast('Đã xóa tài khoản Giáo viên.', 'info');
+            }
+          }
+        ]
+      });
+    };
+
+    // =========================================================================
+    // 23. PHÂN QUYỀN ADMIN / GIÁO VIÊN & THỐNG KÊ TOÀN HỆ THỐNG THEO GV / MÔN
+    // =========================================================================
+    function isSystemAdmin() {
+      return state.currentUser?.role === 'admin';
+    }
+
+    function isStaffUser() {
+      return state.currentUser?.role === 'admin' || state.currentUser?.role === 'teacher';
+    }
+
+    function getStaffDisplayName(username) {
+      if (!username || username === 'admin') return ADMIN_ACCOUNT.name;
+      const found = state.admins.find(a => a.username === username);
+      return found ? `${found.name} (${found.subject || 'Chung'})` : username;
+    }
+
+    function getVisibleStudents() {
+      if (isSystemAdmin()) return state.students || [];
+      const me = state.currentUser?.username;
+      return (state.students || []).filter(s => (s.ownerUsername || 'admin') === me);
+    }
+
+    function getVisibleExams() {
+      if (isSystemAdmin()) return state.exams || [];
+      const me = state.currentUser?.username;
+      return (state.exams || []).filter(e => (e.createdBy || 'admin') === me);
+    }
+
+    function getVisibleQuestionBank() {
+      if (isSystemAdmin()) return state.question_bank || [];
+      const me = state.currentUser?.username;
+      return (state.question_bank || []).filter(q => (q.createdBy || 'admin') === me);
+    }
+
+    function getVisibleAnnouncements() {
+      if (isSystemAdmin()) return state.announcements || [];
+      const me = state.currentUser?.username;
+      return (state.announcements || []).filter(a => (a.createdBy || 'admin') === me);
+    }
+
+    function computeAdminGlobalStats() {
+      const teachers = [
+        { username: 'admin', name: ADMIN_ACCOUNT.name, subject: 'Quản trị hệ thống' },
+        ...(state.admins || []).map(a => ({ username: a.username, name: a.name, subject: a.subject || 'Chung' }))
+      ];
+
+      const teacherRows = teachers.map(t => {
+        const stuCount = (state.students || []).filter(s => (s.ownerUsername || 'admin') === t.username).length;
+        const myExams = (state.exams || []).filter(e => (e.createdBy || 'admin') === t.username);
+        const myExamIds = new Set(myExams.map(e => e.id));
+        const qbCount = (state.question_bank || []).filter(q => (q.createdBy || 'admin') === t.username).length;
+        const mySessions = (state.sessions || []).filter(s => myExamIds.has(s.examId));
+
+        let scoreSum = 0, passCount = 0;
+        mySessions.forEach(s => {
+          const ex = myExams.find(e => e.id === s.examId);
+          if (!ex) return;
+          const ev = evaluateSession(ex, s);
+          const norm10 = (ev.score / (ev.maxScore || 10)) * 10;
+          scoreSum += norm10;
+          if (norm10 >= 5) passCount++;
+        });
+
+        const avg = mySessions.length ? (scoreSum / mySessions.length) : null;
+        const passRate = mySessions.length ? Math.round((passCount / mySessions.length) * 100) : null;
+
+        return {
+          ...t,
+          stuCount,
+          examCount: myExams.length,
+          qbCount,
+          sessionCount: mySessions.length,
+          avg,
+          passRate
+        };
+      });
+
+      // Gom nhóm theo Môn học
+      const subjMap = {};
+      const ensureSubj = (name) => {
+        const key = (name || 'Chung').trim() || 'Chung';
+        if (!subjMap[key]) {
+          subjMap[key] = { subject: key, teacherSet: new Set(), examIds: new Set(), qbCount: 0, sessionCount: 0, scoreSum: 0, passCount: 0 };
+        }
+        return subjMap[key];
+      };
+
+      (state.admins || []).forEach(a => ensureSubj(a.subject || 'Chung').teacherSet.add(a.username));
+      (state.exams || []).forEach(e => {
+        const st = ensureSubj(e.subject || 'Chung');
+        st.examIds.add(e.id);
+        st.teacherSet.add(e.createdBy || 'admin');
+      });
+      (state.question_bank || []).forEach(q => {
+        ensureSubj(q.subject || 'Chung').qbCount++;
+      });
+      (state.sessions || []).forEach(s => {
+        const ex = (state.exams || []).find(e => e.id === s.examId);
+        if (!ex) return;
+        const st = ensureSubj(ex.subject || 'Chung');
+        const ev = evaluateSession(ex, s);
+        const norm10 = (ev.score / (ev.maxScore || 10)) * 10;
+        st.sessionCount++;
+        st.scoreSum += norm10;
+        if (norm10 >= 5) st.passCount++;
+      });
+
+      const subjectRows = Object.values(subjMap).map(st => ({
+        subject: st.subject,
+        teacherCount: st.teacherSet.size,
+        examCount: st.examIds.size,
+        qbCount: st.qbCount,
+        sessionCount: st.sessionCount,
+        avg: st.sessionCount ? (st.scoreSum / st.sessionCount) : null,
+        passRate: st.sessionCount ? Math.round((st.passCount / st.sessionCount) * 100) : null
+      })).sort((a, b) => b.examCount - a.examCount || a.subject.localeCompare(b.subject));
+
+      return { teacherRows, subjectRows };
+    }
+
+    function renderAdminGlobalStats() {
+      const sec = document.getElementById('admin-global-stats-section');
+      if (!sec) return;
+      if (!isSystemAdmin()) {
+        sec.classList.add('hidden');
+        return;
+      }
+      sec.classList.remove('hidden');
+
+      const { teacherRows, subjectRows } = computeAdminGlobalStats();
+      const tcEl = document.getElementById('admin-stats-teacher-count');
+      const scEl = document.getElementById('admin-stats-subject-count');
+      if (tcEl) tcEl.textContent = `${teacherRows.length} GV`;
+      if (scEl) scEl.textContent = `${subjectRows.length} môn`;
+
+      const tBody = document.getElementById('admin-stats-by-teacher-tbody');
+      if (tBody) {
+        tBody.innerHTML = teacherRows.map(r => `
+          <tr class="hover:bg-slate-50">
+            <td class="py-2.5 px-3">
+              <div class="font-bold text-slate-800">${escapeHtml(r.name)}</div>
+              <div class="text-[10px] font-mono text-slate-400">${escapeHtml(r.username)}</div>
+            </td>
+            <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 text-[11px] font-bold">${escapeHtml(r.subject)}</span></td>
+            <td class="py-2.5 px-2.5 text-center font-bold text-slate-700">${r.stuCount}</td>
+            <td class="py-2.5 px-2.5 text-center font-bold text-brand-700">${r.examCount}</td>
+            <td class="py-2.5 px-2.5 text-center font-bold text-indigo-700">${r.qbCount}</td>
+            <td class="py-2.5 px-2.5 text-center font-bold text-slate-700">${r.sessionCount}</td>
+            <td class="py-2.5 px-2.5 text-center font-extrabold ${r.avg !== null ? (r.avg >= 5 ? 'text-emerald-700' : 'text-rose-600') : 'text-slate-300'}">${r.avg !== null ? r.avg.toFixed(2) : '--'}</td>
+            <td class="py-2.5 px-2.5 text-center font-bold text-slate-700">${r.passRate !== null ? r.passRate + '%' : '--'}</td>
+          </tr>
+        `).join('');
+      }
+
+      const sBody = document.getElementById('admin-stats-by-subject-tbody');
+      if (sBody) {
+        sBody.innerHTML = subjectRows.map(r => `
+          <tr class="hover:bg-slate-50">
+            <td class="py-2.5 px-3 font-bold text-slate-800">${escapeHtml(r.subject)}</td>
+            <td class="py-2.5 px-2 text-center font-semibold text-slate-600">${r.teacherCount}</td>
+            <td class="py-2.5 px-2 text-center font-bold text-brand-700">${r.examCount}</td>
+            <td class="py-2.5 px-2 text-center font-bold text-indigo-700">${r.qbCount}</td>
+            <td class="py-2.5 px-2 text-center font-bold text-slate-700">${r.sessionCount}</td>
+            <td class="py-2.5 px-2 text-center font-extrabold ${r.avg !== null ? (r.avg >= 5 ? 'text-emerald-700' : 'text-rose-600') : 'text-slate-300'}">${r.avg !== null ? r.avg.toFixed(2) : '--'}</td>
+            <td class="py-2.5 px-2 text-center font-bold text-slate-700">${r.passRate !== null ? r.passRate + '%' : '--'}</td>
+          </tr>
+        `).join('');
+      }
+      lucide.createIcons({ nodes: [sec] });
+    }
+
+    window.exportGlobalAdminStatsCSV = function() {
+      if (!isSystemAdmin()) return;
+      const { teacherRows, subjectRows } = computeAdminGlobalStats();
+      const qCsv = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+      const lines = [];
+
+      lines.push([qCsv('BÁO CÁO THỐNG KÊ TOÀN HỆ THỐNG THEO GIÁO VIÊN & MÔN HỌC')].join(','));
+      lines.push([qCsv('Thời gian xuất'), qCsv(new Date().toLocaleString('vi-VN'))].join(','));
+      lines.push('');
+
+      lines.push([qCsv('PHẦN 1: THỐNG KÊ THEO GIÁO VIÊN')].join(','));
+      lines.push(['STT', 'Họ và tên GV', 'Tài khoản', 'Môn phụ trách', 'Số HS quản lý', 'Số đề thi', 'Số câu Ngân hàng', 'Số lượt thi', 'Điểm TB (Thang 10)', 'Tỷ lệ đạt ≥5 (%)'].map(qCsv).join(','));
+      teacherRows.forEach((r, i) => {
+        lines.push([i + 1, r.name, r.username, r.subject, r.stuCount, r.examCount, r.qbCount, r.sessionCount, r.avg !== null ? r.avg.toFixed(2) : '', r.passRate !== null ? r.passRate + '%' : ''].map(qCsv).join(','));
+      });
+
+      lines.push('');
+      lines.push([qCsv('PHẦN 2: THỐNG KÊ THEO MÔN HỌC')].join(','));
+      lines.push(['STT', 'Môn học', 'Số giáo viên', 'Số đề thi', 'Số câu Ngân hàng', 'Số lượt thi', 'Điểm TB (Thang 10)', 'Tỷ lệ đạt ≥5 (%)'].map(qCsv).join(','));
+      subjectRows.forEach((r, i) => {
+        lines.push([i + 1, r.subject, r.teacherCount, r.examCount, r.qbCount, r.sessionCount, r.avg !== null ? r.avg.toFixed(2) : '', r.passRate !== null ? r.passRate + '%' : ''].map(qCsv).join(','));
+      });
+
+      const blob = new Blob(['\ufeff' + lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `ThongKe_ToanHeThong_GV_MonHoc_${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('Đã xuất file Thống kê theo Giáo viên & Môn học (.csv) thành công!', 'success');
+    };
+
+    // =========================================================================
+    // 24. TIỆN ÍCH TỐI ƯU TRẢI NGHIỆM GIAO DIỆN (UX & PHÍM TẮT)
+    // =========================================================================
+    window.toggleLoginPasswordVisibility = function() {
+      const inp = document.getElementById('login-password');
+      const icon = document.getElementById('login-pass-eye-icon');
+      if (!inp) return;
+      const isPass = inp.type === 'password';
+      inp.type = isPass ? 'text' : 'password';
+      if (icon) {
+        icon.setAttribute('data-lucide', isPass ? 'eye-off' : 'eye');
+        lucide.createIcons({ nodes: [icon.parentElement] });
+      }
+    };
+
+    window.scrollToQuestionPalette = function() {
+      const aside = document.getElementById('runner-palette-aside');
+      if (aside) aside.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+
+    // Phím tắt làm bài nhanh trên máy tính (Mũi tên Trái/Phải chuyển câu; phím A/B/C/D chọn đáp án Phần I)
+    document.addEventListener('keydown', (e) => {
+      if (state.currentUser?.role !== 'student') return;
+      if (!state.activeExam || state.activeExam.mode === 'pdf' || !state.activeSession || state.activeSession.status !== 'in_progress') return;
+      const tag = (e.target?.tagName || '').toLowerCase();
+      if (tag === 'input' || tag === 'textarea' || e.target?.isContentEditable) return;
+
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        navigateQuestion(-1);
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        navigateQuestion(1);
+      } else {
+        const origQIdx = state.activeSession.questionOrder?.[state.currentQIdx];
+        const q = state.activeExam.questions?.[origQIdx];
+        if (q?.type === 'mcq') {
+          const mapKey = { a: 0, b: 1, c: 2, d: 3, '1': 0, '2': 1, '3': 2, '4': 3 };
+          const idx = mapKey[e.key.toLowerCase()];
+          if (idx !== undefined && idx < (q.options?.length || 4)) {
+            selectMcqOption(idx);
+          }
+        }
+      }
+    });
+
+    // Nút cuộn nhanh lên đầu trang khi kéo xuống sâu
+    window.addEventListener('scroll', () => {
+      const btn = document.getElementById('btn-back-to-top');
+      if (!btn) return;
+      const show = window.scrollY > 360 && !document.body.classList.contains('exam-app-mode');
+      btn.classList.toggle('hidden', !show);
+    }, { passive: true });
 
     // Khởi chạy ứng dụng khi trang tải xong
     window.addEventListener('DOMContentLoaded', () => {
