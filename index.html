@@ -546,7 +546,7 @@
             <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
             Đồng bộ Cloud trực tiếp
           </span>
-          <span id="app-version-label">Phiên bản 2026.11.21-v16</span>
+          <span id="app-version-label">Phiên bản 2026.11.21-v20</span>
         </div>
       </div>
 
@@ -883,7 +883,7 @@
 
               <!-- Quy tắc định dạng tóm tắt (Đa phương thức) -->
               <div class="p-3.5 rounded-xl bg-blue-50/70 border border-blue-100 text-xs text-slate-700 mb-5 grid grid-cols-1 sm:grid-cols-3 gap-2">
-                <div><b class="text-brand-800">Phần I (A, B, C, D):</b> Gạch chân <u>A.</u> / <u>B</u>. (hoặc cả dòng), tô màu đỏ, dấu <code>*A.</code>, hoặc <code>Đáp án: B</code>.</div>
+                <div><b class="text-brand-800">Phần I (A, B, C, D):</b> Gạch chân <u>A.</u> / <u>B</u>., <b>in đậm đáp án</b>, tô màu đỏ, dấu <code>*A.</code>, hoặc <code>Đáp án: B</code> (tự xóa định dạng khi học sinh thi).</div>
                 <div><b class="text-brand-800">Phần II (Đúng/Sai):</b> Gạch chân <u>a)</u> / <u>b)</u> / <u>c)</u> / <u>d)</u> cho ý Đúng (hoặc tô đỏ, dấu <code>*a)</code>).</div>
                 <div><b class="text-brand-800">Phần III &amp; AI Ảnh/PDF:</b> Thêm <code>Đáp án: 12.5</code> hoặc dùng <b>Nhận diện đa phương thức</b> đọc ảnh/PDF scan.</div>
               </div>
@@ -977,6 +977,60 @@
                   <div class="text-sm font-bold text-slate-800">2. Kèm file PDF Đáp án (Tùy chọn)</div>
                   <div id="pdf-key-file-status" class="text-xs text-slate-500 mt-1">Có thể bỏ qua nếu muốn tích đáp án tay</div>
                 </div>
+              </div>
+
+              <!-- KHỐI NẠP BỘ 24 MÃ ĐỀ PDF & ĐÁP ÁN 24 MÃ ĐỀ (TỰ ĐỘNG NHẬN DIỆN MÃ ĐỀ & PHÁT NGẪU NHIÊN) -->
+              <div class="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-blue-50 via-indigo-50/70 to-emerald-50/50 border-2 border-indigo-200 space-y-3.5">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                  <div>
+                    <div class="text-xs font-extrabold uppercase tracking-wider text-indigo-700 flex items-center gap-1.5">
+                      <i data-lucide="layers" class="w-4 h-4"></i> Chế độ Bộ nhiều Mã đề (Tối đa 24 mã đề PDF)
+                    </div>
+                    <p class="text-xs text-slate-600 mt-0.5">Chọn cùng lúc tối đa <b>24 file PDF đề thi</b> — máy tự động nhận diện <b>Mã đề</b> trên trang 1 hoặc tên file. Khi học sinh đăng nhập, hệ thống tự động phát <b>1 mã đề ngẫu nhiên</b> và chấm theo đúng đáp án của mã đề đó.</p>
+                  </div>
+                  <button type="button" onclick="clearMultiPdfVariants()" class="text-[11px] font-bold text-rose-600 hover:underline">Xóa bộ mã đề</button>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div class="border-2 border-dashed border-indigo-300 hover:border-indigo-500 bg-white/80 rounded-xl p-3.5 text-center cursor-pointer transition" onclick="document.getElementById('pdf-multi-exams-input').click()">
+                    <input type="file" id="pdf-multi-exams-input" accept=".pdf" multiple="" class="hidden" onchange="handleMultiPdfExamsUpload(event)">
+                    <div class="text-xs sm:text-sm font-extrabold text-indigo-900 flex items-center justify-center gap-1.5">
+                      <i data-lucide="files" class="w-4 h-4 text-indigo-600"></i> Chọn nhiều file PDF Đề (Tối đa 24 mã)
+                    </div>
+                    <div id="pdf-multi-exams-status" class="text-[11px] text-slate-500 mt-1">Chưa nạp bộ nhiều mã đề (máy tự nhận diện mã đề)</div>
+                  </div>
+
+                  <div class="border-2 border-dashed border-emerald-300 hover:border-emerald-500 bg-white/80 rounded-xl p-3.5 text-center cursor-pointer transition" onclick="document.getElementById('pdf-multi-keys-input').click()">
+                    <input type="file" id="pdf-multi-keys-input" accept=".pdf,.docx,.txt,.csv" class="hidden" onchange="handleMultiPdfKeysUpload(event)">
+                    <div class="text-xs sm:text-sm font-extrabold text-emerald-900 flex items-center justify-center gap-1.5">
+                      <i data-lucide="key-round" class="w-4 h-4 text-emerald-600"></i> Nạp file Đáp án 24 mã đề (PDF/Word/CSV)
+                    </div>
+                    <div id="pdf-multi-keys-status" class="text-[11px] text-slate-500 mt-1">Tự động khớp đáp án vào từng Mã đề tương ứng</div>
+                  </div>
+                </div>
+
+                <!-- Dán nhanh bảng đáp án 24 mã đề từ Excel / Word -->
+                <details class="bg-white/90 rounded-xl border border-indigo-100">
+                  <summary class="px-3.5 py-2 text-xs font-bold text-indigo-900 cursor-pointer flex items-center justify-between">
+                    <span>Hoặc dán bảng đáp án 24 mã đề từ Excel / Word vào đây</span>
+                    <span class="text-slate-400 font-normal">Mở rộng</span>
+                  </summary>
+                  <div class="p-3 pt-0 space-y-2">
+                    <textarea id="multi-keys-paste-area" rows="4" placeholder="Hỗ trợ 2 định dạng:
+1) Bảng Excel (hàng đầu là Mã đề):
+Câu	101	102	103
+1	A	B	C
+2	D	A	B
+2) Theo từng khối Mã đề:
+Mã đề 101: 1A 2B 3C... | P2: ĐSĐS, SĐĐS | P3: 12,5; -3" class="w-full p-2.5 rounded-lg border border-slate-300 text-xs font-mono outline-none focus:border-indigo-600"></textarea>
+                    <div class="flex justify-end">
+                      <button type="button" onclick="applyPastedMultiKeys()" class="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition">Áp dụng đáp án cho các Mã đề</button>
+                    </div>
+                  </div>
+                </details>
+
+                <!-- Danh sách các Mã đề đã nhận diện -->
+                <div id="pdf-multi-variants-list" class="hidden space-y-2"></div>
               </div>
 
               <!-- Thanh Trợ lý AI Phân tích đề & đáp án -->
@@ -1325,19 +1379,167 @@ Cô Trần Thu Hà, Vật lí, gv_ha, 123456" class="w-full p-3 rounded-xl borde
       <!-- ADMIN TAB: NGÂN HÀNG CÂU HỎI & AI XÂY DỰNG TỪ TÀI LIỆU  -->
       <!-- ======================================================= -->
       <div id="admin-tab-bank" class="admin-tab-panel hidden space-y-6">
-        <!-- Thanh chuyển đổi nhanh giữa AI Tạo câu hỏi & Kho Ngân hàng -->
-        <div class="bg-white p-2 rounded-2xl shadow-sm border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <div class="grid grid-cols-2 gap-1.5 flex-1 max-w-xl">
-            <button type="button" id="bank-subtab-btn-ai" onclick="switchBankSubTab('ai')" class="py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 bg-indigo-600 text-white shadow-sm">
-              <i data-lucide="sparkles" class="w-4 h-4"></i> AI Tạo câu hỏi từ SGK / Tài liệu
+        <!-- Thanh chuyển đổi nhanh giữa Chủ đề CT 2018 & Mã hóa | AI Tạo câu hỏi | Kho Ngân hàng -->
+        <div class="bg-white p-2 rounded-2xl shadow-sm border border-slate-200 flex flex-col lg:flex-row lg:items-center justify-between gap-2">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-1.5 flex-1 max-w-3xl">
+            <button type="button" id="bank-subtab-btn-curriculum" onclick="switchBankSubTab('curriculum')" class="py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-1.5 text-slate-600 hover:bg-slate-100">
+              <i data-lucide="table-properties" class="w-4 h-4"></i> Chủ đề CT 2018 &amp; Mã hóa (<span id="curriculum-total-pill">0</span>)
             </button>
-            <button type="button" id="bank-subtab-btn-list" onclick="switchBankSubTab('list')" class="py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 text-slate-600 hover:bg-slate-100">
+            <button type="button" id="bank-subtab-btn-ai" onclick="switchBankSubTab('ai')" class="py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-1.5 bg-indigo-600 text-white shadow-sm">
+              <i data-lucide="sparkles" class="w-4 h-4"></i> AI Tạo câu hỏi từ SGK
+            </button>
+            <button type="button" id="bank-subtab-btn-list" onclick="switchBankSubTab('list')" class="py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-1.5 text-slate-600 hover:bg-slate-100">
               <i data-lucide="library" class="w-4 h-4"></i> Kho Ngân hàng (<span id="bank-total-pill">0</span>)
             </button>
           </div>
           <div class="flex items-center gap-2 px-2 text-xs text-slate-500">
-            <i data-lucide="database" class="w-4 h-4 text-indigo-600"></i>
-            <span>Đồng bộ tự động với Cloud &amp; tạo đề thi ngay</span>
+            <i data-lucide="tags" class="w-4 h-4 text-indigo-600"></i>
+            <span>Phân loại tự động theo ký hiệu CT 2018</span>
+          </div>
+        </div>
+
+        <!-- SUB-PANEL 0: BẢNG CHỦ ĐỀ / TIỂU CHỦ ĐỀ CT 2018 & HƯỚNG DẪN MÃ HÓA CÂU HỎI -->
+        <div id="bank-subpanel-curriculum" class="hidden space-y-5">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+            <!-- Cột trái: Nạp chủ đề lẻ & Nạp hàng loạt từ bảng Excel/Word -->
+            <div class="lg:col-span-5 space-y-4">
+              <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 space-y-3.5">
+                <div class="flex items-center justify-between gap-2 pb-2.5 border-b border-slate-100">
+                  <h3 class="font-bold text-slate-800 text-sm sm:text-base flex items-center gap-2">
+                    <i data-lucide="folder-tree" class="w-4 h-4 text-brand-600"></i> Nạp Chủ đề &amp; Tiểu chủ đề (CT 2018)
+                  </h3>
+                </div>
+                <form id="add-curriculum-form" class="space-y-3">
+                  <div class="grid grid-cols-2 gap-2.5">
+                    <div>
+                      <label class="block text-[11px] font-bold text-slate-600 mb-1">Môn học</label>
+                      <input id="cur-subject" list="subject-suggestions" type="text" required="" value="Công nghệ Công nghiệp" placeholder="VD: Công nghệ Công nghiệp, Công nghệ Nông nghiệp..." class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs sm:text-sm font-semibold outline-none focus:border-brand-600">
+                    </div>
+                    <div>
+                      <label class="block text-[11px] font-bold text-slate-600 mb-1">Khối lớp</label>
+                      <select id="cur-grade" class="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-xs sm:text-sm font-semibold outline-none focus:border-brand-600">
+                        <option value="Lớp 12">Lớp 12</option>
+                        <option value="Lớp 11">Lớp 11</option>
+                        <option value="Lớp 10">Lớp 10</option>
+                        <option value="Lớp 9">Lớp 9</option>
+                        <option value="Lớp 8">Lớp 8</option>
+                        <option value="Lớp 7">Lớp 7</option>
+                        <option value="Lớp 6">Lớp 6</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="grid grid-cols-3 gap-2.5">
+                    <div>
+                      <label class="block text-[11px] font-bold text-slate-600 mb-1">TT</label>
+                      <input id="cur-tt" type="number" min="1" value="1" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs sm:text-sm font-bold text-center outline-none focus:border-brand-600">
+                    </div>
+                    <div class="col-span-2">
+                      <label class="block text-[11px] font-bold text-slate-600 mb-1">Mức độ nhận thức</label>
+                      <select id="cur-level" class="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-xs sm:text-sm font-semibold outline-none focus:border-brand-600">
+                        <option value="Biết">1 — Biết</option>
+                        <option value="Hiểu">2 — Hiểu</option>
+                        <option value="Vận dụng">3 — Vận dụng</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div>
+                    <label class="block text-[11px] font-bold text-slate-600 mb-1">Chủ đề (Theo CT GDPT 2018)</label>
+                    <input id="cur-topic" type="text" required="" placeholder="VD: Chủ đề 1. Giới thiệu chung về kĩ thuật điện" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs sm:text-sm outline-none focus:border-brand-600">
+                  </div>
+                  <div>
+                    <label class="block text-[11px] font-bold text-slate-600 mb-1">Tiểu chủ đề / Bài học</label>
+                    <input id="cur-subtopic" type="text" required="" placeholder="VD: 1.1. Khái quát về kĩ thuật điện" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs sm:text-sm outline-none focus:border-brand-600">
+                  </div>
+                  <div>
+                    <label class="block text-[11px] font-bold text-slate-600 mb-1">Yêu cầu cần đạt (YCCĐ)</label>
+                    <textarea id="cur-yccd" rows="2" required="" placeholder="VD: Trình bày được khái niệm, vai trò và triển vọng của kĩ thuật điện trong sản xuất và đời sống." class="w-full p-2.5 rounded-xl border border-slate-300 text-xs outline-none focus:border-brand-600"></textarea>
+                  </div>
+                  <button type="submit" class="w-full py-2.5 rounded-xl bg-brand-700 hover:bg-brand-800 text-white text-xs sm:text-sm font-bold shadow-sm transition flex items-center justify-center gap-1.5">
+                    <i data-lucide="plus-circle" class="w-4 h-4"></i> Thêm vào Bảng Chủ đề
+                  </button>
+                </form>
+              </div>
+
+              <!-- Nạp hàng loạt từ bảng Excel / Word -->
+              <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 space-y-3">
+                <div class="flex items-center justify-between gap-2">
+                  <h4 class="font-bold text-slate-800 text-xs sm:text-sm flex items-center gap-1.5">
+                    <i data-lucide="file-spreadsheet" class="w-4 h-4 text-emerald-600"></i> Nạp hàng loạt từ bảng (Excel / Word)
+                  </h4>
+                  <div class="flex flex-wrap gap-1.5">
+                    <button type="button" onclick="importOfficialCongNghe2018('CNCN')" class="px-2.5 py-1 rounded-lg bg-brand-700 hover:bg-brand-800 text-white text-[11px] font-bold transition shadow-sm">+ CT CN Công nghiệp (10-12)</button>
+                    <button type="button" onclick="importOfficialCongNghe2018('CNNN')" class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold transition shadow-sm">+ CT CN Nông nghiệp (10-12)</button>
+                    <button type="button" onclick="importOfficialCongNghe2018('CNTHCS')" class="px-2.5 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-[11px] font-bold transition">+ CT CN THCS (6-9)</button>
+                  </div>
+                </div>
+                <p class="text-[11px] text-slate-500 leading-relaxed">
+                  Dán các dòng theo cột (cách nhau bằng <b>Tab</b> từ Excel hoặc dấu <b>|</b>):<br>
+                  <code>TT | Khối | Chủ đề | Tiểu chủ đề | Yêu cầu cần đạt | Mức độ nhận thức</code>
+                </p>
+                <textarea id="bulk-curriculum-input" rows="4" placeholder="1 | Lớp 12 | Chủ đề 1. Kĩ thuật điện | 1.1. Khái quát kĩ thuật điện | Trình bày được vai trò của kĩ thuật điện | Nhận biết
+2 | Lớp 12 | Chủ đề 1. Kĩ thuật điện | 1.2. Mạch điện xoay chiều 3 pha | Tính được các đại lượng trong mạch 3 pha đối xứng | Vận dụng" class="w-full p-2.5 rounded-xl border border-slate-300 text-xs font-mono outline-none focus:border-brand-600"></textarea>
+                <button type="button" onclick="handleBulkImportCurriculum()" class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold transition flex items-center justify-center gap-1.5">
+                  <i data-lucide="upload" class="w-4 h-4"></i> Nhập bảng Chủ đề CT 2018
+                </button>
+              </div>
+            </div>
+
+            <!-- Cột phải: Bảng Chủ đề + Sinh Hướng dẫn mã hóa câu hỏi -->
+            <div class="lg:col-span-7 space-y-4">
+              <!-- Khung Hướng dẫn Mã hóa câu hỏi tự động -->
+              <div class="bg-gradient-to-br from-indigo-50 via-blue-50 to-white rounded-2xl shadow-sm border border-indigo-200 p-5 space-y-3">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                  <div>
+                    <h3 class="font-extrabold text-indigo-950 text-sm sm:text-base flex items-center gap-2">
+                      <i data-lucide="book-key" class="w-4 h-4 text-indigo-600"></i> Hướng dẫn Mã hóa câu hỏi tự động (CT 2018)
+                    </h3>
+                    <p class="text-xs text-indigo-800/80 mt-0.5">Gắn mã ký hiệu vào đầu mỗi câu hỏi trong file Word để hệ thống tự động phân loại khi nạp vào Kho Ngân hàng.</p>
+                  </div>
+                  <div class="flex flex-wrap gap-1.5">
+                    <button type="button" onclick="copyCodingGuideText()" class="px-3 py-1.5 rounded-xl bg-white hover:bg-indigo-100 text-indigo-800 border border-indigo-200 text-xs font-bold transition flex items-center gap-1">
+                      <i data-lucide="copy" class="w-3.5 h-3.5"></i> Sao chép HD
+                    </button>
+                    <button type="button" onclick="downloadCodingGuideDoc()" class="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-sm transition flex items-center gap-1">
+                      <i data-lucide="file-down" class="w-3.5 h-3.5"></i> Tải HD Mã hóa (.doc)
+                    </button>
+                  </div>
+                </div>
+                <div id="curriculum-coding-guide-box" class="p-3.5 rounded-xl bg-white border border-indigo-100 text-xs text-slate-700 space-y-2 leading-relaxed"></div>
+              </div>
+
+              <!-- Bảng danh sách Chủ đề / Tiểu chủ đề đã nạp -->
+              <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="p-4 bg-slate-50 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2">
+                  <div class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                    <i data-lucide="table-2" class="w-4 h-4 text-brand-600"></i> Bảng Chủ đề &amp; Yêu cầu cần đạt (<span id="curriculum-count-badge">0</span>)
+                  </div>
+                  <div class="flex flex-wrap gap-2">
+                    <select id="cur-filter-subject" onchange="renderCurriculumTable()" class="px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white text-xs font-bold text-slate-700 outline-none">
+                      <option value="ALL">Tất cả Môn</option>
+                    </select>
+                    <select id="cur-filter-grade" onchange="renderCurriculumTable()" class="px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white text-xs font-bold text-slate-700 outline-none">
+                      <option value="ALL">Tất cả Khối</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="sticky-table-wrap">
+                  <table class="w-full text-left border-collapse text-xs">
+                    <thead class="bg-slate-50 text-[11px] uppercase font-bold text-slate-600 border-b border-slate-200">
+                      <tr>
+                        <th class="py-2.5 px-2.5 text-center">TT</th>
+                        <th class="py-2.5 px-2.5 whitespace-nowrap">Khối</th>
+                        <th class="py-2.5 px-3 min-w-[140px]">Chủ đề / Tiểu chủ đề</th>
+                        <th class="py-2.5 px-3 min-w-[170px]">Yêu cầu cần đạt</th>
+                        <th class="py-2.5 px-2.5 text-center whitespace-nowrap">Mức độ</th>
+                        <th class="py-2.5 px-2.5 whitespace-nowrap">Ký hiệu mã hóa</th>
+                        <th class="py-2.5 px-2 text-right">Xóa</th>
+                      </tr>
+                    </thead>
+                    <tbody id="curriculum-table-body" class="divide-y divide-slate-100"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -1406,6 +1608,8 @@ Cô Trần Thu Hà, Vật lí, gv_ha, 123456" class="w-full p-3 rounded-xl borde
                     <input id="ai-bank-subject" list="subject-suggestions" type="text" value="Toán học" placeholder="VD: Toán học, Công nghệ..." class="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-sm font-semibold focus:border-indigo-600 outline-none">
                     <datalist id="subject-suggestions">
                       <option value="Toán học"></option>
+                      <option value="Công nghệ Công nghiệp"></option>
+                      <option value="Công nghệ Nông nghiệp"></option>
                       <option value="Công nghệ"></option>
                       <option value="Vật lí"></option>
                       <option value="Hóa học"></option>
@@ -1507,9 +1711,31 @@ Cô Trần Thu Hà, Vật lí, gv_ha, 123456" class="w-full p-3 rounded-xl borde
 
         <!-- SUB-PANEL 2: KHO NGÂN HÀNG CÂU HỎI & LẬP ĐỀ TỪ NGÂN HÀNG -->
         <div id="bank-subpanel-list" class="hidden space-y-5">
+          <!-- Thanh Nạp câu hỏi có ký hiệu mã hóa vào Kho Ngân hàng -->
+          <div class="bg-gradient-to-r from-indigo-50 via-blue-50 to-emerald-50 rounded-2xl shadow-sm border border-indigo-200 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="flex items-start gap-3">
+              <div class="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-sm">
+                <i data-lucide="file-up" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <div class="text-sm font-extrabold text-indigo-950">Nạp câu hỏi vào Kho Ngân hàng (Tự động phân loại theo ký hiệu)</div>
+                <div class="text-xs text-indigo-800/80 mt-0.5">Hỗ trợ file Word (.docx), HTML, TXT có gắn ký hiệu như <code class="bg-white px-1.5 py-0.5 rounded font-bold text-indigo-700">[CNCN-12.C1.1-1]</code> (Mức: <b>1</b>=Biết, <b>2</b>=Hiểu, <b>3</b>=Vận dụng) ở đầu câu hỏi.</div>
+              </div>
+            </div>
+            <div class="flex flex-wrap gap-2 shrink-0">
+              <input type="file" id="bank-coded-file-input" accept=".docx,.html,.htm,.doc,.txt" class="hidden" onchange="handleCodedBankFileUpload(event)">
+              <button type="button" onclick="document.getElementById('bank-coded-file-input').click()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-extrabold shadow-sm transition flex items-center gap-1.5">
+                <i data-lucide="upload-cloud" class="w-4 h-4"></i> Nạp file Word / HTML có mã
+              </button>
+              <button type="button" onclick="switchBankSubTab('curriculum')" class="px-3.5 py-2 rounded-xl bg-white hover:bg-indigo-100 text-indigo-800 border border-indigo-200 text-xs font-bold transition flex items-center gap-1.5">
+                <i data-lucide="book-key" class="w-3.5 h-3.5"></i> Xem HD Mã hóa
+              </button>
+            </div>
+          </div>
+
           <!-- Bộ lọc đa chiều -->
           <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-5 space-y-4">
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-2.5">
               <select id="bank-filter-subject" onchange="renderQuestionBank()" class="px-3 py-2 rounded-xl border border-slate-300 bg-slate-50 text-xs font-bold text-slate-700 outline-none">
                 <option value="ALL">Tất cả Môn học</option>
               </select>
@@ -1519,6 +1745,9 @@ Cô Trần Thu Hà, Vật lí, gv_ha, 123456" class="w-full p-3 rounded-xl borde
               <select id="bank-filter-topic" onchange="renderQuestionBank()" class="px-3 py-2 rounded-xl border border-slate-300 bg-slate-50 text-xs font-bold text-slate-700 outline-none">
                 <option value="ALL">Tất cả Chủ đề</option>
               </select>
+              <select id="bank-filter-subtopic" onchange="renderQuestionBank()" class="px-3 py-2 rounded-xl border border-slate-300 bg-slate-50 text-xs font-bold text-slate-700 outline-none">
+                <option value="ALL">Tất cả Tiểu chủ đề</option>
+              </select>
               <select id="bank-filter-type" onchange="renderQuestionBank()" class="px-3 py-2 rounded-xl border border-slate-300 bg-slate-50 text-xs font-bold text-slate-700 outline-none">
                 <option value="ALL">Tất cả Dạng câu</option>
                 <option value="mcq">Phần I (A-D)</option>
@@ -1527,10 +1756,9 @@ Cô Trần Thu Hà, Vật lí, gv_ha, 123456" class="w-full p-3 rounded-xl borde
               </select>
               <select id="bank-filter-level" onchange="renderQuestionBank()" class="px-3 py-2 rounded-xl border border-slate-300 bg-slate-50 text-xs font-bold text-slate-700 outline-none">
                 <option value="ALL">Tất cả Mức độ</option>
-                <option value="Nhận biết">Nhận biết</option>
-                <option value="Thông hiểu">Thông hiểu</option>
-                <option value="Vận dụng">Vận dụng</option>
-                <option value="Vận dụng cao">Vận dụng cao</option>
+                <option value="Biết">1 — Biết</option>
+                <option value="Hiểu">2 — Hiểu</option>
+                <option value="Vận dụng">3 — Vận dụng</option>
               </select>
               <input id="bank-filter-search" oninput="renderQuestionBank()" type="text" placeholder="Tìm từ khóa..." class="px-3 py-2 rounded-xl border border-slate-300 text-xs outline-none focus:border-brand-600">
             </div>
@@ -2439,7 +2667,7 @@ Cô Trần Thu Hà, Vật lí, gv_ha, 123456" class="w-full p-3 rounded-xl borde
     const EMBEDDED_FIREBASE_CONFIG = /*__EMBEDDED_FIREBASE_CONFIG__*/{"apiKey":"AIzaSyAK4osCrc_vtzPd3SWBSIoCg99W5vqab9g","authDomain":"toanthaytrinh-af1c8.firebaseapp.com","projectId":"toanthaytrinh-af1c8","storageBucket":"toanthaytrinh-af1c8.firebasestorage.app","messagingSenderId":"797090111064","appId":"1:797090111064:web:bad5dae3a6cab29fad342d","measurementId":"G-TWN1BMQH3N"}/*__END_EMBEDDED_FIREBASE_CONFIG__*/;
     const EMBEDDED_APP_ID = /*__EMBEDDED_APP_ID__*/"hoctoan-pro"/*__END_EMBEDDED_APP_ID__*/;
     const EMBEDDED_ADMIN_PASSWORD = /*__EMBEDDED_ADMIN_PASSWORD__*/"123456"/*__END_EMBEDDED_ADMIN_PASSWORD__*/;
-    const APP_BUILD_VERSION = /*__APP_BUILD_VERSION__*/"2026.11.21-v16"/*__END_APP_BUILD_VERSION__*/;
+    const APP_BUILD_VERSION = /*__APP_BUILD_VERSION__*/"2026.11.21-v20"/*__END_APP_BUILD_VERSION__*/;
 
     const LS_KEYS = {
       FB_CONFIG: 'eduexam_custom_fb_config_v2',
@@ -2473,6 +2701,7 @@ Cô Trần Thu Hà, Vật lí, gv_ha, 123456" class="w-full p-3 rounded-xl borde
       exams: [],
       sessions: [],
       question_bank: [],
+      curriculum_topics: [],
       announcements: [],
       editingAnnouncementId: null,
       builderQuestions: [],
@@ -2499,7 +2728,8 @@ Cô Trần Thu Hà, Vật lí, gv_ha, 123456" class="w-full p-3 rounded-xl borde
         keyPages: [],   // array of JPEG dataUrls (file đáp án PDF scan)
         examText: '',
         keyText: '',
-        questions: []   // [{ origIndex, type: 'mcq'|'tf'|'short', correctIndex, options, correctAnswer }]
+        questions: [],  // [{ origIndex, type: 'mcq'|'tf'|'short', correctIndex, options, correctAnswer }]
+        multiVariants: [] // [{ code, fileName, pages: [], pageCount, questions: [], hasKey: false }]
       },
       pdfViewerZoom: 1,
       lastExitRecordedAt: 0
@@ -2751,10 +2981,10 @@ Cô Trần Thu Hà, Vật lí, gv_ha, 123456" class="w-full p-3 rounded-xl borde
     // =========================================================================
     function openLocalIDB() {
       return new Promise((resolve, reject) => {
-        const req = indexedDB.open('EduExamPro_LocalDB_v2', 5);
+        const req = indexedDB.open('EduExamPro_LocalDB_v2', 6);
         req.onupgradeneeded = (e) => {
           const idb = e.target.result;
-          ['students', 'admins', 'exams', 'sessions', 'exam_pages', 'question_bank', 'announcements'].forEach(store => {
+          ['students', 'admins', 'exams', 'sessions', 'exam_pages', 'question_bank', 'curriculum_topics', 'announcements'].forEach(store => {
             if (!idb.objectStoreNames.contains(store)) {
               idb.createObjectStore(store, { keyPath: 'id' });
             }
@@ -2805,6 +3035,7 @@ Cô Trần Thu Hà, Vật lí, gv_ha, 123456" class="w-full p-3 rounded-xl borde
       let exams = await idbGetAll('exams');
       let sessions = await idbGetAll('sessions');
       let qBank = await idbGetAll('question_bank');
+      let curTopics = await idbGetAll('curriculum_topics');
       let announcements = await idbGetAll('announcements');
 
       if (students.length === 0) {
@@ -2816,12 +3047,18 @@ Cô Trần Thu Hà, Vật lí, gv_ha, 123456" class="w-full p-3 rounded-xl borde
         await idbPut('exams', sampleEx);
         exams = [sampleEx];
       }
+      if (curTopics.length === 0) {
+        const seedCur = buildOfficialPresetRecords('CNCN');
+        for (const t of seedCur) await idbPut('curriculum_topics', t);
+        curTopics = seedCur;
+      }
 
       state.students = students.sort((a, b) => (a.username || '').localeCompare(b.username || ''));
       state.admins = admins.sort((a, b) => (a.username || '').localeCompare(b.username || ''));
       state.exams = exams.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
       state.sessions = sessions;
       state.question_bank = qBank.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+      state.curriculum_topics = curTopics.sort((a, b) => (Number(a.tt) || 0) - (Number(b.tt) || 0) || (a.createdAt || 0) - (b.createdAt || 0));
       state.announcements = announcements.sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0) || (b.createdAt || 0) - (a.createdAt || 0));
     }
 
@@ -2873,6 +3110,7 @@ Cô Trần Thu Hà, Vật lí, gv_ha, 123456" class="w-full p-3 rounded-xl borde
         if (colName === 'admins') renderAdminAccountsTable();
         if (colName === 'exams') renderAdminExamList();
         if (colName === 'question_bank') renderQuestionBank();
+        if (colName === 'curriculum_topics') renderCurriculumTable();
         if (colName === 'announcements') renderAdminAnnouncements();
         renderAdminDashboard();
         if (!document.getElementById('admin-tab-reports').classList.contains('hidden')) {
@@ -3347,6 +3585,12 @@ Cô Trần Thu Hà, Vật lí, gv_ha, 123456" class="w-full p-3 rounded-xl borde
                 const sampleExam = buildSampleExamData();
                 await setDoc(getDocRef('exams', sampleExam.id), sampleExam);
               }
+              if (state.curriculum_topics.length === 0) {
+                const seedCur = buildOfficialPresetRecords('CNCN');
+                for (const t of seedCur) {
+                  await setDoc(getDocRef('curriculum_topics', t.id), t);
+                }
+              }
             } catch (seedErr) {
               console.warn('Không thể khởi tạo dữ liệu mẫu trên Cloud:', seedErr);
             }
@@ -3424,7 +3668,15 @@ Cô Trần Thu Hà, Vật lí, gv_ha, 123456" class="w-full p-3 rounded-xl borde
           console.error('Lỗi onSnapshot admins:', err);
         });
 
-        activeUnsubscribers.push(unsub1, unsub2, unsub3, unsub4, unsub5, unsub6, unsub7);
+        const unsub8 = onSnapshot(getColRef('curriculum_topics'), (snap) => {
+          state.curriculum_topics = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+            .sort((a, b) => (Number(a.tt) || 0) - (Number(b.tt) || 0) || (a.createdAt || 0) - (b.createdAt || 0));
+          onDataChanged('curriculum_topics');
+        }, (err) => {
+          console.error('Lỗi onSnapshot curriculum_topics:', err);
+        });
+
+        activeUnsubscribers.push(unsub1, unsub2, unsub3, unsub4, unsub5, unsub6, unsub7, unsub8);
       });
     }
 
@@ -3576,6 +3828,7 @@ Cô Trần Thu Hà, Vật lí, gv_ha, 123456" class="w-full p-3 rounded-xl borde
       if (tabName === 'dashboard') renderAdminDashboard();
       if (tabName === 'exams') renderAdminExamList();
       if (tabName === 'bank') {
+        renderCurriculumTable();
         renderQuestionBank();
         renderAiLoadedDocs();
       }
@@ -3993,10 +4246,26 @@ Cô Trần Thu Hà, Vật lí, gv_ha, 123456" class="w-full p-3 rounded-xl borde
       return false;
     }
 
+    // Kiểm tra một node văn bản có được in đậm (b, strong, font-weight >= 600) hay không
+    function isNodeBold(node, stopRoot) {
+      let cur = node.nodeType === Node.TEXT_NODE ? node.parentElement : node;
+      while (cur && cur !== stopRoot) {
+        const tag = cur.tagName ? cur.tagName.toLowerCase() : '';
+        if (tag === 'b' || tag === 'strong') return true;
+        if (cur.style && cur.style.fontWeight) {
+          const fw = String(cur.style.fontWeight).trim().toLowerCase();
+          if (fw === 'bold' || fw === 'bolder' || parseInt(fw, 10) >= 600) return true;
+        }
+        cur = cur.parentElement;
+      }
+      return false;
+    }
+
     // Nhận diện đa phương thức cho 1 phương án (A,B,C,D hoặc a,b,c,d):
     // 1. Gạch chân mỗi chữ cái đầu phương án (VD: <u>A</u>., <u>A.</u>, <u>a</u>), <u>a)</u>) hoặc gạch chân nội dung
     // 2. Dấu sao * ở đầu (*A., *a))
     // 3. Tô màu đỏ / highlight trên chữ cái đầu phương án hoặc nội dung
+    // 4. In đậm (b/strong/font-weight bold) — tách riêng in đậm chữ cái đầu & in đậm nội dung để tránh nhận nhầm khi cả 4 chữ A. B. C. D. đều đậm
     function detectOptionAnswerSignal(lineHtml) {
       const div = document.createElement('div');
       div.innerHTML = lineHtml;
@@ -4004,10 +4273,9 @@ Cô Trần Thu Hà, Vật lí, gv_ha, 123456" class="w-full p-3 rounded-xl borde
 
       // Phương thức 1: Dấu * ở đầu phương án (*A., *B), *a))
       if (/^\s*\*\s*[A-Da-d]\s*[\.\):]/.test(plain)) {
-        return { isCorrect: true, method: 'Dấu *' };
+        return { isCorrect: true, method: 'Dấu *', leadBold: false, bodyBold: false };
       }
 
-      // Kiểm tra riêng phần nhãn phương án đầu tiên (chữ cái A-D hoặc a-d)
       const walker = document.createTreeWalker(div, NodeFilter.SHOW_TEXT, null);
       let node;
       let checkedLead = false;
@@ -4015,6 +4283,9 @@ Cô Trần Thu Hà, Vật lí, gv_ha, 123456" class="w-full p-3 rounded-xl borde
       let leadUnderlined = false;
       let leadHighlighted = false;
       let anyHighlighted = false;
+      let leadBold = false;
+      let bodyBoldChars = 0;
+      let bodyTotalChars = 0;
 
       while ((node = walker.nextNode())) {
         const val = node.nodeValue || '';
@@ -4023,6 +4294,7 @@ Cô Trần Thu Hà, Vật lí, gv_ha, 123456" class="w-full p-3 rounded-xl borde
 
         const u = isNodeUnderlined(node, div);
         const h = isNodeHighlighted(node, div);
+        const b = isNodeBold(node, div);
         if (u) anyUnderlined = true;
         if (h) anyHighlighted = true;
 
@@ -4030,30 +4302,49 @@ Cô Trần Thu Hà, Vật lí, gv_ha, 123456" class="w-full p-3 rounded-xl borde
           checkedLead = true;
           if (u) leadUnderlined = true;
           if (h) leadHighlighted = true;
+          if (b) leadBold = true;
+          // Nếu cùng 1 text node chứa cả nhãn "A." và nội dung phía sau (VD: "<strong>A. 10 cm</strong>")
+          const afterPrefix = trimmed.replace(/^\*?\s*[A-Da-d]\s*[\.\):]\s*/, '');
+          if (afterPrefix.length > 0) {
+            bodyTotalChars += afterPrefix.length;
+            if (b) bodyBoldChars += afterPrefix.length;
+          }
+        } else {
+          bodyTotalChars += trimmed.length;
+          if (b) bodyBoldChars += trimmed.length;
         }
       }
 
-      if (leadUnderlined) return { isCorrect: true, method: 'Gạch chân phương án' };
-      if (anyUnderlined) return { isCorrect: true, method: 'Gạch chân nội dung' };
-      if (leadHighlighted) return { isCorrect: true, method: 'Tô màu phương án' };
-      if (anyHighlighted) return { isCorrect: true, method: 'Tô màu / Highlight' };
-      return { isCorrect: false, method: '' };
+      const bodyBold = bodyTotalChars > 0 && (bodyBoldChars / bodyTotalChars) >= 0.6;
+
+      if (leadUnderlined) return { isCorrect: true, method: 'Gạch chân phương án', leadBold, bodyBold };
+      if (anyUnderlined) return { isCorrect: true, method: 'Gạch chân nội dung', leadBold, bodyBold };
+      if (leadHighlighted) return { isCorrect: true, method: 'Tô màu phương án', leadBold, bodyBold };
+      if (anyHighlighted) return { isCorrect: true, method: 'Tô màu / Highlight', leadBold, bodyBold };
+      return { isCorrect: false, method: '', leadBold, bodyBold };
     }
 
-    // Xóa toàn bộ định dạng gạch chân / tô màu / highlight khỏi HTML đáp án để học sinh không thấy gợi ý
+    // Xóa toàn bộ định dạng gạch chân / IN ĐẬM / tô màu / highlight khỏi HTML đáp án để học sinh KHÔNG thấy gợi ý lộ đáp án
     function stripUnderlineFromHtml(html) {
       const div = document.createElement('div');
       div.innerHTML = html;
-      div.querySelectorAll('u, ins, mark').forEach(u => {
-        const span = document.createElement('span');
-        span.innerHTML = u.innerHTML;
-        u.replaceWith(span);
-      });
+      // Dùng vòng lặp để gỡ triệt để cả các thẻ lồng nhau (VD: <strong><u>...</u></strong> hoặc <b><strong>...</strong></b>)
+      let safety = 0;
+      while (safety++ < 6) {
+        const targets = div.querySelectorAll('u, ins, mark, b, strong');
+        if (targets.length === 0) break;
+        targets.forEach(el => {
+          const span = document.createElement('span');
+          span.innerHTML = el.innerHTML;
+          el.replaceWith(span);
+        });
+      }
       div.querySelectorAll('font[color]').forEach(el => el.removeAttribute('color'));
       div.querySelectorAll('[style]').forEach(el => {
         el.style.textDecoration = '';
         el.style.textDecorationLine = '';
         el.style.borderBottom = '';
+        el.style.fontWeight = '';
         if (isHighlightOrAccentColor(el.style.color)) el.style.color = '';
         if (isHighlightOrAccentColor(el.style.backgroundColor)) el.style.backgroundColor = '';
       });
@@ -4275,11 +4566,11 @@ Cô Trần Thu Hà, Vật lí, gv_ha, 123456" class="w-full p-3 rounded-xl borde
         if (mcqOptRegex.test(plain)) {
           const sig = detectOptionAnswerSignal(lineHtml);
           const cleanHtml = stripUnderlineFromHtml(stripLeadingPrefixHtml(lineHtml, mcqOptRegex));
-          currentQ.mcqOptions.push({ html: cleanHtml, isCorrect: sig.isCorrect, method: sig.method });
+          currentQ.mcqOptions.push({ html: cleanHtml, isCorrect: sig.isCorrect, method: sig.method, leadBold: !!sig.leadBold, bodyBold: !!sig.bodyBold });
         } else if (tfOptRegex.test(plain)) {
           const sig = detectOptionAnswerSignal(lineHtml);
           const cleanHtml = stripUnderlineFromHtml(stripLeadingPrefixHtml(lineHtml, tfOptRegex));
-          currentQ.tfOptions.push({ html: cleanHtml, isTrue: sig.isCorrect, method: sig.method });
+          currentQ.tfOptions.push({ html: cleanHtml, isTrue: sig.isCorrect, method: sig.method, leadBold: !!sig.leadBold, bodyBold: !!sig.bodyBold });
         } else {
           // Đoạn nối tiếp của đề bài hoặc của đáp án gần nhất
           const isStandaloneMedia = !plain && !!tmp.querySelector('img, svg');
@@ -4326,6 +4617,20 @@ Cô Trần Thu Hà, Vật lí, gv_ha, 123456" class="w-full p-3 rounded-xl borde
             }
           }
 
+          // Nếu chưa đánh dấu bằng gạch chân/màu/dòng đáp án -> kiểm tra tín hiệu in đậm (tránh trường hợp cả 4 ý đều đậm giống nhau)
+          if (!detectMethod) {
+            const sliceTf = rq.tfOptions.slice(0, 4);
+            const bodyBoldCount = sliceTf.filter(o => o.bodyBold).length;
+            const leadBoldCount = sliceTf.filter(o => o.leadBold).length;
+            if (bodyBoldCount > 0 && bodyBoldCount < sliceTf.length) {
+              opts.forEach((o, i) => { o.isTrue = !!sliceTf[i].bodyBold; });
+              detectMethod = 'In đậm ý Đúng';
+            } else if (leadBoldCount > 0 && leadBoldCount < sliceTf.length) {
+              opts.forEach((o, i) => { o.isTrue = !!sliceTf[i].leadBold; });
+              detectMethod = 'In đậm ý Đúng';
+            }
+          }
+
           finalQuestions.push({
             origIndex: finalQuestions.length,
             type: 'tf',
@@ -4344,6 +4649,20 @@ Cô Trần Thu Hà, Vật lí, gv_ha, 123456" class="w-full p-3 rounded-xl borde
             if (mLetter) {
               correctIdx = lettersMcq.indexOf(mLetter[1]);
               detectMethod = 'Dòng đáp án';
+            }
+          }
+
+          // Nếu chưa đánh dấu bằng gạch chân/màu/dòng đáp án -> kiểm tra tín hiệu in đậm duy nhất (tránh khi cả 4 chữ A. B. C. D. đều in đậm)
+          if (correctIdx < 0) {
+            const sliceMcq = rq.mcqOptions.slice(0, 4);
+            const bodyBoldIndices = sliceMcq.map((o, i) => o.bodyBold ? i : -1).filter(i => i >= 0);
+            const leadBoldIndices = sliceMcq.map((o, i) => o.leadBold ? i : -1).filter(i => i >= 0);
+            if (bodyBoldIndices.length === 1) {
+              correctIdx = bodyBoldIndices[0];
+              detectMethod = 'In đậm đáp án';
+            } else if (leadBoldIndices.length === 1) {
+              correctIdx = leadBoldIndices[0];
+              detectMethod = 'In đậm phương án';
             }
           }
 
@@ -5017,8 +5336,18 @@ ${extractedPdfText.slice(0, 12000)}` : ''}`;
       return (exam.maxScore || 10) / totalQ;
     }
 
+    function getSessionQuestions(exam, session) {
+      if (exam?.isMultiCode && Array.isArray(exam.variants) && exam.variants.length > 0) {
+        const code = session?.assignedExamCode;
+        const found = code ? exam.variants.find(v => v.code === code) : null;
+        if (found && Array.isArray(found.questions)) return found.questions;
+        return exam.variants[0].questions || exam.questions || [];
+      }
+      return exam?.questions || [];
+    }
+
     function evaluateSession(exam, session) {
-      const questions = exam.questions || [];
+      const questions = getSessionQuestions(exam, session);
       const totalQ = questions.length;
       if (totalQ === 0) return { score: 0, maxScore: exam.maxScore || 10, perOrigQ: [], answeredCount: 0, correctCount: 0, partialCount: 0, wrongCount: 0 };
 
@@ -5251,6 +5580,7 @@ ${extractedPdfText.slice(0, 12000)}` : ''}`;
                 <span class="text-[11px] font-semibold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded">${escapeHtml(stu.className)}</span>
                 ${statusBadge}
                 ${sess && (sess.exitCount || 0) > 0 ? `<span class="text-[10px] font-bold px-1.5 py-0.5 rounded ${sess.violated ? 'bg-rose-100 text-rose-700' : 'bg-amber-100 text-amber-800'}" title="Số lượt thoát màn hình">⚠ Thoát: ${sess.exitCount}</span>` : ''}
+                ${sess && sess.assignedExamCode ? `<span class="text-[10px] font-mono font-extrabold px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-800">Mã ${escapeHtml(sess.assignedExamCode)}</span>` : ''}
                 ${sess && sess.violated ? `<span class="text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-rose-600 text-white">VI PHẠM</span>` : ''}
               </div>
             </td>
@@ -5438,7 +5768,7 @@ ${extractedPdfText.slice(0, 12000)}` : ''}`;
               <div class="flex flex-wrap gap-3 text-xs text-slate-500">
                 <span class="inline-flex items-center gap-1"><i data-lucide="clock" class="w-3.5 h-3.5 text-brand-600"></i> ${ex.duration} phút</span>
                 <span class="inline-flex items-center gap-1"><i data-lucide="list" class="w-3.5 h-3.5 text-brand-600"></i> ${mcqCount} ABCD${tfCount ? ` • ${tfCount} Đ/S` : ''}${shortCount ? ` • ${shortCount} TL ngắn` : ''}</span>
-                <span class="inline-flex items-center gap-1"><i data-lucide="${ex.mode === 'pdf' ? 'columns-2' : 'shuffle'}" class="w-3.5 h-3.5 text-brand-600"></i> ${ex.mode === 'pdf' ? 'Đề PDF chia đôi màn hình' : 'Đảo câu & Đáp án'}</span>
+                <span class="inline-flex items-center gap-1"><i data-lucide="${ex.mode === 'pdf' ? 'columns-2' : 'shuffle'}" class="w-3.5 h-3.5 text-brand-600"></i> ${ex.mode === 'pdf' ? (ex.isMultiCode ? `Ngẫu nhiên ${ex.variants?.length || 0} mã đề PDF` : 'Đề PDF chia đôi màn hình') : 'Đảo câu & Đáp án'}</span>
                 ${ex.requirePassScore ? `<span class="inline-flex items-center gap-1 text-amber-700 font-bold"><i data-lucide="target" class="w-3.5 h-3.5"></i> Yêu cầu đạt ≥ ${ex.passScore ?? 5}đ</span>` : ''}
               </div>
             </div>
@@ -5471,10 +5801,16 @@ ${extractedPdfText.slice(0, 12000)}` : ''}`;
         let questionOrder = [];
         const optionOrders = {};
 
+        let assignedExamCode = exam.examCode || '';
         if (exam.mode === 'pdf') {
+          if (exam.isMultiCode && Array.isArray(exam.variants) && exam.variants.length > 0) {
+            const rndVar = exam.variants[Math.floor(Math.random() * exam.variants.length)];
+            assignedExamCode = rndVar.code;
+          }
+          const activeQs = getSessionQuestions(exam, { assignedExamCode });
           // Đề PDF giữ đúng thứ tự câu hỏi trên phiếu trả lời để khớp với đề PDF
-          questionOrder = (exam.questions || []).map((_, idx) => idx);
-          (exam.questions || []).forEach((q, idx) => {
+          questionOrder = activeQs.map((_, idx) => idx);
+          activeQs.forEach((q, idx) => {
             optionOrders[String(idx)] = (q.options || [0, 1, 2, 3]).map((_, oi) => oi);
           });
         } else {
@@ -5501,6 +5837,7 @@ ${extractedPdfText.slice(0, 12000)}` : ''}`;
           studentName: state.currentUser.name,
           className: state.currentUser.className,
           status: 'in_progress',
+          assignedExamCode: assignedExamCode || '',
           startedAt: Date.now(),
           submittedAt: null,
           questionOrder,
@@ -5646,7 +5983,7 @@ ${extractedPdfText.slice(0, 12000)}` : ''}`;
         return `
           <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 14px;margin-top:8px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;">
             <span style="font-weight:800;color:#1e40af;min-width:24px;">${labels[dispOptIdx]}${q.type === 'mcq' ? '.' : ')'}</span>
-            <div style="flex:1;line-height:1.55;">${opt.html}</div>
+            <div style="flex:1;line-height:1.55;font-weight:400;">${stripUnderlineFromHtml(opt.html || '')}</div>
           </div>
         `;
       }).join('');
@@ -6887,6 +7224,9 @@ ${(state.pdfBuilder.keyText || '').slice(0, 12000)}`;
       const active = !!document.getElementById('pdf-builder-active').checked;
 
       if (!title) return showToast('Vui lòng nhập tên đề thi PDF!', 'warning');
+      if (state.pdfBuilder.multiVariants && state.pdfBuilder.multiVariants.length > 0) {
+        return await publishMultiCodePdfExam();
+      }
       if (state.pdfBuilder.pages.length === 0) return showToast('Vui lòng tải lên tệp PDF đề thi trước!', 'warning');
       if (state.pdfBuilder.questions.length === 0) return showToast('Vui lòng tạo khung phiếu trả lời (ít nhất 1 câu hỏi)!', 'warning');
 
@@ -7022,12 +7362,20 @@ ${(state.pdfBuilder.keyText || '').slice(0, 12000)}`;
     // =========================================================================
     // 12. PHÒNG THI PDF CHIA ĐÔI MÀN HÌNH (HỌC SINH) + CHỐNG GIAN LẬN THOÁT MH
     // =========================================================================
-    async function loadPdfExamPages(exam) {
-      const count = exam.pdfPageCount || 0;
+    async function loadPdfExamPages(exam, variantCode = '') {
+      let count = exam.pdfPageCount || 0;
+      let prefix = `${exam.id}_p_`;
+      if (exam.isMultiCode && Array.isArray(exam.variants) && exam.variants.length > 0) {
+        const v = (variantCode && exam.variants.find(x => x.code === variantCode)) || exam.variants[0];
+        if (v) {
+          count = v.pageCount || 0;
+          prefix = `${exam.id}_v_${v.code}_p_`;
+        }
+      }
       if (count <= 0) return [];
       if (useCloudMode && fbUser && db) {
         const tasks = Array.from({ length: count }, (_, i) =>
-          getDoc(getDocRef('exam_pages', `${exam.id}_p_${i}`))
+          getDoc(getDocRef('exam_pages', `${prefix}${i}`))
             .then(snap => (snap.exists() ? snap.data().dataUrl : null))
             .catch(() => null)
         );
@@ -7038,14 +7386,15 @@ ${(state.pdfBuilder.keyText || '').slice(0, 12000)}`;
       const allLocal = await idbGetAll('exam_pages');
       const pages = [];
       for (let i = 0; i < count; i++) {
-        const found = allLocal.find(p => p.id === `${exam.id}_p_${i}`);
+        const found = allLocal.find(p => p.id === `${prefix}${i}`);
         if (found) pages.push(found.dataUrl);
       }
       return pages;
     }
 
     async function initPdfSplitRunner(exam) {
-      document.getElementById('pdf-runner-title').textContent = exam.title;
+      const assignedCode = state.activeSession?.assignedExamCode || exam.examCode || '';
+      document.getElementById('pdf-runner-title').textContent = assignedCode ? `${exam.title} — Mã đề: ${assignedCode}` : exam.title;
       state.pdfViewerZoom = 1;
       document.getElementById('pdf-viewer-zoom-label').textContent = '100%';
 
@@ -7056,7 +7405,7 @@ ${(state.pdfBuilder.keyText || '').slice(0, 12000)}`;
       renderPdfStudentAnswerSheet();
 
       try {
-        const pages = await loadPdfExamPages(exam);
+        const pages = await loadPdfExamPages(exam, state.activeSession?.assignedExamCode || '');
         if (pages.length === 0) {
           viewer.innerHTML = `<div class="py-12 text-center text-amber-300 text-sm">Không tải được trang PDF. Hãy kiểm tra kết nối mạng và tải lại.</div>`;
         } else {
@@ -7214,7 +7563,7 @@ ${(state.pdfBuilder.keyText || '').slice(0, 12000)}`;
       const sess = state.activeSession;
       if (!exam || !sess) return;
 
-      const qs = exam.questions || [];
+      const qs = getSessionQuestions(exam, sess);
       const answers = sess.answers || {};
       const mcqs = qs.filter(q => q.type === 'mcq');
       const tfs = qs.filter(q => q.type === 'tf');
@@ -7235,7 +7584,7 @@ ${(state.pdfBuilder.keyText || '').slice(0, 12000)}`;
             <div class="truncate"><span class="text-slate-500">Họ tên:</span> <b class="text-slate-900">${escapeHtml(state.currentUser?.name || '')}</b></div>
             <div><span class="text-slate-500">Lớp:</span> <b class="text-slate-900">${escapeHtml(state.currentUser?.className || '')}</b></div>
             <div><span class="text-slate-500">SBD:</span> <b class="font-mono text-slate-900">${escapeHtml(state.currentUser?.username || '')}</b></div>
-            <div><span class="text-slate-500">Mã đề:</span> <b class="font-mono px-1.5 py-0.5 rounded bg-slate-800 text-white text-[10px]">${escapeHtml(exam.examCode || '0101')}</b></div>
+            <div><span class="text-slate-500">Mã đề:</span> <b class="font-mono px-1.5 py-0.5 rounded bg-slate-800 text-white text-[10px]">${escapeHtml(sess?.assignedExamCode || exam.examCode || '0101')}</b></div>
           </div>
         </div>
       `;
@@ -7828,22 +8177,26 @@ ${(state.pdfBuilder.keyText || '').slice(0, 12000)}`;
     // 14. TRỢ LÝ AI XÂY DỰNG CÂU HỎI TỪ TÀI LIỆU (SGK, CHƯƠNG TRÌNH) & NGÂN HÀNG
     // =========================================================================
     window.switchBankSubTab = function(sub) {
-      const pAi = document.getElementById('bank-subpanel-ai');
-      const pList = document.getElementById('bank-subpanel-list');
-      const bAi = document.getElementById('bank-subtab-btn-ai');
-      const bList = document.getElementById('bank-subtab-btn-list');
-      if (sub === 'list') {
-        pAi.classList.add('hidden');
-        pList.classList.remove('hidden');
-        bList.className = 'py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 bg-indigo-600 text-white shadow-sm';
-        bAi.className = 'py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 text-slate-600 hover:bg-slate-100';
-        renderQuestionBank();
-      } else {
-        pList.classList.add('hidden');
-        pAi.classList.remove('hidden');
-        bAi.className = 'py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 bg-indigo-600 text-white shadow-sm';
-        bList.className = 'py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 text-slate-600 hover:bg-slate-100';
-      }
+      const panels = {
+        curriculum: document.getElementById('bank-subpanel-curriculum'),
+        ai: document.getElementById('bank-subpanel-ai'),
+        list: document.getElementById('bank-subpanel-list')
+      };
+      const btns = {
+        curriculum: document.getElementById('bank-subtab-btn-curriculum'),
+        ai: document.getElementById('bank-subtab-btn-ai'),
+        list: document.getElementById('bank-subtab-btn-list')
+      };
+      const activeCls = 'py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-1.5 bg-indigo-600 text-white shadow-sm';
+      const idleCls = 'py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-1.5 text-slate-600 hover:bg-slate-100';
+
+      Object.keys(panels).forEach(k => {
+        if (panels[k]) panels[k].classList.toggle('hidden', k !== sub);
+        if (btns[k]) btns[k].className = (k === sub) ? activeCls : idleCls;
+      });
+
+      if (sub === 'curriculum') renderCurriculumTable();
+      if (sub === 'list') renderQuestionBank();
       lucide.createIcons();
     };
 
@@ -8333,18 +8686,20 @@ ${sourceText.slice(0, 32000)}`;
       const fSub = document.getElementById('bank-filter-subject')?.value || 'ALL';
       const fGrade = document.getElementById('bank-filter-grade')?.value || 'ALL';
       const fTopic = document.getElementById('bank-filter-topic')?.value || 'ALL';
+      const fSubtopic = document.getElementById('bank-filter-subtopic')?.value || 'ALL';
       const fType = document.getElementById('bank-filter-type')?.value || 'ALL';
       const fLevel = document.getElementById('bank-filter-level')?.value || 'ALL';
       const kw = (document.getElementById('bank-filter-search')?.value || '').trim().toLowerCase();
 
-      return (state.question_bank || []).filter(q => {
+      return getVisibleQuestionBank().filter(q => {
         if (fSub !== 'ALL' && (q.subject || '') !== fSub) return false;
         if (fGrade !== 'ALL' && (q.grade || '') !== fGrade) return false;
         if (fTopic !== 'ALL' && (q.topic || '') !== fTopic) return false;
+        if (fSubtopic !== 'ALL' && (q.subtopic || '') !== fSubtopic) return false;
         if (fType !== 'ALL' && q.type !== fType) return false;
-        if (fLevel !== 'ALL' && (q.level || '') !== fLevel) return false;
+        if (fLevel !== 'ALL' && getLevelShortCode(q.level || '') !== getLevelShortCode(fLevel)) return false;
         if (kw) {
-          const hay = `${q.promptHtml || ''} ${q.topic || ''} ${q.subject || ''} ${q.explanation || ''}`.toLowerCase();
+          const hay = `${q.promptHtml || ''} ${q.topic || ''} ${q.subtopic || ''} ${q.yccd || ''} ${q.code || ''} ${q.subject || ''} ${q.explanation || ''}`.toLowerCase();
           if (!hay.includes(kw)) return false;
         }
         return true;
@@ -8369,6 +8724,7 @@ ${sourceText.slice(0, 32000)}`;
       fillSelect('bank-filter-subject', 'Tất cả Môn học', bank.map(q => q.subject));
       fillSelect('bank-filter-grade', 'Tất cả Khối', bank.map(q => q.grade));
       fillSelect('bank-filter-topic', 'Tất cả Chủ đề', bank.map(q => q.topic));
+      fillSelect('bank-filter-subtopic', 'Tất cả Tiểu chủ đề', bank.map(q => q.subtopic));
 
       const filtered = getFilteredBankQuestions();
       const fCountEl = document.getElementById('bank-filtered-count');
@@ -8430,7 +8786,9 @@ ${sourceText.slice(0, 32000)}`;
                 <span class="text-xs font-extrabold text-slate-500">#${idx + 1}</span>
                 <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-brand-50 text-brand-800">${escapeHtml(q.subject || 'Môn')}</span>
                 <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-700">${escapeHtml(q.grade || '')}</span>
+                ${q.code ? `<span class="text-[10px] font-mono font-extrabold px-2 py-0.5 rounded-md bg-indigo-600 text-white">${escapeHtml(q.code)}</span>` : ''}
                 ${q.topic ? `<span class="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700">${escapeHtml(q.topic)}</span>` : ''}
+                ${q.subtopic ? `<span class="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-blue-50 text-brand-700">${escapeHtml(q.subtopic)}</span>` : ''}
                 <span class="text-[10px] font-bold px-2 py-0.5 rounded-md ${q.type === 'mcq' ? 'bg-blue-100 text-brand-800' : (q.type === 'tf' ? 'bg-purple-100 text-purple-800' : 'bg-teal-100 text-teal-800')}">${q.type === 'mcq' ? 'ABCD' : (q.type === 'tf' ? 'Đ/S' : 'TL ngắn')}</span>
                 ${q.level ? `<span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-amber-100 text-amber-800">${escapeHtml(q.level)}</span>` : ''}
               </div>
@@ -10418,6 +10776,850 @@ ${sourceText.slice(0, 32000)}`;
       const show = window.scrollY > 360 && !document.body.classList.contains('exam-app-mode');
       btn.classList.toggle('hidden', !show);
     }, { passive: true });
+
+    // =========================================================================
+    // 25. QUẢN LÝ CHỦ ĐỀ CT 2018, SINH HƯỚNG DẪN MÃ HÓA (1=BIẾT, 2=HIỂU, 3=VẬN DỤNG)
+    // =========================================================================
+    const CT2018_CONG_NGHE_PRESETS = {"CNCN": [["Công nghệ Công nghiệp", "Lớp 10", 1, "Chủ đề 1. Khái quát về công nghệ", 1, "1.1. Khoa học, kĩ thuật, công nghệ và mối liên hệ", "Nêu được các khái niệm khoa học, kĩ thuật, công nghệ và mối liên hệ giữa chúng.", 1], ["Công nghệ Công nghiệp", "Lớp 10", 1, "Chủ đề 1. Khái quát về công nghệ", 2, "1.2. Công nghệ với tự nhiên, con người và xã hội", "Mô tả được mối quan hệ giữa công nghệ với tự nhiên, con người và xã hội.", 1], ["Công nghệ Công nghiệp", "Lớp 10", 1, "Chủ đề 1. Khái quát về công nghệ", 3, "1.3. Hệ thống kĩ thuật", "Trình bày được khái niệm, cấu trúc của hệ thống kĩ thuật.", 1], ["Công nghệ Công nghiệp", "Lớp 10", 1, "Chủ đề 1. Khái quát về công nghệ", 4, "1.4. Một số công nghệ phổ biến", "Kể tên và tóm tắt được nội dung cơ bản của một số công nghệ phổ biến.", 2], ["Công nghệ Công nghiệp", "Lớp 10", 1, "Chủ đề 1. Khái quát về công nghệ", 5, "1.5. Nghề nghiệp lĩnh vực kĩ thuật, công nghệ", "Trình bày được yêu cầu, triển vọng, thông tin thị trường lao động của một số ngành nghề kĩ thuật, công nghệ; đánh giá được sự phù hợp của bản thân.", 2], ["Công nghệ Công nghiệp", "Lớp 10", 2, "Chủ đề 2. Đổi mới công nghệ", 1, "2.1. Các cuộc cách mạng công nghiệp", "Tóm tắt được nội dung cơ bản, vai trò, đặc điểm của các cuộc cách mạng công nghiệp.", 2], ["Công nghệ Công nghiệp", "Lớp 10", 2, "Chủ đề 2. Đổi mới công nghệ", 2, "2.2. Một số công nghệ mới", "Trình bày được bản chất và hướng ứng dụng của một số công nghệ mới.", 1], ["Công nghệ Công nghiệp", "Lớp 10", 2, "Chủ đề 2. Đổi mới công nghệ", 3, "2.3. Đánh giá công nghệ và sản phẩm công nghệ", "Giải thích được các tiêu chí cơ bản trong đánh giá công nghệ; đánh giá được một số sản phẩm công nghệ phổ biến.", 2], ["Công nghệ Công nghiệp", "Lớp 10", 3, "Chủ đề 3. Vẽ kĩ thuật", 1, "3.1. Khái niệm, vai trò và tiêu chuẩn bản vẽ kĩ thuật", "Trình bày được khái niệm, vai trò của bản vẽ kĩ thuật; mô tả các tiêu chuẩn trình bày bản vẽ kĩ thuật.", 1], ["Công nghệ Công nghiệp", "Lớp 10", 3, "Chủ đề 3. Vẽ kĩ thuật", 2, "3.2. Các hình biểu diễn vật thể", "Vẽ được hình chiếu vuông góc; hình cắt, mặt cắt; hình chiếu trục đo; hình chiếu phối cảnh; hình biểu diễn quy ước ren của vật thể đơn giản.", 2], ["Công nghệ Công nghiệp", "Lớp 10", 3, "Chủ đề 3. Vẽ kĩ thuật", 3, "3.3. Vẽ kĩ thuật với sự hỗ trợ của máy tính", "Vẽ được một số hình biểu diễn của vật thể đơn giản với sự hỗ trợ của máy tính.", 3], ["Công nghệ Công nghiệp", "Lớp 10", 3, "Chủ đề 3. Vẽ kĩ thuật", 4, "3.4. Bản vẽ chi tiết, bản vẽ lắp và bản vẽ xây dựng", "Lập và đọc được bản vẽ chi tiết đơn giản, bản vẽ xây dựng đơn giản; đọc được bản vẽ lắp của vật thể đơn giản.", 2], ["Công nghệ Công nghiệp", "Lớp 10", 4, "Chủ đề 4. Thiết kế kĩ thuật", 1, "4.1. Vai trò, ý nghĩa và nguyên tắc thiết kế kĩ thuật", "Trình bày được vai trò, ý nghĩa và nêu được các nguyên tắc thiết kế kĩ thuật.", 1], ["Công nghệ Công nghiệp", "Lớp 10", 4, "Chủ đề 4. Thiết kế kĩ thuật", 2, "4.2. Quy trình và yếu tố ảnh hưởng thiết kế kĩ thuật", "Giải thích được quy trình thiết kế kĩ thuật; phân tích được các yếu tố ảnh hưởng trong quá trình thiết kế kĩ thuật.", 2], ["Công nghệ Công nghiệp", "Lớp 10", 4, "Chủ đề 4. Thiết kế kĩ thuật", 3, "4.3. Nghề nghiệp liên quan tới thiết kế", "Mô tả được đặc điểm, tính chất của một số nghề nghiệp liên quan tới thiết kế.", 1], ["Công nghệ Công nghiệp", "Lớp 10", 4, "Chủ đề 4. Thiết kế kĩ thuật", 4, "4.4. Thực hành thiết kế sản phẩm đơn giản", "Thiết kế được sản phẩm đơn giản đáp ứng yêu cầu cho trước.", 3], ["Công nghệ Công nghiệp", "Lớp 10", 5, "Chủ đề 5. Chuyên đề học tập Công nghệ 10", 1, "5.1. Vẽ và thiết kế với sự hỗ trợ của máy tính (CAD)", "Trình bày vai trò của CNTT trong vẽ và thiết kế kĩ thuật; sử dụng được phần mềm CAD để lập bản vẽ kĩ thuật của vật thể đơn giản.", 3], ["Công nghệ Công nghiệp", "Lớp 10", 5, "Chủ đề 5. Chuyên đề học tập Công nghệ 10", 2, "5.2. Thiết kế mạch điều khiển ngôi nhà thông minh", "Trình bày sơ đồ khối, cảm biến thông dụng; thiết kế được hệ thống điều khiển đơn giản cho ngôi nhà thông minh.", 3], ["Công nghệ Công nghiệp", "Lớp 10", 5, "Chủ đề 5. Chuyên đề học tập Công nghệ 10", 3, "5.3. Nghề nghiệp STEM", "Tóm tắt các vấn đề cơ bản về STEM, nhu cầu nghề nghiệp STEM tại Việt Nam; lập và thực hiện kế hoạch thích ứng nghề nghiệp STEM.", 2], ["Công nghệ Công nghiệp", "Lớp 11", 1, "Chủ đề 1. Giới thiệu chung về cơ khí chế tạo", 1, "1.1. Khái niệm, vai trò, đặc điểm cơ khí chế tạo", "Trình bày được khái niệm, vai trò và đặc điểm của cơ khí chế tạo.", 1], ["Công nghệ Công nghiệp", "Lớp 11", 1, "Chủ đề 1. Giới thiệu chung về cơ khí chế tạo", 2, "1.2. Quy trình chế tạo và ngành nghề cơ khí chế tạo", "Mô tả được các bước cơ bản trong quy trình chế tạo cơ khí; nhận biết được một số ngành nghề phổ biến thuộc lĩnh vực cơ khí chế tạo.", 1], ["Công nghệ Công nghiệp", "Lớp 11", 2, "Chủ đề 2. Vật liệu cơ khí", 1, "2.1. Khái niệm và phân loại vật liệu cơ khí", "Trình bày được khái niệm cơ bản và phân loại của vật liệu cơ khí.", 1], ["Công nghệ Công nghiệp", "Lớp 11", 2, "Chủ đề 2. Vật liệu cơ khí", 2, "2.2. Tính chất, công dụng vật liệu thông dụng và vật liệu mới", "Mô tả được công dụng, tính chất của một số vật liệu cơ khí thông dụng, vật liệu mới; nhận biết tính chất cơ bản bằng phương pháp đơn giản.", 2], ["Công nghệ Công nghiệp", "Lớp 11", 3, "Chủ đề 3. Các phương pháp gia công cơ khí", 1, "3.1. Khái niệm, phân loại phương pháp gia công cơ khí", "Trình bày được khái niệm, phân loại và tóm tắt nội dung cơ bản của một số phương pháp gia công cơ khí.", 1], ["Công nghệ Công nghiệp", "Lớp 11", 3, "Chủ đề 3. Các phương pháp gia công cơ khí", 2, "3.2. Lập quy trình và thực hành gia công cắt gọt", "Lập được quy trình công nghệ gia công một chi tiết đơn giản; gia công được một chi tiết cơ khí đơn giản bằng phương pháp cắt gọt.", 3], ["Công nghệ Công nghiệp", "Lớp 11", 4, "Chủ đề 4. Sản xuất cơ khí", 1, "4.1. Quá trình sản xuất cơ khí và dây chuyền tự động hoá", "Phân tích được các bước của quá trình sản xuất cơ khí; mô tả được dây chuyền sản xuất tự động hoá có sử dụng robot công nghiệp.", 2], ["Công nghệ Công nghiệp", "Lớp 11", 4, "Chủ đề 4. Sản xuất cơ khí", 2, "4.2. CMCN 4.0, an toàn lao động và bảo vệ môi trường", "Nhận biết tác động của CMCN 4.0 trong tự động hoá sản xuất; nhận thức tầm quan trọng của an toàn lao động và bảo vệ môi trường trong sản xuất cơ khí.", 1], ["Công nghệ Công nghiệp", "Lớp 11", 5, "Chủ đề 5. Giới thiệu chung về cơ khí động lực", 1, "5.1. Hệ thống cơ khí động lực và ngành nghề liên quan", "Trình bày cấu tạo, vai trò từng bộ phận trong hệ thống cơ khí động lực; kể tên một số máy móc và nhận biết ngành nghề phổ biến.", 1], ["Công nghệ Công nghiệp", "Lớp 11", 6, "Chủ đề 6. Động cơ đốt trong", 1, "6.1. Khái niệm, phân loại và cấu tạo động cơ đốt trong", "Trình bày được khái niệm, phân loại và mô tả được cấu tạo của động cơ đốt trong.", 1], ["Công nghệ Công nghiệp", "Lớp 11", 6, "Chủ đề 6. Động cơ đốt trong", 2, "6.2. Nguyên lí làm việc và thông số kĩ thuật ĐCĐT", "Giải thích được nguyên lí làm việc và ý nghĩa một số thông số kĩ thuật cơ bản của động cơ đốt trong.", 2], ["Công nghệ Công nghiệp", "Lớp 11", 7, "Chủ đề 7. Ô tô", 1, "7.1. Vai trò, cấu tạo chung và các bộ phận chính của ô tô", "Trình bày vai trò của ô tô; mô tả cấu tạo chung dưới dạng sơ đồ khối; trình bày cấu tạo và nguyên lí làm việc các bộ phận chính trên ô tô.", 2], ["Công nghệ Công nghiệp", "Lớp 11", 7, "Chủ đề 7. Ô tô", 2, "7.2. Sử dụng, bảo dưỡng ô tô và an toàn giao thông", "Nhận biết được những nội dung cơ bản về sử dụng, bảo dưỡng ô tô và an toàn khi tham gia giao thông.", 1], ["Công nghệ Công nghiệp", "Lớp 11", 8, "Chủ đề 8. Chuyên đề học tập Công nghệ 11", 1, "8.1. Dự án nghiên cứu lĩnh vực kĩ thuật cơ khí", "Mô tả đặc điểm dự án nghiên cứu cơ khí; hình thành ý tưởng, lập kế hoạch, triển khai và báo cáo kết quả dự án.", 3], ["Công nghệ Công nghiệp", "Lớp 11", 8, "Chủ đề 8. Chuyên đề học tập Công nghệ 11", 2, "8.2. Công nghệ CAD/CAM-CNC", "Trình bày vai trò, chức năng CAD/CAM-CNC; mô tả cấu trúc máy CNC và tóm tắt quy trình gia công CNC.", 2], ["Công nghệ Công nghiệp", "Lớp 11", 8, "Chủ đề 8. Chuyên đề học tập Công nghệ 11", 3, "8.3. Công nghệ in 3D", "Trình bày đặc điểm, ứng dụng, cấu trúc, nguyên lí máy in 3D; lập trình, kết nối và in được vật thể đơn giản bằng máy in 3D.", 3], ["Công nghệ Công nghiệp", "Lớp 12", 1, "Chủ đề 1. Giới thiệu chung về kĩ thuật điện", 1, "1.1. Khái niệm, vị trí, vai trò và triển vọng kĩ thuật điện", "Trình bày được khái niệm kĩ thuật điện; tóm tắt được vị trí, vai trò và triển vọng phát triển của kĩ thuật điện trong sản xuất và đời sống.", 1], ["Công nghệ Công nghiệp", "Lớp 12", 1, "Chủ đề 1. Giới thiệu chung về kĩ thuật điện", 2, "1.2. Ngành nghề thuộc lĩnh vực kĩ thuật điện", "Nhận biết được một số ngành nghề thuộc lĩnh vực kĩ thuật điện.", 1], ["Công nghệ Công nghiệp", "Lớp 12", 2, "Chủ đề 2. Hệ thống điện quốc gia", 1, "2.1. Mạch điện xoay chiều ba pha", "Trình bày khái niệm và nguyên lí tạo ra dòng điện xoay chiều ba pha; mô tả cách nối nguồn, tải ba pha và xác định thông số hiệu dụng mạch ba pha đối xứng.", 2], ["Công nghệ Công nghiệp", "Lớp 12", 2, "Chủ đề 2. Hệ thống điện quốc gia", 2, "2.2. Cấu trúc hệ thống điện quốc gia", "Vẽ và mô tả được cấu trúc chung và vai trò của từng thành phần trong hệ thống điện quốc gia.", 2], ["Công nghệ Công nghiệp", "Lớp 12", 2, "Chủ đề 2. Hệ thống điện quốc gia", 3, "2.3. Các phương pháp sản xuất điện năng chủ yếu", "Trình bày nội dung cơ bản, ưu điểm và hạn chế của các phương pháp sản xuất điện năng (thuỷ điện, nhiệt điện, điện hạt nhân, điện gió, điện mặt trời).", 1], ["Công nghệ Công nghiệp", "Lớp 12", 2, "Chủ đề 2. Hệ thống điện quốc gia", 4, "2.4. Mạng điện sản xuất quy mô nhỏ và mạng điện hạ áp sinh hoạt", "Mô tả cấu trúc, thiết bị mạng điện sản xuất quy mô nhỏ; vẽ và trình bày sơ đồ, thông số kĩ thuật mạng điện hạ áp dùng trong sinh hoạt.", 2], ["Công nghệ Công nghiệp", "Lớp 12", 3, "Chủ đề 3. Hệ thống điện trong gia đình", 1, "3.1. Cấu trúc và thiết bị điện trong gia đình", "Vẽ và mô tả cấu trúc chung hệ thống điện gia đình; trình bày chức năng và thông số kĩ thuật của một số thiết bị điện phổ biến.", 1], ["Công nghệ Công nghiệp", "Lớp 12", 3, "Chủ đề 3. Hệ thống điện trong gia đình", 2, "3.2. Sơ đồ nguyên lí, sơ đồ lắp đặt và chọn thiết bị", "Vẽ được sơ đồ nguyên lí và sơ đồ lắp đặt hệ thống điện gia đình; xác định thông số kĩ thuật cho thiết bị đóng cắt, bảo vệ, truyền dẫn điện.", 3], ["Công nghệ Công nghiệp", "Lớp 12", 3, "Chủ đề 3. Hệ thống điện trong gia đình", 3, "3.3. Thiết kế và lắp đặt mạch điều khiển điện đơn giản", "Thiết kế và lắp đặt được một mạch điều khiển điện đơn giản trong gia đình.", 3], ["Công nghệ Công nghiệp", "Lớp 12", 4, "Chủ đề 4. An toàn và tiết kiệm điện năng", 1, "4.1. Khái niệm và biện pháp an toàn, tiết kiệm điện năng", "Trình bày khái niệm và tóm tắt các biện pháp an toàn điện và tiết kiệm điện năng.", 2], ["Công nghệ Công nghiệp", "Lớp 12", 4, "Chủ đề 4. An toàn và tiết kiệm điện năng", 2, "4.2. Thực hành an toàn và tiết kiệm điện năng", "Thực hiện được một số biện pháp an toàn và tiết kiệm điện năng trong cuộc sống.", 3], ["Công nghệ Công nghiệp", "Lớp 12", 5, "Chủ đề 5. Giới thiệu chung về kĩ thuật điện tử", 1, "5.1. Khái niệm, vai trò, triển vọng kĩ thuật điện tử", "Trình bày khái niệm; tóm tắt vị trí, vai trò và triển vọng phát triển của kĩ thuật điện tử trong sản xuất và đời sống.", 1], ["Công nghệ Công nghiệp", "Lớp 12", 5, "Chủ đề 5. Giới thiệu chung về kĩ thuật điện tử", 2, "5.2. Ngành nghề và dịch vụ ứng dụng kĩ thuật điện tử", "Nhận biết một số ngành nghề lĩnh vực kĩ thuật điện tử; kể tên và mô tả một số dịch vụ phổ biến có ứng dụng kĩ thuật điện tử.", 1], ["Công nghệ Công nghiệp", "Lớp 12", 6, "Chủ đề 6. Linh kiện điện tử", 1, "6.1. Kí hiệu, công dụng và thông số linh kiện điện tử", "Vẽ được kí hiệu, trình bày được công dụng và thông số kĩ thuật của một số linh kiện điện tử.", 1], ["Công nghệ Công nghiệp", "Lớp 12", 6, "Chủ đề 6. Linh kiện điện tử", 2, "6.2. Đọc số liệu, lựa chọn và kiểm tra linh kiện điện tử", "Nhận biết, đọc số liệu kĩ thuật, lựa chọn, kiểm tra được một số linh kiện điện tử phổ biến.", 2], ["Công nghệ Công nghiệp", "Lớp 12", 6, "Chủ đề 6. Linh kiện điện tử", 3, "6.3. Lắp ráp và kiểm tra mạch điện tử đơn giản", "Lắp ráp, kiểm tra được một mạch điện tử ứng dụng đơn giản (sử dụng ít nhất năm linh kiện).", 3], ["Công nghệ Công nghiệp", "Lớp 12", 7, "Chủ đề 7. Điện tử tương tự", 1, "7.1. Tín hiệu và mạch xử lí tín hiệu tương tự", "Trình bày nội dung cơ bản về tín hiệu và một số mạch xử lí tín hiệu (khuếch đại, điều chế, giải điều chế) của điện tử tương tự.", 1], ["Công nghệ Công nghiệp", "Lớp 12", 7, "Chủ đề 7. Điện tử tương tự", 2, "7.2. Mạch khuếch đại thuật toán (Op-Amp)", "Trình bày kí hiệu, nguyên lí làm việc và ứng dụng cơ bản của mạch khuếch đại thuật toán.", 2], ["Công nghệ Công nghiệp", "Lớp 12", 7, "Chủ đề 7. Điện tử tương tự", 3, "7.3. Lắp ráp và kiểm tra mạch khuếch đại thuật toán", "Lắp ráp và kiểm tra được một mạch điện tử ứng dụng khuếch đại thuật toán.", 3], ["Công nghệ Công nghiệp", "Lớp 12", 8, "Chủ đề 8. Điện tử số", 1, "8.1. Tín hiệu số, mạch tổ hợp và mạch dãy", "Trình bày nội dung cơ bản về tín hiệu và một số mạch xử lí tín hiệu (thuộc mạch tổ hợp và mạch dãy) trong điện tử số.", 1], ["Công nghệ Công nghiệp", "Lớp 12", 8, "Chủ đề 8. Điện tử số", 2, "8.2. Các cổng logic cơ bản", "Vẽ kí hiệu, trình bày công dụng và nhận biết được một số cổng logic cơ bản.", 2], ["Công nghệ Công nghiệp", "Lớp 12", 8, "Chủ đề 8. Điện tử số", 3, "8.3. Lắp ráp và kiểm tra mạch điện tử số đơn giản", "Lắp ráp, kiểm tra được mạch điện tử số đơn giản dùng các cổng logic cơ bản.", 3], ["Công nghệ Công nghiệp", "Lớp 12", 9, "Chủ đề 9. Vi điều khiển", 1, "9.1. Khái niệm, phân loại, ứng dụng và sơ đồ chức năng", "Trình bày khái niệm, phân loại, ứng dụng; vẽ và giải thích được sơ đồ chức năng của vi điều khiển.", 2], ["Công nghệ Công nghiệp", "Lớp 12", 9, "Chủ đề 9. Vi điều khiển", 2, "9.2. Bo mạch lập trình vi điều khiển và ứng dụng", "Mô tả cấu trúc, ứng dụng, công cụ lập trình bo mạch vi điều khiển; thiết kế, lắp ráp, kiểm tra mạch ứng dụng dùng bo mạch vi điều khiển.", 3], ["Công nghệ Công nghiệp", "Lớp 12", 10, "Chủ đề 10. Chuyên đề học tập Công nghệ 12", 1, "10.1. Thiết kế hệ thống cảnh báo trong gia đình", "Nhận biết nhu cầu cảnh báo; trình bày cấu trúc, nguyên lí và thiết kế, chế tạo hệ thống cảnh báo dùng vi điều khiển.", 3], ["Công nghệ Công nghiệp", "Lớp 12", 10, "Chủ đề 10. Chuyên đề học tập Công nghệ 12", 2, "10.2. Dự án nghiên cứu lĩnh vực hệ thống nhúng", "Mô tả đặc điểm dự án hệ thống nhúng; hình thành ý tưởng, lập kế hoạch, triển khai và báo cáo dự án.", 3], ["Công nghệ Công nghiệp", "Lớp 12", 10, "Chủ đề 10. Chuyên đề học tập Công nghệ 12", 3, "10.3. Dự án nghiên cứu lĩnh vực robot và máy thông minh", "Mô tả đặc điểm dự án robot và máy thông minh; hình thành ý tưởng, lập kế hoạch, triển khai và báo cáo dự án.", 3]], "CNNN": [["Công nghệ Nông nghiệp", "Lớp 10", 1, "Chủ đề 1. Giới thiệu chung về trồng trọt", 1, "1.1. Vai trò, triển vọng và phân loại cây trồng", "Trình bày vai trò, triển vọng trồng trọt trong CMCN 4.0; phân loại nhóm cây trồng và phân tích mối quan hệ giữa cây trồng với yếu tố chính.", 2], ["Công nghệ Nông nghiệp", "Lớp 10", 1, "Chủ đề 1. Giới thiệu chung về trồng trọt", 2, "1.2. Thành tựu công nghệ cao và ngành nghề trồng trọt", "Nêu một số thành tựu công nghệ cao và yêu cầu cơ bản với người lao động trong trồng trọt.", 1], ["Công nghệ Nông nghiệp", "Lớp 10", 2, "Chủ đề 2. Đất trồng", 1, "2.1. Thành phần, tính chất và cải tạo đất trồng", "Trình bày khái niệm, thành phần, tính chất đất trồng; giải thích cơ sở khoa học biện pháp sử dụng, cải tạo, bảo vệ đất; nêu ứng dụng sản xuất giá thể.", 2], ["Công nghệ Nông nghiệp", "Lớp 10", 2, "Chủ đề 2. Đất trồng", 2, "2.2. Xác định độ chua, độ mặn và thực tiễn cải tạo đất", "Xác định được độ mặn, độ chua của đất; vận dụng kiến thức sử dụng, cải tạo đất trồng vào thực tiễn.", 3], ["Công nghệ Nông nghiệp", "Lớp 10", 3, "Chủ đề 3. Phân bón", 1, "3.1. Đặc điểm, sử dụng, bảo quản và công nghệ sản xuất phân bón", "Trình bày khái niệm, vai trò, đặc điểm phân bón; so sánh biện pháp sử dụng, bảo quản; trình bày ứng dụng công nghệ vi sinh, nano.", 2], ["Công nghệ Nông nghiệp", "Lớp 10", 3, "Chủ đề 3. Phân bón", 2, "3.2. Nhận biết và vận dụng sử dụng phân bón", "Nhận biết một số loại phân bón thông thường; vận dụng kiến thức sử dụng và bảo quản phân bón vào thực tiễn.", 3], ["Công nghệ Nông nghiệp", "Lớp 10", 4, "Chủ đề 4. Công nghệ giống cây trồng", 1, "4.1. Chọn, tạo, nhân giống và ứng dụng công nghệ sinh học", "Trình bày khái niệm, vai trò giống; mô tả phương pháp chọn, tạo, nhân giống và ứng dụng công nghệ sinh học; thực hiện nhân giống vô tính.", 3], ["Công nghệ Nông nghiệp", "Lớp 10", 5, "Chủ đề 5. Phòng, trừ sâu, bệnh hại cây trồng", 1, "5.1. Nhận biết sâu bệnh và biện pháp phòng trừ an toàn", "Trình bày tác hại, đặc điểm nhận biết, nguyên nhân, biện pháp phòng trừ và ứng dụng công nghệ vi sinh; lựa chọn biện pháp an toàn.", 2], ["Công nghệ Nông nghiệp", "Lớp 10", 6, "Chủ đề 6. Kĩ thuật trồng trọt", 1, "6.1. Quy trình trồng trọt, cơ giới hoá và bảo quản chế biến", "Mô tả quy trình trồng trọt; nêu ứng dụng cơ giới hoá, công nghệ cao; lập kế hoạch, tính chi phí và chế biến sản phẩm đơn giản.", 3], ["Công nghệ Nông nghiệp", "Lớp 10", 7, "Chủ đề 7. Trồng trọt công nghệ cao", 1, "7.1. Mô hình trồng trọt công nghệ cao và trồng cây không dùng đất", "Trình bày vấn đề cơ bản, mô tả mô hình, giải thích cơ sở khoa học hệ thống thuỷ canh, khí canh; thực hiện trồng cây không dùng đất.", 3], ["Công nghệ Nông nghiệp", "Lớp 10", 8, "Chủ đề 8. Bảo vệ môi trường trong trồng trọt", 1, "8.1. Xử lí chất thải trồng trọt bằng công nghệ vi sinh", "Trình bày sự cần thiết bảo vệ môi trường; nêu ứng dụng công nghệ vi sinh và thực hiện xử lí chất thải trồng trọt.", 3], ["Công nghệ Nông nghiệp", "Lớp 10", 9, "Chủ đề 9. Chuyên đề học tập Trồng trọt 10", 1, "9.1. Công nghệ sinh học, hoa cây cảnh và VietGAP trong trồng trọt", "Phân tích ứng dụng CNSH; mô tả quy trình trồng hoa, cây cảnh và trồng trọt theo tiêu chuẩn VietGAP.", 2], ["Công nghệ Nông nghiệp", "Lớp 11", 1, "Chủ đề 1. Giới thiệu chung về chăn nuôi", 1, "1.1. Vai trò, phân loại, phương thức và ngành nghề chăn nuôi", "Trình bày vai trò, triển vọng chăn nuôi trong CMCN 4.0; phân loại vật nuôi; nêu phương thức, xu hướng chăn nuôi bền vững, thông minh và ngành nghề.", 1], ["Công nghệ Nông nghiệp", "Lớp 11", 2, "Chủ đề 2. Công nghệ giống vật nuôi", 1, "2.1. Chọn, nhân giống và ứng dụng CNSH trong giống vật nuôi", "Trình bày khái niệm, vai trò, chỉ tiêu, phương pháp chọn giống; lựa chọn phương pháp phù hợp và phân tích ứng dụng CNSH.", 2], ["Công nghệ Nông nghiệp", "Lớp 11", 3, "Chủ đề 3. Công nghệ thức ăn chăn nuôi", 1, "3.1. Dinh dưỡng, sản xuất và bảo quản thức ăn chăn nuôi", "Trình bày nhu cầu dinh dưỡng, giải thích thành phần thức ăn; mô tả phương pháp sản xuất, ứng dụng công nghệ cao; thực hiện chế biến, bảo quản.", 3], ["Công nghệ Nông nghiệp", "Lớp 11", 4, "Chủ đề 4. Phòng, trị bệnh cho vật nuôi", 1, "4.1. Phòng, trị bệnh phổ biến và ứng dụng CNSH", "Trình bày vai trò, đặc điểm, nguyên nhân, biện pháp phòng trị bệnh và ứng dụng CNSH; đề xuất biện pháp an toàn và vận dụng vào thực tiễn.", 3], ["Công nghệ Nông nghiệp", "Lớp 11", 5, "Chủ đề 5. Công nghệ chăn nuôi", 1, "5.1. Quy trình chăn nuôi, VietGAP và mô hình công nghệ cao", "Mô tả quy trình nuôi dưỡng, yêu cầu chuồng nuôi, mô hình công nghệ cao; phân tích quy trình VietGAP; đề xuất biện pháp vệ sinh và thực hành.", 3], ["Công nghệ Nông nghiệp", "Lớp 11", 6, "Chủ đề 6. Bảo vệ môi trường trong chăn nuôi", 1, "6.1. Xử lí chất thải chăn nuôi bằng công nghệ sinh học", "Trình bày sự cần thiết bảo vệ môi trường; mô tả biện pháp xử lí chất thải, đệm lót sinh học và vận dụng vào thực tiễn.", 2], ["Công nghệ Nông nghiệp", "Lớp 11", 7, "Chủ đề 7. Chuyên đề học tập Chăn nuôi 11", 1, "7.1. CNSH, động vật cảnh và chăn nuôi VietGAP", "Phân tích ứng dụng CNSH trong chăn nuôi; mô tả quy trình nuôi động vật cảnh và chăn nuôi theo tiêu chuẩn VietGAP.", 2], ["Công nghệ Nông nghiệp", "Lớp 12", 1, "Chủ đề 1. Giới thiệu chung về lâm nghiệp", 1, "1.1. Vai trò, hoạt động, suy thoái rừng và ngành nghề lâm nghiệp", "Trình bày vai trò, hoạt động, đặc trưng sản xuất và ngành nghề lâm nghiệp; phân tích nguyên nhân suy thoái rừng và giải pháp khắc phục.", 2], ["Công nghệ Nông nghiệp", "Lớp 12", 2, "Chủ đề 2. Trồng và chăm sóc rừng", 1, "2.1. Quy luật sinh trưởng và kĩ thuật trồng, chăm sóc rừng", "Trình bày vai trò, nhiệm vụ; phân tích quy luật sinh trưởng cây rừng; giải thích bố trí thời vụ và mô tả kĩ thuật trồng, chăm sóc rừng.", 2], ["Công nghệ Nông nghiệp", "Lớp 12", 3, "Chủ đề 3. Bảo vệ và khai thác tài nguyên rừng bền vững", 1, "3.1. Biện pháp bảo vệ, khai thác rừng bền vững", "Trình bày ý nghĩa, nhiệm vụ, biện pháp bảo vệ và khai thác rừng bền vững; đánh giá thực trạng địa phương và đề xuất biện pháp.", 3], ["Công nghệ Nông nghiệp", "Lớp 12", 4, "Chủ đề 4. Giới thiệu chung về thuỷ sản", 1, "4.1. Vai trò, phân loại, phương thức và xu hướng thuỷ sản", "Trình bày vai trò, triển vọng, phân loại nhóm thuỷ sản, phương thức nuôi, xu hướng phát triển và yêu cầu ngành nghề thuỷ sản.", 2], ["Công nghệ Nông nghiệp", "Lớp 12", 5, "Chủ đề 5. Môi trường nuôi thuỷ sản", 1, "5.1. Yêu cầu, yếu tố ảnh hưởng và xử lí môi trường nuôi", "Trình bày yêu cầu, phân tích yếu tố ảnh hưởng; mô tả biện pháp xử lí, ứng dụng CNSH; xác định một số chỉ tiêu cơ bản nước nuôi thuỷ sản.", 3], ["Công nghệ Nông nghiệp", "Lớp 12", 6, "Chủ đề 6. Công nghệ giống thuỷ sản", 1, "6.1. Đặc điểm sinh sản, ương nuôi và CNSH giống thuỷ sản", "Trình bày vai trò giống; phân tích đặc điểm sinh sản cá, tôm; mô tả kĩ thuật ương nuôi và phân tích ứng dụng CNSH trong chọn, nhân giống.", 2], ["Công nghệ Nông nghiệp", "Lớp 12", 7, "Chủ đề 7. Công nghệ thức ăn thuỷ sản", 1, "7.1. Dinh dưỡng, bảo quản, chế biến thức ăn thuỷ sản", "Trình bày thành phần dinh dưỡng, vai trò nhóm thức ăn và ứng dụng CNSH; mô tả và thực hiện bảo quản, chế biến thức ăn thuỷ sản quy mô nhỏ.", 3], ["Công nghệ Nông nghiệp", "Lớp 12", 8, "Chủ đề 8. Phòng, trị bệnh thuỷ sản", 1, "8.1. Phòng, trị bệnh phổ biến và ứng dụng CNSH", "Trình bày vai trò, đặc điểm, nguyên nhân, biện pháp phòng trị bệnh thuỷ sản và ứng dụng CNSH; vận dụng vào thực tiễn.", 3], ["Công nghệ Nông nghiệp", "Lớp 12", 9, "Chủ đề 9. Công nghệ nuôi thuỷ sản", 1, "9.1. Quy trình nuôi, VietGAP, Biofloc và thu hoạch bảo quản", "Mô tả quy trình nuôi, công nghệ Biofloc/Semi-biofloc, thu hoạch bảo quản; phân tích VietGAP; đề xuất biện pháp vệ sinh ao nuôi và thực hành.", 3], ["Công nghệ Nông nghiệp", "Lớp 12", 10, "Chủ đề 10. Bảo vệ và khai thác nguồn lợi thuỷ sản", 1, "10.1. Biện pháp khai thác và bảo vệ nguồn lợi thuỷ sản", "Trình bày ý nghĩa, nhiệm vụ, biện pháp khai thác và bảo vệ nguồn lợi thuỷ sản; đề xuất biện pháp nâng cao ý thức bảo vệ.", 3], ["Công nghệ Nông nghiệp", "Lớp 12", 11, "Chủ đề 11. Chuyên đề học tập Lâm nghiệp – Thuỷ sản 12", 1, "11.1. CNSH trong lâm nghiệp, thuỷ sản và nuôi cá cảnh", "Phân tích ứng dụng CNSH trong lâm nghiệp và thuỷ sản; mô tả và thực hành quy trình nuôi dưỡng, chăm sóc cá cảnh.", 2]], "CNTHCS": [["Công nghệ", "Lớp 6", 1, "Chủ đề 1. Nhà ở", 1, "1.1. Kiến trúc, xây dựng, ngôi nhà thông minh và tiết kiệm năng lượng", "Nêu vai trò, đặc điểm nhà ở, vật liệu xây dựng; mô tả ngôi nhà thông minh; thực hiện biện pháp sử dụng năng lượng tiết kiệm, hiệu quả.", 2], ["Công nghệ", "Lớp 6", 2, "Chủ đề 2. Bảo quản và chế biến thực phẩm", 1, "2.1. Dinh dưỡng, bảo quản và chế biến thực phẩm an toàn", "Nhận biết nhóm thực phẩm; trình bày phương pháp bảo quản, chế biến; chế biến món ăn không dùng nhiệt và tính toán chi phí bữa ăn.", 3], ["Công nghệ", "Lớp 6", 3, "Chủ đề 3. Trang phục và thời trang", 1, "3.1. Các loại vải, thời trang và sử dụng bảo quản trang phục", "Nhận biết vai trò, các loại vải; trình bày kiến thức thời trang; lựa chọn, sử dụng và bảo quản trang phục phù hợp.", 2], ["Công nghệ", "Lớp 6", 4, "Chủ đề 4. Đồ dùng điện trong gia đình", 1, "4.1. Cấu tạo, nguyên lí và sử dụng an toàn đồ dùng điện", "Nhận biết bộ phận, vẽ sơ đồ khối, mô tả nguyên lí; sử dụng và lựa chọn đồ dùng điện tiết kiệm năng lượng, an toàn.", 2], ["Công nghệ", "Lớp 7", 1, "Chủ đề 1. Trồng trọt", 1, "1.1. Mở đầu và quy trình trồng trọt", "Trình bày vai trò, phương thức, trồng trọt công nghệ cao và quy trình trồng trọt; thực hiện giâm cành, lập kế hoạch và tính chi phí.", 3], ["Công nghệ", "Lớp 7", 2, "Chủ đề 2. Trồng, chăm sóc và bảo vệ rừng", 1, "2.1. Vai trò rừng, quy trình trồng và bảo vệ rừng", "Trình bày vai trò, phân biệt các loại rừng; tóm tắt quy trình trồng, chăm sóc và biện pháp bảo vệ rừng.", 2], ["Công nghệ", "Lớp 7", 3, "Chủ đề 3. Chăn nuôi", 1, "3.1. Mở đầu, nuôi dưỡng, chăm sóc và phòng trị bệnh vật nuôi", "Trình bày vai trò, phương thức, kĩ thuật nuôi dưỡng và phòng trị bệnh vật nuôi; lập kế hoạch và tính chi phí nuôi.", 2], ["Công nghệ", "Lớp 7", 4, "Chủ đề 4. Nuôi thuỷ sản", 1, "4.1. Quy trình nuôi và đo các chỉ tiêu nước nuôi thuỷ sản", "Trình bày vai trò, quy trình nuôi thuỷ sản; lập kế hoạch tính chi phí; đo được nhiệt độ, độ trong của nước nuôi.", 3], ["Công nghệ", "Lớp 8", 1, "Chủ đề 1. Vẽ kĩ thuật", 1, "1.1. Tiêu chuẩn, hình chiếu vuông góc và đọc bản vẽ", "Mô tả tiêu chuẩn bản vẽ; vẽ hình chiếu vuông góc khối đa diện, tròn xoay, vật thể đơn giản; đọc bản vẽ chi tiết, bản vẽ lắp, bản vẽ nhà.", 2], ["Công nghệ", "Lớp 8", 2, "Chủ đề 2. Cơ khí", 1, "2.1. Vật liệu, truyền biến đổi chuyển động và gia công cơ khí", "Nhận biết vật liệu; trình bày truyền/biến đổi chuyển động và gia công tay; tháo lắp tính tỉ số truyền và thực hiện gia công cầm tay.", 3], ["Công nghệ", "Lớp 8", 3, "Chủ đề 3. An toàn điện", 1, "3.1. Nguyên nhân, biện pháp an toàn và sơ cứu tai nạn điện", "Nhận biết nguyên nhân, trình bày biện pháp an toàn điện; sử dụng dụng cụ bảo vệ và thực hiện sơ cứu người bị tai nạn điện.", 3], ["Công nghệ", "Lớp 8", 4, "Chủ đề 4. Kĩ thuật điện", 1, "4.1. Cấu trúc mạch điện và mạch điều khiển dùng mô đun cảm biến", "Trình bày cấu trúc mạch điện; vẽ sơ đồ khối mạch điều khiển; lắp ráp mạch điều khiển dùng mô đun cảm biến ánh sáng, nhiệt độ, độ ẩm.", 3], ["Công nghệ", "Lớp 8", 5, "Chủ đề 5. Thiết kế kĩ thuật", 1, "5.1. Mục đích, vai trò, các bước và thực hành thiết kế kĩ thuật", "Trình bày mục đích, vai trò, ngành nghề và các bước thiết kế kĩ thuật; thiết kế sản phẩm đơn giản theo gợi ý.", 3], ["Công nghệ", "Lớp 9", 1, "Chủ đề 1. Định hướng nghề nghiệp", 1, "1.1. Nghề nghiệp, hệ thống giáo dục, thị trường lao động và lựa chọn nghề", "Trình bày khái niệm nghề nghiệp, phân luồng sau THCS, thị trường lao động kĩ thuật công nghệ và tự đánh giá năng lực lựa chọn nghề.", 2], ["Công nghệ", "Lớp 9", 2, "Chủ đề 2. Trải nghiệm nghề nghiệp (Mô đun tự chọn)", 1, "2.1. Lắp đặt mạng điện trong nhà / Nhà thông minh / Kit vi điều khiển", "Mô tả cấu tạo thiết bị, thiết kế sơ đồ, lựa chọn vật liệu, lắp đặt, kiểm tra và tính toán chi phí cho mô đun trải nghiệm nghề nghiệp.", 3]]};
+
+    function getVisibleCurriculumTopics() {
+      if (isSystemAdmin()) return state.curriculum_topics || [];
+      const me = state.currentUser?.username;
+      return (state.curriculum_topics || []).filter(t => (t.createdBy || 'admin') === me || (t.createdBy || 'admin') === 'admin');
+    }
+
+    function getSubjectPrefixCode(subject) {
+      const s = (subject || '').toLowerCase();
+      if (s.includes('công nghệ công nghiệp') || s.includes('cong nghe cong nghiep')) return 'CNCN';
+      if (s.includes('công nghệ nông nghiệp') || s.includes('cong nghe nong nghiep')) return 'CNNN';
+      if (s.includes('công nghệ') || s.includes('cong nghe')) return 'CN';
+      if (s.includes('toán') || s.includes('toan')) return 'TO';
+      if (s.includes('vật lí') || s.includes('vật lý') || s.includes('vat li')) return 'VL';
+      if (s.includes('hóa') || s.includes('hoa')) return 'HH';
+      if (s.includes('sinh')) return 'SH';
+      if (s.includes('tin')) return 'TH';
+      if (s.includes('ngữ văn') || s.includes('văn')) return 'NV';
+      if (s.includes('anh')) return 'TA';
+      if (s.includes('lịch sử') || s.includes('sử')) return 'LS';
+      if (s.includes('địa') || s.includes('dia')) return 'DL';
+      if (s.includes('gdkt') || s.includes('kinh tế')) return 'KT';
+      const clean = (subject || 'MH').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-zA-Z]/g, '').toUpperCase();
+      return (clean.slice(0, 3) || 'MH');
+    }
+
+    // Quy ước nhanh theo yêu cầu: Biết = 1 | Hiểu = 2 | Vận dụng = 3
+    function getLevelShortCode(level) {
+      const l = String(level ?? '').trim().toLowerCase();
+      if (l === '3' || l.includes('vận dụng') || l === 'vd' || l === 'vdc') return '3';
+      if (l === '2' || l.includes('hiểu') || l === 'th') return '2';
+      return '1';
+    }
+
+    function levelCodeToFull(code) {
+      const u = String(code ?? '').trim().toUpperCase();
+      if (u === '3' || u === 'VD' || u === 'VDC' || u.includes('VẬN DỤNG')) return 'Vận dụng';
+      if (u === '2' || u === 'TH' || u.includes('HIỂU')) return 'Hiểu';
+      return 'Biết';
+    }
+
+    function formatLevelBadge(level) {
+      const num = getLevelShortCode(level);
+      const label = levelCodeToFull(num);
+      return `${num} (${label})`;
+    }
+
+    function buildCurriculumSymbolCode(subject, grade, topic, subtopic, level, tt) {
+      const subCode = getSubjectPrefixCode(subject);
+      const gradeNum = (String(grade || '12').match(/\d+/) || ['12'])[0];
+      const topicNum = (String(topic || '').match(/\d+/) || [String(tt || 1)])[0];
+      const subMatch = String(subtopic || '').match(/\d+\.(\d+)/) || String(subtopic || '').match(/(\d+)/);
+      const subNum = subMatch ? subMatch[1] : String(tt || 1);
+      const lvlCode = getLevelShortCode(level);
+      return `${subCode}-${gradeNum}.C${topicNum}.${subNum}-${lvlCode}`;
+    }
+
+    function buildOfficialPresetRecords(presetKey) {
+      const rows = CT2018_CONG_NGHE_PRESETS[presetKey] || [];
+      return rows.map((r, idx) => {
+        const [subject, grade, topicNum, topic, subNum, subtopic, yccd, lvlNum] = r;
+        const level = levelCodeToFull(lvlNum);
+        const code = `${getSubjectPrefixCode(subject)}-${(grade.match(/\d+/) || ['12'])[0]}.C${topicNum}.${subNum}-${lvlNum}`;
+        return {
+          id: `ct2018-${presetKey.toLowerCase()}-${code.toLowerCase().replace(/[^a-z0-9]/g, '-')}`,
+          tt: idx + 1,
+          subject,
+          grade,
+          topic,
+          subtopic,
+          yccd,
+          level,
+          code,
+          createdBy: 'admin',
+          createdByName: 'CT GDPT 2018 (Bộ GD&ĐT)',
+          createdAt: 1700000000000 + idx
+        };
+      });
+    }
+
+    window.importOfficialCongNghe2018 = async function(presetKey) {
+      const records = buildOfficialPresetRecords(presetKey);
+      if (records.length === 0) return;
+      const existingCodes = new Set((state.curriculum_topics || []).map(t => (t.code || '').toUpperCase()));
+      let added = 0;
+      for (const rec of records) {
+        if (existingCodes.has(rec.code.toUpperCase())) continue;
+        await saveDocData('curriculum_topics', rec.id, rec);
+        existingCodes.add(rec.code.toUpperCase());
+        added++;
+      }
+      renderCurriculumTable();
+      const labelMap = { CNCN: 'Công nghệ Công nghiệp (10-11-12)', CNNN: 'Công nghệ Nông nghiệp (10-11-12)', CNTHCS: 'Công nghệ THCS (6-7-8-9)' };
+      if (added > 0) {
+        showToast(`Đã bổ sung ${added} tiểu chủ đề CT 2018 môn ${labelMap[presetKey] || presetKey} (Mức: 1=Biết, 2=Hiểu, 3=Vận dụng)!`, 'success');
+      } else {
+        showToast(`Toàn bộ CT 2018 môn ${labelMap[presetKey] || presetKey} đã có sẵn trong bảng chủ đề!`, 'info');
+      }
+    };
+
+    document.getElementById('add-curriculum-form')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const subject = document.getElementById('cur-subject').value.trim() || 'Công nghệ Công nghiệp';
+      const grade = document.getElementById('cur-grade').value || 'Lớp 12';
+      const tt = parseInt(document.getElementById('cur-tt').value) || 1;
+      const topic = document.getElementById('cur-topic').value.trim();
+      const subtopic = document.getElementById('cur-subtopic').value.trim();
+      const yccd = document.getElementById('cur-yccd').value.trim();
+      const level = levelCodeToFull(document.getElementById('cur-level').value || '1');
+      if (!topic || !subtopic || !yccd) return;
+
+      const code = buildCurriculumSymbolCode(subject, grade, topic, subtopic, level, tt);
+      const docId = 'cur-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6);
+      await saveDocData('curriculum_topics', docId, {
+        id: docId,
+        tt,
+        subject,
+        grade,
+        topic,
+        subtopic,
+        yccd,
+        level,
+        code,
+        createdBy: state.currentUser?.username || 'admin',
+        createdByName: state.currentUser?.name || 'Admin',
+        createdAt: Date.now()
+      });
+
+      document.getElementById('cur-tt').value = tt + 1;
+      document.getElementById('cur-subtopic').value = '';
+      document.getElementById('cur-yccd').value = '';
+      showToast(`Đã thêm chủ đề & sinh mã ký hiệu [${code}]!`, 'success');
+    });
+
+    window.handleBulkImportCurriculum = async function() {
+      const raw = (document.getElementById('bulk-curriculum-input')?.value || '').trim();
+      if (!raw) return showToast('Vui lòng dán bảng chủ đề vào ô nhập!', 'warning');
+      const defaultSubject = document.getElementById('cur-subject')?.value.trim() || 'Công nghệ Công nghiệp';
+      const lines = raw.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+      let added = 0;
+
+      for (const line of lines) {
+        const parts = line.includes('\t') ? line.split('\t') : line.split('|');
+        if (parts.length < 4) continue;
+        if (/^tt$/i.test(parts[0].trim()) || /yêu cầu cần đạt/i.test(line)) continue;
+
+        const tt = parseInt(parts[0].trim()) || (added + 1);
+        const rawGrade = parts[1].trim();
+        const grade = /lớp/i.test(rawGrade) ? rawGrade : (`Lớp ${rawGrade.replace(/[^0-9]/g, '') || '12'}`);
+        let topic = '', subtopic = '', yccd = '', level = 'Biết';
+
+        if (parts.length >= 6) {
+          topic = parts[2].trim();
+          subtopic = parts[3].trim();
+          yccd = parts[4].trim();
+          level = levelCodeToFull(parts[5].trim());
+        } else {
+          topic = parts[2].trim();
+          subtopic = topic;
+          yccd = parts[3].trim();
+          level = levelCodeToFull((parts[4] || '1').trim());
+        }
+
+        const code = buildCurriculumSymbolCode(defaultSubject, grade, topic, subtopic, level, tt);
+        const docId = 'cur-' + Date.now() + '-' + added + '-' + Math.random().toString(36).slice(2, 5);
+        await saveDocData('curriculum_topics', docId, {
+          id: docId,
+          tt,
+          subject: defaultSubject,
+          grade,
+          topic,
+          subtopic,
+          yccd,
+          level,
+          code,
+          createdBy: state.currentUser?.username || 'admin',
+          createdByName: state.currentUser?.name || 'Admin',
+          createdAt: Date.now() + added
+        });
+        added++;
+      }
+
+      if (added > 0) {
+        document.getElementById('bulk-curriculum-input').value = '';
+        showToast(`Đã nạp thành công ${added} dòng chủ đề CT 2018 và tự động sinh mã ký hiệu!`, 'success');
+      } else {
+        showToast('Không nhận diện được dòng hợp lệ. Kiểm tra định dạng 6 cột cách nhau bằng Tab hoặc dấu |.', 'error');
+      }
+    };
+
+    window.deleteCurriculumTopic = async function(id) {
+      await deleteDocData('curriculum_topics', id);
+      showToast('Đã xóa dòng chủ đề.', 'info');
+    };
+
+    window.copyCurriculumCode = function(code) {
+      const txt = `[${code}]`;
+      if (navigator.clipboard) navigator.clipboard.writeText(txt).catch(() => {});
+      showToast(`Đã sao chép ký hiệu ${txt} để dán vào đầu câu hỏi Word!`, 'success');
+    };
+
+    function getFilteredCurriculumTopics() {
+      const all = getVisibleCurriculumTopics();
+      const fSub = document.getElementById('cur-filter-subject')?.value || 'ALL';
+      const fGrade = document.getElementById('cur-filter-grade')?.value || 'ALL';
+      return all.filter(t => (fSub === 'ALL' || t.subject === fSub) && (fGrade === 'ALL' || t.grade === fGrade));
+    }
+
+    window.renderCurriculumTable = function() {
+      const all = getVisibleCurriculumTopics();
+      const pill = document.getElementById('curriculum-total-pill');
+      const cntBadge = document.getElementById('curriculum-count-badge');
+      if (pill) pill.textContent = all.length;
+
+      const fillSel = (id, allTxt, vals) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const prev = el.value || 'ALL';
+        const uniq = [...new Set(vals.filter(Boolean))].sort();
+        el.innerHTML = `<option value="ALL">${allTxt}</option>` + uniq.map(v => `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`).join('');
+        if (prev === 'ALL' || uniq.includes(prev)) el.value = prev;
+      };
+      fillSel('cur-filter-subject', 'Tất cả Môn', all.map(t => t.subject));
+      fillSel('cur-filter-grade', 'Tất cả Khối', all.map(t => t.grade));
+
+      const filtered = getFilteredCurriculumTopics();
+      if (cntBadge) cntBadge.textContent = filtered.length;
+
+      const tbody = document.getElementById('curriculum-table-body');
+      if (tbody) {
+        if (filtered.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-slate-400">Chưa có chủ đề CT 2018 nào. Hãy bấm <b>+ CT CN Công nghiệp (10-12)</b> ở cột bên trái để nạp ngay!</td></tr>`;
+        } else {
+          tbody.innerHTML = filtered.map((t, idx) => `
+            <tr class="hover:bg-slate-50">
+              <td class="py-2.5 px-2.5 text-center font-bold text-slate-500">${idx + 1}</td>
+              <td class="py-2.5 px-2.5 whitespace-nowrap">
+                <div class="font-bold text-slate-800">${escapeHtml(t.grade)}</div>
+                <div class="text-[10px] text-indigo-700 font-semibold">${escapeHtml(t.subject)}</div>
+              </td>
+              <td class="py-2.5 px-3">
+                <div class="font-bold text-slate-800">${escapeHtml(t.topic)}</div>
+                <div class="text-[11px] text-brand-700 font-medium mt-0.5">↳ ${escapeHtml(t.subtopic)}</div>
+              </td>
+              <td class="py-2.5 px-3 text-slate-600 leading-snug">${escapeHtml(t.yccd)}</td>
+              <td class="py-2.5 px-2.5 text-center whitespace-nowrap">
+                <span class="px-2 py-0.5 rounded-md bg-amber-50 text-amber-800 border border-amber-200 font-bold text-[10px]">${escapeHtml(formatLevelBadge(t.level))}</span>
+              </td>
+              <td class="py-2.5 px-2.5 whitespace-nowrap">
+                <button type="button" onclick="copyCurriculumCode('${escapeHtml(t.code)}')" title="Nhấn để sao chép ký hiệu" class="px-2 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-mono text-[11px] font-extrabold transition">
+                  [${escapeHtml(t.code)}]
+                </button>
+              </td>
+              <td class="py-2.5 px-2 text-right">
+                <button type="button" onclick="deleteCurriculumTopic('${escapeHtml(t.id)}')" class="p-1 rounded-lg text-rose-500 hover:bg-rose-50 transition" title="Xóa">
+                  <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                </button>
+              </td>
+            </tr>
+          `).join('');
+        }
+      }
+
+      renderCodingGuideBox(filtered);
+      lucide.createIcons();
+    };
+
+    function renderCodingGuideBox(topicsList) {
+      const box = document.getElementById('curriculum-coding-guide-box');
+      if (!box) return;
+      const sample1 = topicsList[0]?.code || 'CNCN-12.C1.1-1';
+      const sample2 = topicsList[1]?.code || 'CNCN-12.C2.1-2';
+      const sample3 = topicsList.find(t => getLevelShortCode(t.level) === '3')?.code || 'CNCN-12.C3.3-3';
+      box.innerHTML = `
+        <div><b>1. Cấu trúc ký hiệu chuẩn (gõ nhanh):</b> <code class="px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-900 font-extrabold">[MÃ_MÔN]-[KHỐI].C[CHỦ_ĐỀ].[TIỂU_CĐ]-[MỨC_ĐỘ]</code></div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-[11px] text-slate-600">
+          <div>• <b>Quy ước Mức độ (nhanh):</b> <code class="font-extrabold text-indigo-700">1</code> = Biết &nbsp;|&nbsp; <code class="font-extrabold text-indigo-700">2</code> = Hiểu &nbsp;|&nbsp; <code class="font-extrabold text-indigo-700">3</code> = Vận dụng</div>
+          <div>• <b>Mã môn Công nghệ:</b> <code>CNCN</code> (CN Công nghiệp), <code>CNNN</code> (CN Nông nghiệp), <code>CN</code> (THCS)</div>
+        </div>
+        <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200 font-mono text-[11px] text-slate-800 space-y-0.5">
+          <div><b>Ví dụ gắn mã ngay sau "Câu X." trong file Word:</b></div>
+          <div>Câu 1. <span class="text-indigo-700 font-extrabold">[${escapeHtml(sample1)}]</span> Nội dung câu hỏi mức Biết (1)...</div>
+          <div>Câu 2. <span class="text-indigo-700 font-extrabold">[${escapeHtml(sample2)}]</span> Nội dung câu hỏi mức Hiểu (2)...</div>
+          <div>Câu 3. <span class="text-indigo-700 font-extrabold">[${escapeHtml(sample3)}]</span> Nội dung câu hỏi mức Vận dụng (3)...</div>
+        </div>
+      `;
+    }
+
+    function buildCodingGuidePlainText() {
+      const list = getFilteredCurriculumTopics();
+      const lines = [
+        'HƯỚNG DẪN MÃ HÓA CÂU HỎI KHO NGÂN HÀNG (CHƯƠNG TRÌNH GDPT 2018)',
+        'Cấu trúc ký hiệu: [MÃ_MÔN]-[KHỐI].C[CHỦ_ĐỀ].[TIỂU_CĐ]-[MỨC_ĐỘ]',
+        'Quy ước mức độ nhận thức (gõ nhanh): 1 = Biết | 2 = Hiểu | 3 = Vận dụng',
+        'Cách gắn trong file Word: Đặt ký hiệu trong dấu ngoặc vuông ngay sau "Câu 1."',
+        'Ví dụ: Câu 1. [CNCN-12.C1.1-1] Nội dung câu hỏi...',
+        '',
+        'BẢNG KÝ HIỆU MÃ HÓA THEO CHỦ ĐỀ / TIỂU CHỦ ĐỀ:'
+      ];
+      list.forEach((t, i) => {
+        lines.push(`${i + 1}. [${t.code}] | ${t.subject} - ${t.grade} | ${t.topic} > ${t.subtopic} | Mức độ: ${formatLevelBadge(t.level)} | YCCĐ: ${t.yccd}`);
+      });
+      return lines.join('\n');
+    }
+
+    window.copyCodingGuideText = function() {
+      const txt = buildCodingGuidePlainText();
+      if (navigator.clipboard) navigator.clipboard.writeText(txt).catch(() => {});
+      showToast('Đã sao chép toàn bộ Hướng dẫn mã hóa câu hỏi!', 'success');
+    };
+
+    window.downloadCodingGuideDoc = function() {
+      const list = getFilteredCurriculumTopics();
+      const rows = list.map((t, i) => `
+        <tr>
+          <td style="border:1px solid #94a3b8;padding:6px;text-align:center;">${i + 1}</td>
+          <td style="border:1px solid #94a3b8;padding:6px;">${escapeHtml(t.subject)}<br/><b>${escapeHtml(t.grade)}</b></td>
+          <td style="border:1px solid #94a3b8;padding:6px;"><b>${escapeHtml(t.topic)}</b><br/>${escapeHtml(t.subtopic)}</td>
+          <td style="border:1px solid #94a3b8;padding:6px;">${escapeHtml(t.yccd)}</td>
+          <td style="border:1px solid #94a3b8;padding:6px;text-align:center;font-weight:bold;">${escapeHtml(formatLevelBadge(t.level))}</td>
+          <td style="border:1px solid #94a3b8;padding:6px;font-family:monospace;font-weight:bold;color:#1e40af;white-space:nowrap;">[${escapeHtml(t.code)}]</td>
+        </tr>
+      `).join('');
+
+      const docHtml = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word'>
+        <head><meta charset='utf-8'><title>Huong_Dan_Ma_Hoa_CT2018</title></head>
+        <body style="font-family:'Times New Roman',serif;font-size:12pt;">
+          <h2>HƯỚNG DẪN MÃ HÓA CÂU HỎI KHO NGÂN HÀNG (CT GDPT 2018)</h2>
+          <p><b>Cấu trúc ký hiệu:</b> <code>[MÃ_MÔN]-[KHỐI].C[CHỦ_ĐỀ].[TIỂU_CĐ]-[MỨC_ĐỘ]</code></p>
+          <p><b>Quy ước mức độ nhận thức (gõ nhanh):</b> <b>1</b> = Biết &nbsp;|&nbsp; <b>2</b> = Hiểu &nbsp;|&nbsp; <b>3</b> = Vận dụng</p>
+          <p><b>Cách dùng:</b> Đặt ký hiệu trong dấu ngoặc vuông ngay sau <code>Câu 1.</code> trong file Word (VD: <code>Câu 1. [CNCN-12.C1.1-1] ...</code>). Khi nạp vào hệ thống, phần mềm tự động bóc tách ký hiệu và phân loại vào đúng Môn học, Khối, Chủ đề, Tiểu chủ đề và Mức độ nhận thức.</p>
+          <table style="border-collapse:collapse;width:100%;margin-top:10px;">
+            <thead>
+              <tr style="background:#eff6ff;">
+                <th style="border:1px solid #94a3b8;padding:6px;">TT</th>
+                <th style="border:1px solid #94a3b8;padding:6px;">Môn / Khối</th>
+                <th style="border:1px solid #94a3b8;padding:6px;">Chủ đề / Tiểu chủ đề</th>
+                <th style="border:1px solid #94a3b8;padding:6px;">Yêu cầu cần đạt</th>
+                <th style="border:1px solid #94a3b8;padding:6px;">Mức độ</th>
+                <th style="border:1px solid #94a3b8;padding:6px;">Ký hiệu mã hóa</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </body></html>`;
+
+      const blob = new Blob(['\ufeff', docHtml], { type: 'application/msword' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'Huong_Dan_Ma_Hoa_Cau_Hoi_CT2018.doc';
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast(`Đã tải file Hướng dẫn mã hóa (${list.length} mục CT 2018)!`, 'success');
+    };
+
+    // Bóc tách mã ký hiệu [CNCN-12.C1.1-1] (hoặc [CN-12.C1.1-NB]) và tự động phân loại theo bảng CT 2018
+    function extractCodeAndClassifyQuestion(promptHtml) {
+      const tmp = document.createElement('div');
+      tmp.innerHTML = promptHtml || '';
+      const plain = (tmp.textContent || '').trim();
+      const m = plain.match(/\[\s*([A-Z]{2,5}\s*-\s*\d{1,2}\.[A-Z]?\d+(?:\.\d+)?\s*-\s*(?:1|2|3|VDC|VD|TH|NB))\s*\]/i);
+
+      if (!m) {
+        return { cleanPromptHtml: promptHtml, code: '', matchedTopic: null };
+      }
+
+      const rawTag = m[0];
+      const normCode = m[1].replace(/\s+/g, '').toUpperCase();
+      const cleanPromptHtml = (promptHtml || '').replace(rawTag, '').replace(/<p>\s*<\/p>/g, '').trim();
+
+      const allCur = getVisibleCurriculumTopics();
+      // 1. Khớp chính xác
+      let matched = allCur.find(t => (t.code || '').toUpperCase() === normCode);
+      // 2. Khớp cùng phần Môn-Khối.ChủĐề.TiểuCĐ (khác mức độ 1/2/3)
+      if (!matched) {
+        const prefix = normCode.replace(/-(1|2|3|VDC|VD|TH|NB)$/, '');
+        matched = allCur.find(t => (t.code || '').toUpperCase().startsWith(prefix + '-'));
+      }
+      // 3. Khớp linh hoạt khi GV gõ gọn [CN-12.C1.1-1] thay vì [CNCN-12.C1.1-1]
+      if (!matched && normCode.startsWith('CN-')) {
+        const altPrefix = normCode.replace(/^CN-/, 'CNCN-').replace(/-(1|2|3|VDC|VD|TH|NB)$/, '');
+        matched = allCur.find(t => (t.code || '').toUpperCase().startsWith(altPrefix + '-'));
+      }
+
+      const lvlMatch = normCode.match(/-(1|2|3|VDC|VD|TH|NB)$/);
+      const levelFromCode = lvlMatch ? levelCodeToFull(lvlMatch[1]) : 'Biết';
+      const gradeMatch = normCode.match(/-(\d{1,2})\./);
+      const gradeFromCode = gradeMatch ? `Lớp ${gradeMatch[1]}` : 'Lớp 12';
+
+      return {
+        cleanPromptHtml,
+        code: normCode,
+        subject: matched?.subject || (state.currentUser?.subject && state.currentUser.subject !== 'Quản trị hệ thống' ? state.currentUser.subject : 'Công nghệ Công nghiệp'),
+        grade: matched?.grade || gradeFromCode,
+        topic: matched?.topic || `Chủ đề theo mã ${normCode}`,
+        subtopic: matched?.subtopic || '',
+        yccd: matched?.yccd || '',
+        level: levelFromCode
+      };
+    }
+
+    window.handleCodedBankFileUpload = async function(event) {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      event.target.value = '';
+
+      const lower = file.name.toLowerCase();
+      showToast(`Đang đọc & phân loại tự động câu hỏi từ "${file.name}"...`, 'info');
+
+      try {
+        const arrayBuffer = await file.arrayBuffer();
+        const header = new Uint8Array(arrayBuffer.slice(0, 4));
+        const isZipDocx = header[0] === 0x50 && header[1] === 0x4B;
+        let rawHtml = '';
+
+        if (lower.endsWith('.docx') || isZipDocx) {
+          const result = await mammoth.convertToHtml({ arrayBuffer }, {
+            styleMap: ["u => u", "r[style-name='Underline'] => u"],
+            convertImage: mammoth.images.imgElement(async (image) => {
+              const base64 = await image.read("base64");
+              const optimizedSrc = await compressDataUrlIfNeeded(`data:${image.contentType};base64,${base64}`);
+              return { src: optimizedSrc };
+            })
+          });
+          rawHtml = result.value;
+        } else {
+          const text = new TextDecoder('utf-8').decode(arrayBuffer);
+          rawHtml = lower.endsWith('.txt') ? text.split(/\r?\n/).map(l => `<p>${escapeHtml(l)}</p>`).join('') : text;
+        }
+
+        const parsed = parseExamHtml(rawHtml);
+        if (parsed.length === 0) {
+          return showToast('Không tìm thấy câu hỏi hợp lệ trong tệp!', 'error');
+        }
+
+        let classifiedCount = 0;
+        for (let i = 0; i < parsed.length; i++) {
+          const q = parsed[i];
+          const clsInfo = extractCodeAndClassifyQuestion(q.promptHtml);
+          if (clsInfo.code) classifiedCount++;
+
+          const docId = 'qb-' + Date.now() + '-' + i + '-' + Math.random().toString(36).slice(2, 5);
+          const record = {
+            id: docId,
+            type: q.type,
+            code: clsInfo.code || '',
+            subject: clsInfo.subject || (state.currentUser?.subject && state.currentUser.subject !== 'Quản trị hệ thống' ? state.currentUser.subject : 'Công nghệ Công nghiệp'),
+            grade: clsInfo.grade || 'Lớp 12',
+            topic: clsInfo.topic || 'Chưa phân loại',
+            subtopic: clsInfo.subtopic || '',
+            yccd: clsInfo.yccd || '',
+            level: clsInfo.level || 'Biết',
+            sourceDoc: file.name,
+            promptHtml: clsInfo.cleanPromptHtml,
+            createdBy: state.currentUser?.username || 'admin',
+            createdByName: state.currentUser?.name || 'Admin',
+            createdAt: Date.now() + i
+          };
+          if (q.type === 'mcq') {
+            record.options = q.options;
+            record.correctIndex = q.correctIndex;
+          } else if (q.type === 'tf') {
+            record.options = q.options;
+          } else {
+            record.correctAnswer = q.correctAnswer || '';
+          }
+          await saveDocData('question_bank', docId, record);
+        }
+
+        renderQuestionBank();
+        showToast(`Đã nạp ${parsed.length} câu vào Kho Ngân hàng (${classifiedCount} câu tự động phân loại theo ký hiệu mã hóa)!`, 'success');
+      } catch (err) {
+        console.error('Lỗi nạp kho ngân hàng có mã:', err);
+        showToast('Lỗi nạp file: ' + err.message, 'error');
+      }
+    };
+
+    // =========================================================================
+    // 26. NẠP BỘ 24 MÃ ĐỀ PDF, TỰ ĐỘNG NHẬN DIỆN MÃ ĐỀ & KHỚP ĐÁP ÁN 24 MÃ ĐỀ
+    // =========================================================================
+    function detectExamCodeFromTextAndFile(page1Text, fileName, fallbackIdx) {
+      const txt = String(page1Text || '');
+      const mText = txt.match(/(?:M[ÃA]\s*Đ[ỀE](?:\s*THI)?|Đ[ỀE]\s*S[ỐO]|M[ÃA]\s*Đ[ỀE]\s*S[ỐO])\s*[:\-\.]?\s*([0-9]{3,4}|[A-Z0-9]{2,6})/i);
+      if (mText && mText[1]) return mText[1].trim().toUpperCase();
+
+      const base = String(fileName || '').replace(/\.pdf$/i, '');
+      const mFile = base.match(/(?:m[aã]\s*[dđ][eề]|de|md)?[\s_\-]*(\d{3,4})\b/i) || base.match(/(\d{3,4})/);
+      if (mFile && mFile[1]) return mFile[1];
+
+      return String(101 + fallbackIdx).padStart(4, '0');
+    }
+
+    window.handleMultiPdfExamsUpload = async function(event) {
+      const files = Array.from(event.target.files || []).slice(0, 24);
+      if (files.length === 0) return;
+      event.target.value = '';
+
+      const statusEl = document.getElementById('pdf-multi-exams-status');
+      statusEl.innerHTML = `<span class="text-indigo-700 font-bold">Đang đọc & nhận diện mã đề cho ${files.length} file PDF...</span>`;
+      showToast(`Đang xử lý ${files.length} file PDF & tự động nhận diện Mã đề...`, 'info');
+
+      const variants = [];
+      const usedCodes = new Set();
+
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        statusEl.innerHTML = `<span class="text-indigo-700 font-bold">Đang xử lý file ${i + 1}/${files.length}: ${escapeHtml(file.name)}...</span>`;
+        try {
+          const res = await extractPdfPagesAndText(file, true, 25);
+          let code = detectExamCodeFromTextAndFile(res.fullText, file.name, i);
+          while (usedCodes.has(code)) {
+            code = String((parseInt(code, 10) || (101 + i)) + 1);
+          }
+          usedCodes.add(code);
+          variants.push({
+            code,
+            fileName: file.name,
+            pages: res.pages,
+            pageCount: res.pages.length,
+            questions: [],
+            hasKey: false
+          });
+        } catch (err) {
+          console.error(`Lỗi đọc file PDF ${file.name}:`, err);
+          showToast(`Lỗi đọc file "${file.name}": ${err.message}`, 'error');
+        }
+      }
+
+      variants.sort((a, b) => a.code.localeCompare(b.code, undefined, { numeric: true }));
+      state.pdfBuilder.multiVariants = variants;
+
+      if (!document.getElementById('pdf-builder-title').value.trim() && files[0]) {
+        document.getElementById('pdf-builder-title').value = `Đề thi trắc nghiệm (${variants.length} mã đề PDF)`;
+      }
+
+      statusEl.innerHTML = `<span class="text-emerald-700 font-bold">✓ Đã nạp & nhận diện ${variants.length} mã đề PDF!</span>`;
+      renderMultiPdfVariantsList();
+      showToast(`Đã nhận diện xong ${variants.length} mã đề PDF! Hãy nạp file Đáp án của ${variants.length} mã đề.`, 'success');
+    };
+
+    function parseMultiCodeAnswerKeys(rawText) {
+      const mapByCode = {};
+      const text = String(rawText || '').trim();
+      if (!text) return mapByCode;
+
+      const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+
+      // Cách 1: Bảng ma trận Excel/CSV (hàng đầu chứa nhiều mã đề: "Câu | 101 | 102 | 103 ...")
+      if (lines.length >= 2) {
+        const delim = lines[0].includes('\t') ? '\t' : (lines[0].includes(',') ? ',' : (lines[0].includes(';') ? ';' : null));
+        if (delim) {
+          const headers = lines[0].split(delim).map(h => h.trim().replace(/^Mã\s*đề\s*/i, ''));
+          const codeCols = [];
+          headers.forEach((h, colIdx) => {
+            if (colIdx > 0 && /^\d{2,4}$/.test(h)) codeCols.push({ colIdx, code: h });
+          });
+          if (codeCols.length >= 2) {
+            codeCols.forEach(c => { mapByCode[c.code] = []; });
+            const letters = ['A', 'B', 'C', 'D'];
+            for (let r = 1; r < lines.length; r++) {
+              const cells = lines[r].split(delim).map(x => x.trim());
+              codeCols.forEach(({ colIdx, code }) => {
+                const val = (cells[colIdx] || '').trim();
+                if (!val) return;
+                const up = val.toUpperCase();
+                if (/^[A-D]$/.test(up)) {
+                  mapByCode[code].push({ origIndex: mapByCode[code].length, type: 'mcq', options: [{ html: 'A' }, { html: 'B' }, { html: 'C' }, { html: 'D' }], correctIndex: letters.indexOf(up) });
+                } else if (/^[ĐDSFTđdsft\-\s]{4,}$/.test(val) && val.replace(/[^ĐDSFTđdsft]/g, '').length === 4) {
+                  const bools = val.replace(/[^ĐDSFTđdsft]/g, '').split('').map(ch => /[ĐDT]/i.test(ch));
+                  mapByCode[code].push({ origIndex: mapByCode[code].length, type: 'tf', options: bools.map((b, bi) => ({ html: ['a', 'b', 'c', 'd'][bi], isTrue: b })) });
+                } else {
+                  mapByCode[code].push({ origIndex: mapByCode[code].length, type: 'short', correctAnswer: val });
+                }
+              });
+            }
+            if (Object.values(mapByCode).some(arr => arr.length > 0)) return mapByCode;
+          }
+        }
+      }
+
+      // Cách 2: Theo từng khối "Mã đề 101 ... Mã đề 102 ..."
+      const blockRegex = /(?:M[ÃA]\s*Đ[ỀE](?:\s*THI)?|Đ[ỀE]\s*S[ỐO])\s*[:\-\.]?\s*([0-9]{2,4})/gi;
+      const matches = [];
+      let m;
+      while ((m = blockRegex.exec(text)) !== null) {
+        matches.push({ code: m[1].trim(), idx: m.index, endIdx: m.index + m[0].length });
+      }
+
+      if (matches.length > 0) {
+        for (let i = 0; i < matches.length; i++) {
+          const code = matches[i].code;
+          const chunk = text.slice(matches[i].endIdx, i + 1 < matches.length ? matches[i + 1].idx : text.length);
+          const parsed = parsePdfLocally('', chunk);
+          const qs = [];
+          parsed.mcqList.forEach(q => qs.push({ ...q, origIndex: qs.length }));
+          parsed.tfList.forEach(q => qs.push({ ...q, origIndex: qs.length }));
+          parsed.shortList.forEach(q => qs.push({ ...q, origIndex: qs.length }));
+          if (qs.length > 0) mapByCode[code] = qs;
+        }
+      }
+
+      return mapByCode;
+    }
+
+    function applyMultiCodeKeyMap(keyMap) {
+      const variants = state.pdfBuilder.multiVariants || [];
+      if (variants.length === 0) {
+        showToast('Vui lòng nạp các file PDF Đề thi trước khi nạp đáp án!', 'warning');
+        return 0;
+      }
+
+      const normCode = (c) => String(c || '').replace(/^0+/, '') || '0';
+      const keyEntries = Object.entries(keyMap);
+      let matchedCount = 0;
+
+      variants.forEach(v => {
+        let foundQs = keyMap[v.code];
+        if (!foundQs) {
+          const hit = keyEntries.find(([k]) => normCode(k) === normCode(v.code));
+          if (hit) foundQs = hit[1];
+        }
+        if (foundQs && foundQs.length > 0) {
+          v.questions = foundQs;
+          v.hasKey = true;
+          matchedCount++;
+        }
+      });
+
+      renderMultiPdfVariantsList();
+      const statusEl = document.getElementById('pdf-multi-keys-status');
+      if (statusEl) {
+        statusEl.innerHTML = matchedCount > 0
+          ? `<span class="text-emerald-700 font-bold">✓ Đã khớp đáp án cho ${matchedCount}/${variants.length} mã đề!</span>`
+          : `<span class="text-amber-700 font-bold">⚠ Chưa khớp mã đề nào — kiểm tra lại số Mã đề trong file đáp án</span>`;
+      }
+      return matchedCount;
+    }
+
+    window.handleMultiPdfKeysUpload = async function(event) {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      event.target.value = '';
+      showToast(`Đang đọc file đáp án "${file.name}"...`, 'info');
+
+      try {
+        let rawText = '';
+        const lower = file.name.toLowerCase();
+        if (lower.endsWith('.pdf')) {
+          const res = await extractPdfPagesAndText(file, false, 0);
+          rawText = res.fullText;
+        } else if (lower.endsWith('.docx')) {
+          const buf = await file.arrayBuffer();
+          const r = await mammoth.extractRawText({ arrayBuffer: buf });
+          rawText = r.value || '';
+        } else {
+          rawText = await file.text();
+        }
+
+        const keyMap = parseMultiCodeAnswerKeys(rawText);
+        const matched = applyMultiCodeKeyMap(keyMap);
+        if (matched > 0) {
+          showToast(`Đã tự động khớp đáp án cho ${matched}/${state.pdfBuilder.multiVariants.length} mã đề!`, 'success');
+        } else {
+          showToast('Không nhận diện được cấu trúc bảng đáp án nhiều mã đề. Bạn có thể dán bảng Excel vào ô "dán bảng đáp án"!', 'warning');
+        }
+      } catch (err) {
+        showToast('Lỗi đọc file đáp án 24 mã đề: ' + err.message, 'error');
+      }
+    };
+
+    window.applyPastedMultiKeys = function() {
+      const raw = (document.getElementById('multi-keys-paste-area')?.value || '').trim();
+      if (!raw) return showToast('Ô dán đáp án đang trống!', 'warning');
+      const keyMap = parseMultiCodeAnswerKeys(raw);
+      const matched = applyMultiCodeKeyMap(keyMap);
+      if (matched > 0) {
+        showToast(`Đã khớp đáp án thành công cho ${matched}/${state.pdfBuilder.multiVariants.length} mã đề!`, 'success');
+      } else {
+        showToast('Chưa khớp được mã đề nào. Đảm bảo số Mã đề trong bảng trùng với Mã đề đã nhận diện!', 'warning');
+      }
+    };
+
+    window.editMultiVariantCode = function(idx, newCode) {
+      if (state.pdfBuilder.multiVariants[idx]) {
+        state.pdfBuilder.multiVariants[idx].code = String(newCode || '').trim().toUpperCase();
+      }
+    };
+
+    window.removeMultiVariant = function(idx) {
+      state.pdfBuilder.multiVariants.splice(idx, 1);
+      renderMultiPdfVariantsList();
+    };
+
+    window.clearMultiPdfVariants = function() {
+      state.pdfBuilder.multiVariants = [];
+      const st1 = document.getElementById('pdf-multi-exams-status');
+      const st2 = document.getElementById('pdf-multi-keys-status');
+      if (st1) st1.textContent = 'Chưa nạp bộ nhiều mã đề (máy tự nhận diện mã đề)';
+      if (st2) st2.textContent = 'Tự động khớp đáp án vào từng Mã đề tương ứng';
+      renderMultiPdfVariantsList();
+    };
+
+    function renderMultiPdfVariantsList() {
+      const listEl = document.getElementById('pdf-multi-variants-list');
+      const sumEl = document.getElementById('pdf-builder-summary');
+      const variants = state.pdfBuilder.multiVariants || [];
+      if (!listEl) return;
+
+      if (variants.length === 0) {
+        listEl.classList.add('hidden');
+        listEl.innerHTML = '';
+        return;
+      }
+
+      listEl.classList.remove('hidden');
+      const keyed = variants.filter(v => v.hasKey).length;
+      if (sumEl) {
+        sumEl.textContent = `Bộ ${variants.length} mã đề PDF (${keyed}/${variants.length} mã đã có đáp án) — Học sinh vào thi sẽ nhận ngẫu nhiên 1 mã đề`;
+      }
+
+      listEl.innerHTML = `
+        <div class="text-xs font-bold text-indigo-950 flex items-center justify-between">
+          <span>Danh sách ${variants.length} Mã đề đã nhận diện (${keyed} mã đã có đáp án):</span>
+          <span class="text-[11px] font-normal text-slate-500">Có thể sửa nhanh số Mã đề nếu cần</span>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 max-h-[260px] overflow-y-auto pr-1">
+          ${variants.map((v, idx) => `
+            <div class="p-2.5 rounded-xl bg-white border ${v.hasKey ? 'border-emerald-300' : 'border-amber-300'} flex items-center justify-between gap-2 text-xs">
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center gap-1.5">
+                  <span class="text-[10px] font-bold text-slate-400">Mã:</span>
+                  <input type="text" value="${escapeHtml(v.code)}" onchange="editMultiVariantCode(${idx}, this.value)" class="w-16 px-1.5 py-0.5 rounded border border-slate-300 font-mono font-extrabold text-indigo-800 text-xs text-center outline-none focus:border-indigo-600" />
+                  <span class="text-[10px] font-bold px-1.5 py-0.5 rounded ${v.hasKey ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+                    ${v.hasKey ? `✓ ${v.questions.length} câu` : 'Chưa Đ/A'}
+                  </span>
+                </div>
+                <div class="text-[10px] text-slate-400 truncate mt-1" title="${escapeHtml(v.fileName)}">${escapeHtml(v.fileName)} (${v.pageCount} tr)</div>
+              </div>
+              <button type="button" onclick="removeMultiVariant(${idx})" class="p-1 text-slate-400 hover:text-rose-600 transition" title="Xóa mã đề này">
+                <i data-lucide="x" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+          `).join('')}
+        </div>
+      `;
+      lucide.createIcons({ nodes: [listEl] });
+    }
+
+    async function publishMultiCodePdfExam() {
+      const title = document.getElementById('pdf-builder-title').value.trim();
+      const duration = Math.max(1, parseInt(document.getElementById('pdf-builder-duration').value) || 90);
+      const scoringMode = document.getElementById('pdf-builder-scoring-mode').value || 'thpt2025';
+      const maxViolations = Math.max(1, parseInt(document.getElementById('pdf-builder-max-violations').value) || 3);
+      const autoSubmitOnViolation = !!document.getElementById('pdf-builder-auto-submit').checked;
+      const requirePassScore = !!document.getElementById('pdf-builder-require-pass')?.checked;
+      const passScore = Math.max(0, parseFloat(document.getElementById('pdf-builder-pass-score')?.value) || 5);
+      const active = !!document.getElementById('pdf-builder-active').checked;
+      const variants = state.pdfBuilder.multiVariants || [];
+
+      const missingKey = variants.filter(v => !v.hasKey || v.questions.length === 0);
+      if (missingKey.length > 0) {
+        if (state.pdfBuilder.questions.length > 0) {
+          missingKey.forEach(v => { v.questions = JSON.parse(JSON.stringify(state.pdfBuilder.questions)); });
+        } else {
+          return showToast(`Còn ${missingKey.length} mã đề chưa có đáp án (${missingKey.slice(0, 4).map(x => x.code).join(', ')}...). Hãy nạp đáp án trước!`, 'warning');
+        }
+      }
+
+      const examId = 'exam-pdf-multi-' + Date.now();
+      const btn = document.getElementById('btn-publish-pdf-exam');
+      const prevBtnHtml = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = `<span class="inline-block w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin"></span> Đang lưu ${variants.length} mã đề PDF...`;
+
+      try {
+        let totalPages = variants.reduce((s, v) => s + v.pages.length, 0);
+        let uploaded = 0;
+
+        for (const v of variants) {
+          for (let i = 0; i < v.pages.length; i++) {
+            const pageDocId = `${examId}_v_${v.code}_p_${i}`;
+            const payload = { id: pageDocId, examId, variantCode: v.code, pageIndex: i, dataUrl: v.pages[i] };
+            await idbPut('exam_pages', payload);
+            if (useCloudMode && fbUser && db) {
+              await setDoc(getDocRef('exam_pages', pageDocId), payload);
+            }
+            uploaded++;
+            setPdfPublishStatusBox('info', `Đang tải lên trang ${uploaded}/${totalPages} (Mã đề ${v.code})...`);
+          }
+        }
+
+        const firstVar = variants[0];
+        const maxScore = Math.round(firstVar.questions.reduce((acc, q) => acc + getQuestionMaxPoint({ scoringMode, maxScore: 10, questions: firstVar.questions }, q), 0) * 100) / 100 || 10;
+
+        const examData = {
+          id: examId,
+          mode: 'pdf',
+          isMultiCode: true,
+          examCode: `${variants.length} mã`,
+          subject: state.currentUser?.subject || 'Chung',
+          createdBy: state.currentUser?.username || 'admin',
+          createdByName: state.currentUser?.name || 'Giáo viên',
+          title,
+          duration,
+          maxScore,
+          scoringMode,
+          maxViolations,
+          autoSubmitOnViolation,
+          requirePassScore,
+          passScore,
+          active,
+          pdfPageCount: firstVar.pageCount,
+          questions: firstVar.questions,
+          variants: variants.map(v => ({
+            code: v.code,
+            fileName: v.fileName,
+            pageCount: v.pageCount,
+            questions: v.questions
+          })),
+          createdAt: Date.now()
+        };
+
+        await saveDocData('exams', examId, examData);
+        setPdfPublishStatusBox('success', `✓ Đã phát hành thành công bộ ${variants.length} mã đề PDF "${title}"! Học sinh vào thi sẽ tự động nhận ngẫu nhiên 1 mã đề.`);
+        showToast(`Đã lưu & phát hành bộ ${variants.length} mã đề PDF thành công!`, 'success');
+        clearMultiPdfVariants();
+        renderAdminExamList();
+        triggerPostExamZaloNotify(examData);
+      } catch (err) {
+        console.error('Lỗi xuất bản bộ 24 mã đề PDF:', err);
+        setPdfPublishStatusBox('error', 'Lỗi lưu bộ mã đề PDF: ' + err.message);
+        showToast('Lỗi lưu bộ mã đề PDF: ' + err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = prevBtnHtml;
+        lucide.createIcons();
+      }
+    }
 
     // Khởi chạy ứng dụng khi trang tải xong
     window.addEventListener('DOMContentLoaded', () => {
