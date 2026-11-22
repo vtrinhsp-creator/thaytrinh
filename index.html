@@ -562,7 +562,7 @@
             <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
             Đồng bộ Cloud trực tiếp
           </span>
-          <span id="app-version-label">Phiên bản 2026.11.22-v34</span>
+          <span id="app-version-label">Phiên bản 2026.11.22-v35</span>
         </div>
       </div>
 
@@ -3386,7 +3386,7 @@ Cô Trần Thu Hà, Vật lí, gv_ha, 123456" class="w-full p-3 rounded-xl borde
     import { initializeApp, getApps, deleteApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import {
-      getFirestore, initializeFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, onSnapshot, collection
+      getFirestore, initializeFirestore, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, onSnapshot, collection, query, where
     } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     // =========================================================================
@@ -3395,7 +3395,7 @@ Cô Trần Thu Hà, Vật lí, gv_ha, 123456" class="w-full p-3 rounded-xl borde
     const EMBEDDED_FIREBASE_CONFIG = /*__EMBEDDED_FIREBASE_CONFIG__*/{"apiKey":"AIzaSyAK4osCrc_vtzPd3SWBSIoCg99W5vqab9g","authDomain":"toanthaytrinh-af1c8.firebaseapp.com","projectId":"toanthaytrinh-af1c8","storageBucket":"toanthaytrinh-af1c8.firebasestorage.app","messagingSenderId":"797090111064","appId":"1:797090111064:web:bad5dae3a6cab29fad342d","measurementId":"G-TWN1BMQH3N"}/*__END_EMBEDDED_FIREBASE_CONFIG__*/;
     const EMBEDDED_APP_ID = /*__EMBEDDED_APP_ID__*/"hoctoan-pro"/*__END_EMBEDDED_APP_ID__*/;
     const EMBEDDED_ADMIN_PASSWORD = /*__EMBEDDED_ADMIN_PASSWORD__*/"123456"/*__END_EMBEDDED_ADMIN_PASSWORD__*/;
-    const APP_BUILD_VERSION = /*__APP_BUILD_VERSION__*/"2026.11.22-v34"/*__END_APP_BUILD_VERSION__*/;
+    const APP_BUILD_VERSION = /*__APP_BUILD_VERSION__*/"2026.11.22-v35"/*__END_APP_BUILD_VERSION__*/;
 
     const LS_KEYS = {
       FB_CONFIG: 'eduexam_custom_fb_config_v2',
@@ -3991,8 +3991,51 @@ Cô Trần Thu Hà, Vật lí, gv_ha, 123456" class="w-full p-3 rounded-xl borde
 
       activeFirebaseConfig = firebaseConfig;
       useCloudMode = true;
-      await attachRealtimeListeners();
+      // Tối ưu chịu tải 100-300 HS cùng lúc: Chỉ đọc mật khẩu admin lúc khởi động,
+      // chưa bật 9 luồng onSnapshot cho tới khi xác định vai trò Giáo viên hay Học sinh!
+      try {
+        const authSnap = await getDoc(getDocRef('settings', 'admin_auth'));
+        if (authSnap.exists() && authSnap.data()?.password) {
+          cloudAdminPassword = String(authSnap.data().password);
+          localStorage.setItem(LS_KEYS.ADMIN_PASS, cloudAdminPassword);
+        }
+      } catch (e) {}
+      if (isStaffUser()) {
+        await attachRealtimeListeners();
+      } else if (state.currentUser?.role === 'student') {
+        await loadStudentLightweightCloudData(state.currentUser.username);
+      }
       updateSyncStatusUI();
+    }
+
+    // Tải dữ liệu siêu nhẹ riêng cho Học sinh (chống bão đọc Firestore khi 100-300 HS thi cùng lúc)
+    async function loadStudentLightweightCloudData(studentUsername) {
+      if (!useCloudMode || !fbUser || !db) return;
+      detachAllListeners(); // Đảm bảo học sinh KHÔNG lắng nghe sessions của 99 bạn khác hay ngân hàng câu hỏi
+      const stuUser = (studentUsername || '').trim().toLowerCase();
+      try {
+        const [exSnap, annSnap, mySessSnap, myProfileSnap] = await Promise.all([
+          getDocs(getColRef('exams')),
+          getDocs(getColRef('announcements')),
+          getDocs(query(getColRef('sessions'), where('studentUsername', '==', stuUser))),
+          getDoc(getDocRef('students', stuUser))
+        ]);
+        state.exams = exSnap.docs.map(d => ({ id: d.id, ...d.data() }))
+          .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+        state.announcements = annSnap.docs.map(d => ({ id: d.id, ...d.data() }))
+          .sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0) || (b.createdAt || 0) - (a.createdAt || 0));
+        state.sessions = mySessSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+        if (myProfileSnap.exists()) {
+          const stuData = { id: myProfileSnap.id, ...myProfileSnap.data() };
+          state.students = [stuData];
+          if (state.currentUser) {
+            state.currentUser.ownerUsername = stuData.ownerUsername || 'admin';
+            state.currentUser.className = stuData.className || state.currentUser.className;
+          }
+        }
+      } catch (err) {
+        console.error('Lỗi tải dữ liệu nhẹ cho học sinh:', err);
+      }
     }
 
     // Lưu & Kết nối Firebase từ tab Cấu hình đồng bộ
@@ -4450,70 +4493,109 @@ Cô Trần Thu Hà, Vật lí, gv_ha, 123456" class="w-full p-3 rounded-xl borde
       document.getElementById('login-error').classList.add('hidden');
     };
 
-    document.getElementById('login-form').addEventListener('submit', (e) => {
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const username = document.getElementById('login-username').value.trim();
+      const lowerUser = username.toLowerCase();
       const password = document.getElementById('login-password').value.trim();
       const errBox = document.getElementById('login-error');
       const errText = document.getElementById('login-error-text');
+      const submitBtn = e.target.querySelector('button[type="submit"]');
       errBox.classList.add('hidden');
 
-      // 1. Kiểm tra tài khoản Quản trị gốc (admin)
-      if (username.toLowerCase() === ADMIN_ACCOUNT.username && password === ADMIN_ACCOUNT.password) {
-        state.currentUser = {
-          role: 'admin',
-          username: 'admin',
-          name: ADMIN_ACCOUNT.name,
-          subject: 'Quản trị hệ thống',
-          isSuperAdmin: true
-        };
-        enterAdminPortal();
-        showToast('Chào mừng Quản trị viên gốc đăng nhập hệ thống!', 'success');
-        return;
-      }
+      const setBtnBusy = (busy) => {
+        if (!submitBtn) return;
+        submitBtn.disabled = busy;
+        submitBtn.innerHTML = busy
+          ? '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Đang đăng nhập...'
+          : '<i data-lucide="log-in" class="w-4 h-4"></i> Đăng nhập ngay';
+        if (window.lucide) lucide.createIcons({ nodes: [submitBtn] });
+      };
 
-      // 2. Kiểm tra danh sách tài khoản Giáo viên (Admin nhiều môn học)
-      const adminAcc = state.admins.find(a => (a.username || '').toLowerCase() === username.toLowerCase() && a.password === password);
-      if (adminAcc) {
-        if (adminAcc.active === false) {
-          errText.textContent = 'Tài khoản Giáo viên này hiện đang bị khóa. Vui lòng liên hệ Quản trị gốc!';
-          errBox.classList.remove('hidden');
+      setBtnBusy(true);
+      try {
+        // 1. Kiểm tra tài khoản Quản trị gốc (admin)
+        if (lowerUser === ADMIN_ACCOUNT.username && password === ADMIN_ACCOUNT.password) {
+          state.currentUser = {
+            role: 'admin',
+            username: 'admin',
+            name: ADMIN_ACCOUNT.name,
+            subject: 'Quản trị hệ thống',
+            isSuperAdmin: true
+          };
+          if (useCloudMode) await attachRealtimeListeners();
+          enterAdminPortal();
+          showToast('Chào mừng Quản trị viên gốc đăng nhập hệ thống!', 'success');
           return;
         }
-        state.currentUser = {
-          role: adminAcc.isSuperAdmin ? 'admin' : 'teacher',
-          id: adminAcc.id,
-          username: adminAcc.username,
-          name: adminAcc.name,
-          subject: adminAcc.subject || 'Giáo viên bộ môn',
-          isSuperAdmin: !!adminAcc.isSuperAdmin
-        };
-        enterAdminPortal();
-        showToast(`Chào mừng ${adminAcc.name} (${adminAcc.isSuperAdmin ? 'Admin' : 'Giáo viên'} • Môn ${adminAcc.subject || 'Chung'})!`, 'success');
-        return;
-      }
 
-      // Kiểm tra tài khoản Học sinh
-      const student = state.students.find(s => (s.username || '').toLowerCase() === username.toLowerCase() && s.password === password);
-      if (student) {
-        state.currentUser = {
-          role: 'student',
-          username: student.username,
-          name: student.name,
-          className: student.className || 'Chưa phân lớp',
-          ownerUsername: student.ownerUsername || 'admin'
-        };
-        enterStudentPortal();
-        showToast(`Xin chào ${student.name} (${student.className})!`, 'success');
-        return;
-      }
+        // 2. Tra cứu 1 tài khoản Giáo viên hoặc Học sinh trực tiếp (giảm 99% lượt đọc Firestore lúc đăng nhập)
+        let adminAcc = state.admins.find(a => (a.username || '').toLowerCase() === lowerUser);
+        let student = state.students.find(s => (s.username || '').toLowerCase() === lowerUser);
 
-      errText.textContent = 'Tên đăng nhập hoặc mật khẩu không chính xác. Vui lòng kiểm tra lại!';
-      errBox.classList.remove('hidden');
+        if (useCloudMode && fbUser && db) {
+          if (!adminAcc) {
+            try {
+              const aSnap = await getDoc(getDocRef('admins', lowerUser));
+              if (aSnap.exists()) adminAcc = { id: aSnap.id, ...aSnap.data() };
+            } catch (e) {}
+          }
+          if (!student && !adminAcc) {
+            try {
+              const sSnap = await getDoc(getDocRef('students', lowerUser));
+              if (sSnap.exists()) student = { id: sSnap.id, ...sSnap.data() };
+            } catch (e) {}
+          }
+        }
+
+        if (adminAcc && adminAcc.password === password) {
+          if (adminAcc.active === false) {
+            errText.textContent = 'Tài khoản Giáo viên này hiện đang bị khóa. Vui lòng liên hệ Quản trị gốc!';
+            errBox.classList.remove('hidden');
+            return;
+          }
+          state.currentUser = {
+            role: adminAcc.isSuperAdmin ? 'admin' : 'teacher',
+            id: adminAcc.id,
+            username: adminAcc.username,
+            name: adminAcc.name,
+            subject: adminAcc.subject || 'Giáo viên bộ môn',
+            isSuperAdmin: !!adminAcc.isSuperAdmin
+          };
+          if (useCloudMode) await attachRealtimeListeners();
+          enterAdminPortal();
+          showToast(`Chào mừng ${adminAcc.name} (${adminAcc.isSuperAdmin ? 'Admin' : 'Giáo viên'} • Môn ${adminAcc.subject || 'Chung'})!`, 'success');
+          return;
+        }
+
+        if (student && student.password === password) {
+          state.currentUser = {
+            role: 'student',
+            username: student.username,
+            name: student.name,
+            className: student.className || 'Chưa phân lớp',
+            ownerUsername: student.ownerUsername || 'admin'
+          };
+          if (useCloudMode) await loadStudentLightweightCloudData(student.username);
+          enterStudentPortal();
+          showToast(`Xin chào ${student.name} (${student.className})!`, 'success');
+          return;
+        }
+
+        errText.textContent = 'Tên đăng nhập hoặc mật khẩu không chính xác. Vui lòng kiểm tra lại!';
+        errBox.classList.remove('hidden');
+      } finally {
+        setBtnBusy(false);
+      }
     });
 
     window.logout = function() {
       if (state.timerInterval) clearInterval(state.timerInterval);
+      if (sessionSyncDebounceTimer) {
+        clearTimeout(sessionSyncDebounceTimer);
+        sessionSyncDebounceTimer = null;
+      }
+      detachAllListeners();
       state.currentUser = null;
       state.activeExam = null;
       state.activeSession = null;
@@ -6552,6 +6634,15 @@ ${extractedPdfText.slice(0, 12000)}` : ''}`;
 
       const sessionId = `${exam.id}_${state.currentUser.username}`;
       let session = state.sessions.find(s => s.id === sessionId);
+      try {
+        const draftRaw = localStorage.getItem('eduexam_draft_' + sessionId);
+        if (draftRaw) {
+          const draft = JSON.parse(draftRaw);
+          if (draft && draft.status !== 'submitted' && (!session || (draft.lastUpdatedAt || 0) > (session.lastUpdatedAt || 0))) {
+            session = draft;
+          }
+        }
+      } catch (e) {}
 
       if (!session) {
         let questionOrder = [];
@@ -6899,14 +6990,53 @@ ${extractedPdfText.slice(0, 12000)}` : ''}`;
       await syncActiveSessionToCloud();
     };
 
-    async function syncActiveSessionToCloud() {
+    let sessionSyncDebounceTimer = null;
+
+    function saveSessionDraftLocally(session) {
+      if (!session || !session.id) return;
+      try {
+        localStorage.setItem('eduexam_draft_' + session.id, JSON.stringify(session));
+      } catch (e) {}
+    }
+
+    function clearSessionDraftLocally(sessionId) {
+      if (!sessionId) return;
+      try { localStorage.removeItem('eduexam_draft_' + sessionId); } catch (e) {}
+    }
+
+    async function syncActiveSessionToCloud(immediate = false) {
+      if (!state.activeExam || !state.activeSession) return;
       const ev = evaluateSession(state.activeExam, state.activeSession);
       state.activeSession.score = ev.score;
       state.activeSession.lastUpdatedAt = Date.now();
-      try {
-        await saveDocData('sessions', state.activeSession.id, state.activeSession);
-      } catch (err) {
-        console.error('Lỗi đồng bộ đáp án:', err);
+
+      // 1. Lưu tức thì vào máy học sinh (0ms, chống mất bài khi rớt mạng)
+      saveSessionDraftLocally(state.activeSession);
+      const localIdx = state.sessions.findIndex(s => s.id === state.activeSession.id);
+      if (localIdx >= 0) state.sessions[localIdx] = { ...state.activeSession };
+      else state.sessions.push({ ...state.activeSession });
+
+      // 2. Gom nhịp ghi lên Cloud (3 giây/lần) để chịu tải mượt 100-300 HS cùng lúc
+      const doFlush = async () => {
+        if (!state.activeSession) return;
+        try {
+          await saveDocData('sessions', state.activeSession.id, state.activeSession);
+        } catch (err) {
+          console.error('Lỗi đồng bộ đáp án:', err);
+        }
+      };
+
+      if (sessionSyncDebounceTimer) {
+        clearTimeout(sessionSyncDebounceTimer);
+        sessionSyncDebounceTimer = null;
+      }
+      if (immediate || !useCloudMode) {
+        await doFlush();
+      } else {
+        sessionSyncDebounceTimer = setTimeout(() => {
+          sessionSyncDebounceTimer = null;
+          doFlush();
+        }, 3000);
       }
     }
 
@@ -7003,12 +7133,20 @@ ${extractedPdfText.slice(0, 12000)}` : ''}`;
 
     async function submitExamNow() {
       if (state.timerInterval) clearInterval(state.timerInterval);
+      if (sessionSyncDebounceTimer) {
+        clearTimeout(sessionSyncDebounceTimer);
+        sessionSyncDebounceTimer = null;
+      }
       const ev = evaluateSession(state.activeExam, state.activeSession);
       state.activeSession.status = 'submitted';
       state.activeSession.submittedAt = Date.now();
       state.activeSession.score = ev.score;
 
       await saveDocData('sessions', state.activeSession.id, state.activeSession);
+      clearSessionDraftLocally(state.activeSession.id);
+      const localIdx = state.sessions.findIndex(s => s.id === state.activeSession.id);
+      if (localIdx >= 0) state.sessions[localIdx] = { ...state.activeSession };
+      else state.sessions.push({ ...state.activeSession });
       showToast('Đã nộp bài thành công!', 'success');
       showStudentResultScreen(state.activeExam, state.activeSession);
     }
@@ -7147,10 +7285,13 @@ ${extractedPdfText.slice(0, 12000)}` : ''}`;
 
 
     window.refreshStudentLobby = async function() {
-      if (!useCloudMode) {
+      if (useCloudMode && state.currentUser?.role === 'student') {
+        await loadStudentLightweightCloudData(state.currentUser.username);
+      } else if (!useCloudMode) {
         await loadLocalDataAndSeed();
       }
       renderStudentLobby();
+      renderStudentAnnouncements();
       showToast('Đã cập nhật danh sách đề thi mới nhất!', 'info');
     };
 
