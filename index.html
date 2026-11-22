@@ -562,7 +562,7 @@
             <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
             Đồng bộ Cloud trực tiếp
           </span>
-          <span id="app-version-label">Phiên bản 2026.11.22-v36</span>
+          <span id="app-version-label">Phiên bản 2026.11.22-v39</span>
         </div>
       </div>
 
@@ -964,8 +964,8 @@
             </div>
           </div>
 
-          <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
+          <div id="live-matrix-scroll-wrap" class="overflow-x-auto">
+            <table id="live-matrix-table" class="w-full text-left border-collapse">
               <thead id="live-matrix-head" class="bg-slate-50 text-slate-600 text-xs uppercase font-bold border-b border-slate-200">
               </thead>
               <tbody id="live-matrix-body" class="divide-y divide-slate-100 text-sm">
@@ -1404,14 +1404,23 @@ a) D b) S c) S d) D" class="w-full p-2.5 rounded-xl border border-slate-300 bg-w
               <h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
                 <i data-lucide="user-plus" class="w-4 h-4 text-brand-600"></i> Cấp tài khoản học sinh mới
               </h3>
+              <datalist id="school-suggestions">
+                <option value="Trường THPT Gia Viễn B"></option>
+              </datalist>
               <form id="add-student-form" class="space-y-3">
                 <div>
                   <label class="block text-xs font-bold text-slate-600 mb-1">Họ và tên</label>
                   <input id="stu-name" type="text" required="" placeholder="VD: Nguyễn Văn An" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm outline-none focus:border-brand-600">
                 </div>
-                <div>
-                  <label class="block text-xs font-bold text-slate-600 mb-1">Lớp</label>
-                  <input id="stu-class" type="text" required="" placeholder="VD: 12A1" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm outline-none focus:border-brand-600">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label class="block text-xs font-bold text-slate-600 mb-1">Trường</label>
+                    <input id="stu-school" list="school-suggestions" type="text" required="" value="Trường THPT Gia Viễn B" placeholder="VD: Trường THPT Gia Viễn B" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm outline-none focus:border-brand-600">
+                  </div>
+                  <div>
+                    <label class="block text-xs font-bold text-slate-600 mb-1">Lớp</label>
+                    <input id="stu-class" type="text" required="" placeholder="VD: 12A1" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm outline-none focus:border-brand-600">
+                  </div>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                   <div>
@@ -1434,9 +1443,13 @@ a) D b) S c) S d) D" class="w-full p-2.5 rounded-xl border border-slate-300 bg-w
               <h3 class="font-bold text-slate-800 mb-2 flex items-center gap-2">
                 <i data-lucide="file-spreadsheet" class="w-4 h-4 text-emerald-600"></i> Tạo hàng loạt (Excel / CSV)
               </h3>
-              <p class="text-xs text-slate-500 mb-3">Mỗi dòng 1 học sinh theo định dạng: <code>Họ tên, Lớp, Tên đăng nhập, Mật khẩu</code> (hỗ trợ dán trực tiếp từ Excel).</p>
+              <div class="mb-2.5">
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">Trường mặc định cho danh sách (nếu không nhập cột Trường)</label>
+                <input id="bulk-stu-school" list="school-suggestions" type="text" value="Trường THPT Gia Viễn B" placeholder="VD: Trường THPT Gia Viễn B" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold outline-none focus:border-brand-600">
+              </div>
+              <p class="text-xs text-slate-500 mb-2">Mỗi dòng 1 học sinh: <code>Họ tên, Lớp, Tên đăng nhập, Mật khẩu</code> hoặc 5 cột: <code>Họ tên, Lớp, Trường, Tên đăng nhập, Mật khẩu</code>.</p>
               <textarea id="bulk-students-input" rows="5" placeholder="Trần Thị Bình, 12A1, hs05, 123456
-Lê Minh Quân, 12A2, hs06, 123456" class="w-full p-3 rounded-xl border border-slate-300 text-xs font-mono outline-none focus:border-brand-600 mb-3"></textarea>
+Lê Minh Quân, 12A2, Trường THPT Gia Viễn B, hs06, 123456" class="w-full p-3 rounded-xl border border-slate-300 text-xs font-mono outline-none focus:border-brand-600 mb-3"></textarea>
               <button type="button" onclick="handleBulkAddStudents()" class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold transition flex items-center justify-center gap-2">
                 <i data-lucide="users" class="w-4 h-4"></i> Nhập danh sách học sinh
               </button>
@@ -1446,13 +1459,66 @@ Lê Minh Quân, 12A2, hs06, 123456" class="w-full p-3 rounded-xl border border-s
           <!-- Bảng danh sách học sinh -->
           <div class="lg:col-span-8">
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-              <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <h3 class="font-bold text-slate-800 flex items-center gap-2">
-                  <i data-lucide="list" class="w-4 h-4 text-brand-600"></i> Danh sách tài khoản học sinh (<span id="student-total-count">0</span>)
-                </h3>
-                <div class="relative">
-                  <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
-                  <input id="student-search-input" oninput="renderStudentTable()" type="text" placeholder="Tìm tên, lớp, tài khoản..." class="pl-9 pr-3 py-2 rounded-xl border border-slate-300 text-xs sm:text-sm outline-none focus:border-brand-600 w-full sm:w-64">
+              <div class="p-4 sm:p-5 border-b border-slate-100 space-y-3 bg-slate-50/50">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                  <h3 class="font-bold text-slate-800 flex items-center gap-2">
+                    <i data-lucide="list" class="w-4 h-4 text-brand-600"></i>
+                    <span>Danh sách tài khoản học sinh (<span id="student-total-count">0</span>)</span>
+                  </h3>
+                  <div class="flex items-center gap-2">
+                    <span id="student-filtered-badge" class="px-2.5 py-0.5 rounded-full bg-brand-50 text-brand-700 border border-brand-200 text-[11px] font-bold">Hiển thị 0 / 0</span>
+                    <button id="btn-reset-student-filters" type="button" onclick="resetStudentFilters()" class="hidden px-2.5 py-1 rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 text-[11px] font-bold transition inline-flex items-center gap-1">
+                      <i data-lucide="rotate-ccw" class="w-3 h-3"></i> Đặt lại lọc
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Bộ lọc 5 tiêu chí theo thứ tự: Trường → Khối → Lớp → Môn → Giáo viên -->
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
+                  <div>
+                    <label class="block text-[10px] font-bold uppercase text-slate-500 mb-0.5">1. Trường</label>
+                    <select id="student-filter-school" onchange="onStudentFilterCascade('school')" title="Lọc theo Trường" class="w-full px-2.5 py-2 rounded-xl border border-slate-300 bg-white text-xs font-bold text-slate-700 outline-none focus:border-brand-600">
+                      <option value="ALL">Tất cả Trường</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-[10px] font-bold uppercase text-slate-500 mb-0.5">2. Khối</label>
+                    <select id="student-filter-grade" onchange="onStudentFilterCascade('grade')" title="Lọc theo Khối" class="w-full px-2.5 py-2 rounded-xl border border-slate-300 bg-white text-xs font-bold text-slate-700 outline-none focus:border-brand-600">
+                      <option value="ALL">Tất cả Khối</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-[10px] font-bold uppercase text-slate-500 mb-0.5">3. Lớp</label>
+                    <select id="student-filter-class" onchange="onStudentFilterCascade('class')" title="Lọc theo Lớp" class="w-full px-2.5 py-2 rounded-xl border border-slate-300 bg-white text-xs font-bold text-slate-700 outline-none focus:border-brand-600">
+                      <option value="ALL">Tất cả Lớp</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-[10px] font-bold uppercase text-slate-500 mb-0.5">4. Môn</label>
+                    <select id="student-filter-subject" onchange="onStudentFilterCascade('subject')" title="Lọc theo Môn" class="w-full px-2.5 py-2 rounded-xl border border-slate-300 bg-white text-xs font-bold text-slate-700 outline-none focus:border-brand-600">
+                      <option value="ALL">Tất cả Môn</option>
+                    </select>
+                  </div>
+                  <div class="col-span-2 sm:col-span-1">
+                    <label class="block text-[10px] font-bold uppercase text-slate-500 mb-0.5">5. Giáo viên</label>
+                    <select id="student-filter-teacher" onchange="onStudentFilterCascade('teacher')" title="Lọc theo Giáo viên" class="w-full px-2.5 py-2 rounded-xl border border-slate-300 bg-white text-xs font-bold text-slate-700 outline-none focus:border-brand-600">
+                      <option value="ALL">Tất cả Giáo viên</option>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- Ô Tìm kiếm nhanh Học sinh + nút Hiện toàn bộ -->
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                  <div class="relative flex-1">
+                    <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                    <input id="student-search-input" oninput="renderStudentTable()" type="text" autocomplete="off" placeholder="Tìm nhanh học sinh (họ tên, tài khoản, lớp, trường, giáo viên)..." class="w-full pl-9 pr-8 py-2 rounded-xl border border-slate-300 bg-white text-xs font-medium outline-none focus:border-brand-600 transition">
+                    <button id="student-search-clear" type="button" onclick="document.getElementById('student-search-input').value=''; renderStudentTable();" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 p-0.5" title="Xóa từ khóa">
+                      <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                    </button>
+                  </div>
+                  <button id="btn-show-all-students" type="button" onclick="toggleShowAllStudents()" class="px-3.5 py-2 rounded-xl bg-brand-50 hover:bg-brand-100 text-brand-800 border border-brand-200 text-xs font-bold transition whitespace-nowrap">
+                    Hiện tất cả HS
+                  </button>
                 </div>
               </div>
               <div class="overflow-x-auto">
@@ -1489,6 +1555,10 @@ Lê Minh Quân, 12A2, hs06, 123456" class="w-full p-3 rounded-xl border border-s
                 <div>
                   <label class="block text-xs font-bold text-slate-600 mb-1">Họ và tên Giáo viên</label>
                   <input id="adm-name" type="text" required="" placeholder="VD: Cô Nguyễn Thị Lan" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm outline-none focus:border-brand-600">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-slate-600 mb-1">Đơn vị công tác (Trường / Tổ chuyên môn)</label>
+                  <input id="adm-unit" type="text" required="" placeholder="VD: Trường THPT Gia Viễn B" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm outline-none focus:border-brand-600">
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
@@ -1531,9 +1601,9 @@ Lê Minh Quân, 12A2, hs06, 123456" class="w-full p-3 rounded-xl border border-s
               <h3 class="font-bold text-slate-800 mb-2 flex items-center gap-2">
                 <i data-lucide="file-spreadsheet" class="w-4 h-4 text-emerald-600"></i> Tạo hàng loạt Giáo viên (Excel/CSV)
               </h3>
-              <p class="text-xs text-slate-500 mb-3">Mỗi dòng 1 giáo viên: <code>Họ tên, Môn học, Cấp học (THPT/THCS), Tên đăng nhập, Mật khẩu</code></p>
-              <textarea id="bulk-admins-input" rows="4" placeholder="Thầy Đặng Minh Hiến, Công nghệ, gv_hien, 123456
-Cô Trần Thu Hà, Vật lí, gv_ha, 123456" class="w-full p-3 rounded-xl border border-slate-300 text-xs font-mono outline-none focus:border-brand-600 mb-3"></textarea>
+              <p class="text-xs text-slate-500 mb-3">Mỗi dòng 1 giáo viên: <code>Họ tên, Môn học, Cấp học, Đơn vị, Tài khoản, Mật khẩu</code></p>
+              <textarea id="bulk-admins-input" rows="4" placeholder="Thầy Đặng Minh Hiến, Công nghệ, THPT, THPT Gia Viễn B, gv_hien, 123456
+Cô Trần Thu Hà, Vật lí, THPT, THPT Gia Viễn B, gv_ha, 123456" class="w-full p-3 rounded-xl border border-slate-300 text-xs font-mono outline-none focus:border-brand-600 mb-3"></textarea>
               <button type="button" onclick="handleBulkAddAdmins()" class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold transition flex items-center justify-center gap-2">
                 <i data-lucide="users" class="w-4 h-4"></i> Nhập danh sách Giáo viên
               </button>
@@ -3421,7 +3491,7 @@ Cô Trần Thu Hà, Vật lí, gv_ha, 123456" class="w-full p-3 rounded-xl borde
     const EMBEDDED_FIREBASE_CONFIG = /*__EMBEDDED_FIREBASE_CONFIG__*/{"apiKey":"AIzaSyAK4osCrc_vtzPd3SWBSIoCg99W5vqab9g","authDomain":"toanthaytrinh-af1c8.firebaseapp.com","projectId":"toanthaytrinh-af1c8","storageBucket":"toanthaytrinh-af1c8.firebasestorage.app","messagingSenderId":"797090111064","appId":"1:797090111064:web:bad5dae3a6cab29fad342d","measurementId":"G-TWN1BMQH3N"}/*__END_EMBEDDED_FIREBASE_CONFIG__*/;
     const EMBEDDED_APP_ID = /*__EMBEDDED_APP_ID__*/"hoctoan-pro"/*__END_EMBEDDED_APP_ID__*/;
     const EMBEDDED_ADMIN_PASSWORD = /*__EMBEDDED_ADMIN_PASSWORD__*/"123456"/*__END_EMBEDDED_ADMIN_PASSWORD__*/;
-    const APP_BUILD_VERSION = /*__APP_BUILD_VERSION__*/"2026.11.22-v36"/*__END_APP_BUILD_VERSION__*/;
+    const APP_BUILD_VERSION = /*__APP_BUILD_VERSION__*/"2026.11.22-v39"/*__END_APP_BUILD_VERSION__*/;
 
     const LS_KEYS = {
       FB_CONFIG: 'eduexam_custom_fb_config_v2',
@@ -4585,6 +4655,7 @@ Cô Trần Thu Hà, Vật lí, gv_ha, 123456" class="w-full p-3 rounded-xl borde
             id: adminAcc.id,
             username: adminAcc.username,
             name: adminAcc.name,
+            unit: adminAcc.unit || '',
             subject: adminAcc.subject || 'Giáo viên bộ môn',
             educationLevel: adminAcc.educationLevel || 'THPT',
             isSuperAdmin: !!adminAcc.isSuperAdmin
@@ -4658,6 +4729,11 @@ Cô Trần Thu Hà, Vật lí, gv_ha, 123456" class="w-full p-3 rounded-xl borde
       if (subtabBar) subtabBar.classList.toggle('hidden', !isAdm);
       if (!isAdm) switchAccountsSubTab('students');
       switchAdminTab('dashboard');
+      const defUnit = state.currentUser?.unit || 'Trường THPT Gia Viễn B';
+      const stuSchEl = document.getElementById('stu-school');
+      const bulkSchEl = document.getElementById('bulk-stu-school');
+      if (stuSchEl) stuSchEl.value = defUnit;
+      if (bulkSchEl) bulkSchEl.value = defUnit;
       renderStudentTable();
       renderAdminAccountsTable();
       renderAdminExamList();
@@ -4714,6 +4790,7 @@ Cô Trần Thu Hà, Vật lí, gv_ha, 123456" class="w-full p-3 rounded-xl borde
     document.getElementById('add-student-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const name = document.getElementById('stu-name').value.trim();
+      const school = (document.getElementById('stu-school')?.value || '').trim() || state.currentUser?.unit || 'Trường THPT Gia Viễn B';
       const className = document.getElementById('stu-class').value.trim();
       const username = document.getElementById('stu-username').value.trim().toLowerCase().replace(/\s+/g, '');
       const password = document.getElementById('stu-password').value.trim();
@@ -4730,27 +4807,32 @@ Cô Trần Thu Hà, Vật lí, gv_ha, 123456" class="w-full p-3 rounded-xl borde
           username,
           password,
           name,
+          school,
           className: className || 'Chưa phân lớp',
           ownerUsername: state.currentUser?.username || 'admin',
           ownerName: state.currentUser?.name || 'Admin',
           ownerSubject: state.currentUser?.subject || 'Chung',
+          ownerUnit: school,
           createdAt: Date.now()
         });
         document.getElementById('add-student-form').reset();
         document.getElementById('stu-password').value = '123456';
-        showToast(`Đã cấp tài khoản cho ${name} (${username})`, 'success');
+        const schInp = document.getElementById('stu-school');
+        if (schInp) schInp.value = school;
+        showToast(`Đã cấp tài khoản cho ${name} (${className} • ${school})`, 'success');
       } catch (err) {
         showToast('Lỗi lưu tài khoản: ' + err.message, 'error');
       }
     });
 
-    // Tạo hàng loạt từ Excel / CSV
+    // Tạo hàng loạt từ Excel / CSV (hỗ trợ cả 4 cột và 5 cột có Trường)
     window.handleBulkAddStudents = async function() {
       const raw = document.getElementById('bulk-students-input').value.trim();
       if (!raw) {
         showToast('Vui lòng dán danh sách học sinh vào ô nhập!', 'warning');
         return;
       }
+      const defaultSchool = (document.getElementById('bulk-stu-school')?.value || '').trim() || state.currentUser?.unit || 'Trường THPT Gia Viễn B';
       const lines = raw.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
       let added = 0;
 
@@ -4760,8 +4842,17 @@ Cô Trần Thu Hà, Vật lí, gv_ha, 123456" class="w-full p-3 rounded-xl borde
         if (parts.length < 3) continue;
         const name = parts[0].trim();
         const className = (parts[1] || '12A1').trim();
-        const username = parts[2].trim().toLowerCase().replace(/\s+/g, '');
-        const password = (parts[3] || '123456').trim();
+        let school = defaultSchool;
+        let username = '';
+        let password = '123456';
+        if (parts.length >= 5) {
+          school = parts[2].trim() || defaultSchool;
+          username = parts[3].trim().toLowerCase().replace(/\s+/g, '');
+          password = (parts[4] || '123456').trim();
+        } else {
+          username = parts[2].trim().toLowerCase().replace(/\s+/g, '');
+          password = (parts[3] || '123456').trim();
+        }
 
         if (!name || !username || username === 'admin') continue;
         await saveDocData('students', username, {
@@ -4769,10 +4860,12 @@ Cô Trần Thu Hà, Vật lí, gv_ha, 123456" class="w-full p-3 rounded-xl borde
           username,
           password,
           name,
+          school,
           className,
           ownerUsername: state.currentUser?.username || 'admin',
           ownerName: state.currentUser?.name || 'Admin',
           ownerSubject: state.currentUser?.subject || 'Chung',
+          ownerUnit: school,
           createdAt: Date.now() + added
         });
         added++;
@@ -4786,22 +4879,212 @@ Cô Trần Thu Hà, Vật lí, gv_ha, 123456" class="w-full p-3 rounded-xl borde
       }
     };
 
+    let studentListShowAll = false;
+
+    function extractStudentGrade(className) {
+      const m = String(className || '').trim().match(/^(\d{1,2})/);
+      return m ? `Khối ${m[1]}` : 'Khối khác';
+    }
+
+    function populateSchoolSuggestions() {
+      const dl = document.getElementById('school-suggestions');
+      if (!dl) return;
+      const set = new Set(['Trường THPT Gia Viễn B']);
+      if (state.currentUser?.unit) set.add(state.currentUser.unit);
+      (state.admins || []).forEach(a => { if (a.unit) set.add(a.unit); });
+      (state.students || []).forEach(s => {
+        if (s.school) set.add(s.school);
+        if (s.ownerUnit) set.add(s.ownerUnit);
+      });
+      dl.innerHTML = [...set].sort((a, b) => a.localeCompare(b, 'vi')).map(sc => `<option value="${escapeHtml(sc)}"></option>`).join('');
+    }
+
+    function resolveStudentOwnerMeta(s) {
+      const ownerUser = (s.ownerUsername || 'admin').trim().toLowerCase();
+      const grade = extractStudentGrade(s.className);
+      if (ownerUser === 'admin') {
+        return {
+          ownerUser: 'admin',
+          ownerName: s.ownerName || ADMIN_ACCOUNT.name,
+          ownerSubject: s.ownerSubject || 'Quản trị hệ thống',
+          school: s.school || s.ownerUnit || 'Trường THPT Gia Viễn B',
+          grade
+        };
+      }
+      const adm = (state.admins || []).find(a => (a.username || '').toLowerCase() === ownerUser);
+      return {
+        ownerUser,
+        ownerName: adm?.name || s.ownerName || ownerUser,
+        ownerSubject: adm?.subject || s.ownerSubject || 'Chung',
+        school: s.school || adm?.unit || s.ownerUnit || 'Trường THPT Gia Viễn B',
+        grade
+      };
+    }
+
+    function stripVnAccents(str) {
+      return String(str || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').toLowerCase();
+    }
+
+    window.onStudentFilterCascade = function(level) {
+      const order = ['school', 'grade', 'class', 'subject', 'teacher'];
+      const idx = order.indexOf(level);
+      if (idx >= 0) {
+        const idMap = {
+          school: 'student-filter-school',
+          grade: 'student-filter-grade',
+          class: 'student-filter-class',
+          subject: 'student-filter-subject',
+          teacher: 'student-filter-teacher'
+        };
+        for (let i = idx + 1; i < order.length; i++) {
+          const el = document.getElementById(idMap[order[i]]);
+          if (el) el.value = 'ALL';
+        }
+      }
+      renderStudentTable();
+    };
+
+    window.toggleShowAllStudents = function() {
+      studentListShowAll = !studentListShowAll;
+      renderStudentTable();
+    };
+
+    window.resetStudentFilters = function() {
+      studentListShowAll = false;
+      const ids = ['student-search-input', 'student-filter-school', 'student-filter-grade', 'student-filter-class', 'student-filter-subject', 'student-filter-teacher'];
+      ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.value = el.tagName === 'SELECT' ? 'ALL' : '';
+      });
+      renderStudentTable();
+    };
+
     window.renderStudentTable = function() {
+      populateSchoolSuggestions();
       const visibleStudents = getVisibleStudents();
-      const keyword = (document.getElementById('student-search-input')?.value || '').trim().toLowerCase();
-      const filtered = visibleStudents.filter(s =>
-        (s.name || '').toLowerCase().includes(keyword) ||
-        (s.className || '').toLowerCase().includes(keyword) ||
-        (s.username || '').toLowerCase().includes(keyword) ||
-        (s.ownerName || '').toLowerCase().includes(keyword)
-      );
+      const enriched = visibleStudents.map(s => ({ ...s, _meta: resolveStudentOwnerMeta(s) }));
+
+      const schSel = document.getElementById('student-filter-school');
+      const grdSel = document.getElementById('student-filter-grade');
+      const clsSel = document.getElementById('student-filter-class');
+      const subSel = document.getElementById('student-filter-subject');
+      const teaSel = document.getElementById('student-filter-teacher');
+      const natSort = (a, b) => String(a || '').localeCompare(String(b || ''), 'vi', { numeric: true, sensitivity: 'base' });
+
+      const prevSch = schSel?.value || 'ALL';
+      const prevGrd = grdSel?.value || 'ALL';
+      const prevCls = clsSel?.value || 'ALL';
+      const prevSub = subSel?.value || 'ALL';
+      const prevTea = teaSel?.value || 'ALL';
+
+      // 1. Trường
+      if (schSel) {
+        const schools = [...new Set(enriched.map(s => s._meta.school).filter(Boolean))].sort(natSort);
+        schSel.innerHTML = `<option value="ALL">Tất cả Trường (${schools.length})</option>` +
+          schools.map(sc => `<option value="${escapeHtml(sc)}">${escapeHtml(sc)}</option>`).join('');
+        schSel.value = (prevSch !== 'ALL' && schools.includes(prevSch)) ? prevSch : 'ALL';
+      }
+      const selSch = schSel?.value || 'ALL';
+      const poolAfterSch = selSch === 'ALL' ? enriched : enriched.filter(s => s._meta.school === selSch);
+
+      // 2. Khối
+      if (grdSel) {
+        const grades = [...new Set(poolAfterSch.map(s => s._meta.grade).filter(Boolean))].sort(natSort);
+        grdSel.innerHTML = `<option value="ALL">Tất cả Khối (${grades.length})</option>` +
+          grades.map(g => `<option value="${escapeHtml(g)}">${escapeHtml(g)}</option>`).join('');
+        grdSel.value = (prevGrd !== 'ALL' && grades.includes(prevGrd)) ? prevGrd : 'ALL';
+      }
+      const selGrd = grdSel?.value || 'ALL';
+      const poolAfterGrd = selGrd === 'ALL' ? poolAfterSch : poolAfterSch.filter(s => s._meta.grade === selGrd);
+
+      // 3. Lớp
+      if (clsSel) {
+        const classes = [...new Set(poolAfterGrd.map(s => s.className || 'Chưa phân lớp'))].sort(natSort);
+        clsSel.innerHTML = `<option value="ALL">Tất cả Lớp (${classes.length})</option>` +
+          classes.map(c => `<option value="${escapeHtml(c)}">Lớp ${escapeHtml(c)}</option>`).join('');
+        clsSel.value = (prevCls !== 'ALL' && classes.includes(prevCls)) ? prevCls : 'ALL';
+      }
+      const selCls = clsSel?.value || 'ALL';
+      const poolAfterCls = selCls === 'ALL' ? poolAfterGrd : poolAfterGrd.filter(s => (s.className || 'Chưa phân lớp') === selCls);
+
+      // 4. Môn
+      if (subSel) {
+        const subjects = [...new Set(poolAfterCls.map(s => s._meta.ownerSubject).filter(Boolean))].sort(natSort);
+        subSel.innerHTML = `<option value="ALL">Tất cả Môn (${subjects.length})</option>` +
+          subjects.map(sub => `<option value="${escapeHtml(sub)}">${escapeHtml(sub)}</option>`).join('');
+        subSel.value = (prevSub !== 'ALL' && subjects.includes(prevSub)) ? prevSub : 'ALL';
+      }
+      const selSub = subSel?.value || 'ALL';
+      const poolAfterSub = selSub === 'ALL' ? poolAfterCls : poolAfterCls.filter(s => s._meta.ownerSubject === selSub);
+
+      // 5. Giáo viên
+      if (teaSel) {
+        const teacherMap = new Map();
+        poolAfterSub.forEach(s => {
+          if (!teacherMap.has(s._meta.ownerUser)) teacherMap.set(s._meta.ownerUser, s._meta);
+        });
+        const teachers = [...teacherMap.values()].sort((a, b) => natSort(a.ownerName, b.ownerName));
+        teaSel.innerHTML = `<option value="ALL">Tất cả Giáo viên (${teachers.length})</option>` +
+          teachers.map(t => `<option value="${escapeHtml(t.ownerUser)}">${escapeHtml(t.ownerName)} (${escapeHtml(t.ownerSubject)})</option>`).join('');
+        teaSel.value = (prevTea !== 'ALL' && teacherMap.has(prevTea)) ? prevTea : 'ALL';
+      }
+      const selTea = teaSel?.value || 'ALL';
+
+      const rawKeyword = (document.getElementById('student-search-input')?.value || '').trim();
+      const kwNorm = stripVnAccents(rawKeyword);
+
+      const clrBtn = document.getElementById('student-search-clear');
+      if (clrBtn) clrBtn.classList.toggle('hidden', rawKeyword.length === 0);
+
+      const hasFilter = rawKeyword.length > 0 || selSch !== 'ALL' || selGrd !== 'ALL' || selCls !== 'ALL' || selSub !== 'ALL' || selTea !== 'ALL';
+      const resetBtn = document.getElementById('btn-reset-student-filters');
+      if (resetBtn) resetBtn.classList.toggle('hidden', !hasFilter && !studentListShowAll);
+
+      const showAllBtn = document.getElementById('btn-show-all-students');
+      if (showAllBtn) {
+        showAllBtn.textContent = studentListShowAll ? 'Ẩn danh sách' : `Hiện tất cả (${visibleStudents.length} HS)`;
+      }
 
       document.getElementById('student-total-count').textContent = visibleStudents.length;
       const subStu = document.getElementById('subtab-stu-count');
       if (subStu) subStu.textContent = visibleStudents.length;
+
       const tbody = document.getElementById('student-table-body');
+      const filtBadge = document.getElementById('student-filtered-badge');
+
+      // Giao diện ban đầu KHÔNG hiển thị danh sách học sinh cho tới khi chọn bộ lọc hoặc tìm kiếm
+      if (!hasFilter && !studentListShowAll) {
+        if (filtBadge) filtBadge.textContent = `Đang ẩn (${visibleStudents.length} HS)`;
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" class="py-12 px-6 text-center">
+              <div class="max-w-md mx-auto space-y-2.5">
+                <div class="w-11 h-11 rounded-2xl bg-blue-50 text-brand-600 flex items-center justify-center mx-auto">
+                  <i data-lucide="filter" class="w-5 h-5"></i>
+                </div>
+                <div class="text-sm font-bold text-slate-700">Chọn bộ lọc hoặc tìm kiếm để xem danh sách học sinh</div>
+                <p class="text-xs text-slate-500 leading-relaxed">Hệ thống ẩn sẵn danh sách ở giao diện ban đầu để gọn gàng và tăng tốc tải trang. Hãy chọn <b>Trường, Khối, Lớp, Môn, Giáo viên</b> hoặc gõ tên vào ô tìm kiếm nhanh phía trên.</p>
+              </div>
+            </td>
+          </tr>`;
+        lucide.createIcons({ nodes: [tbody] });
+        return;
+      }
+
+      const filtered = poolAfterSub.filter(s => {
+        if (selTea !== 'ALL' && s._meta.ownerUser !== selTea) return false;
+        if (kwNorm) {
+          const hay = stripVnAccents(`${s.name || ''} ${s.username || ''} ${s.className || ''} ${s._meta.grade || ''} ${s._meta.school || ''} ${s._meta.ownerName || ''} ${s._meta.ownerSubject || ''}`);
+          if (!hay.includes(kwNorm)) return false;
+        }
+        return true;
+      });
+
+      if (filtBadge) filtBadge.textContent = `Hiển thị ${filtered.length} / ${visibleStudents.length} HS`;
+
       if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-400">Không có tài khoản học sinh nào phù hợp.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-400">Không có tài khoản học sinh nào phù hợp bộ lọc.</td></tr>`;
         return;
       }
 
@@ -4810,7 +5093,7 @@ Cô Trần Thu Hà, Vật lí, gv_ha, 123456" class="w-full p-3 rounded-xl borde
           <td class="py-3 px-4 text-slate-400 font-medium">${idx + 1}</td>
           <td class="py-3 px-4">
             <div class="font-semibold text-slate-800">${escapeHtml(s.name)}</div>
-            ${isSystemAdmin() && s.ownerName ? `<div class="text-[10px] text-indigo-700 font-semibold">GV: ${escapeHtml(s.ownerName)}${s.ownerSubject ? ' (' + escapeHtml(s.ownerSubject) + ')' : ''}</div>` : ''}
+            <div class="text-[10px] text-indigo-700 font-semibold mt-0.5">${escapeHtml(s._meta.school)} • GV: ${escapeHtml(s._meta.ownerName)} (${escapeHtml(s._meta.ownerSubject)})</div>
           </td>
           <td class="py-3 px-4"><span class="px-2.5 py-0.5 rounded-full bg-blue-50 text-brand-700 text-xs font-bold">${escapeHtml(s.className)}</span></td>
           <td class="py-3 px-4 font-mono text-xs font-bold text-slate-700">${escapeHtml(s.username)}</td>
@@ -4831,6 +5114,7 @@ Cô Trần Thu Hà, Vật lí, gv_ha, 123456" class="w-full p-3 rounded-xl borde
     window.openEditStudentModal = function(stuId) {
       const stu = state.students.find(s => s.id === stuId);
       if (!stu) return;
+      const meta = resolveStudentOwnerMeta(stu);
       openModal({
         title: `Chỉnh sửa tài khoản: ${stu.username}`,
         bodyHtml: `
@@ -4839,9 +5123,15 @@ Cô Trần Thu Hà, Vật lí, gv_ha, 123456" class="w-full p-3 rounded-xl borde
               <label class="block text-xs font-bold text-slate-600 mb-1">Họ và tên</label>
               <input id="edit-stu-name" type="text" value="${escapeHtml(stu.name)}" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm" />
             </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-600 mb-1">Lớp</label>
-              <input id="edit-stu-class" type="text" value="${escapeHtml(stu.className)}" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm" />
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">Trường</label>
+                <input id="edit-stu-school" list="school-suggestions" type="text" value="${escapeHtml(meta.school)}" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm" />
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">Lớp</label>
+                <input id="edit-stu-class" type="text" value="${escapeHtml(stu.className)}" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm" />
+              </div>
             </div>
             <div>
               <label class="block text-xs font-bold text-slate-600 mb-1">Mật khẩu</label>
@@ -4856,10 +5146,11 @@ Cô Trần Thu Hà, Vật lí, gv_ha, 123456" class="w-full p-3 rounded-xl borde
             className: 'px-4 py-2 rounded-xl bg-brand-700 hover:bg-brand-800 text-white text-sm font-semibold',
             onClick: async () => {
               const name = document.getElementById('edit-stu-name').value.trim();
+              const school = (document.getElementById('edit-stu-school')?.value || '').trim() || meta.school;
               const className = document.getElementById('edit-stu-class').value.trim();
               const password = document.getElementById('edit-stu-pass').value.trim();
               if (!name || !password) return;
-              await saveDocData('students', stu.id, { ...stu, name, className, password });
+              await saveDocData('students', stu.id, { ...stu, name, school, ownerUnit: school, className, password });
               closeModal();
               showToast('Đã cập nhật tài khoản học sinh!', 'success');
             }
@@ -6377,78 +6668,95 @@ ${extractedPdfText.slice(0, 12000)}` : ''}`;
       document.getElementById('kpi-submitted').textContent = submitted;
       document.getElementById('kpi-avg-score').textContent = scoredCount > 0 ? (scoreSum / scoredCount).toFixed(2) : '0.00';
 
-      // Render tiêu đề bảng ma trận
+      // Tối ưu hiển thị gọn vừa màn hình: <= 28 câu hiển thị trọn vẹn KHÔNG cuộn ngang
+      const fitNoScroll = questions.length > 0 && questions.length <= 28;
+      const matrixTable = document.getElementById('live-matrix-table');
+      const matrixWrap = document.getElementById('live-matrix-scroll-wrap');
+      if (matrixTable) {
+        matrixTable.className = fitNoScroll
+          ? 'w-full text-left border-collapse table-fixed'
+          : 'w-full text-left border-collapse';
+      }
+      if (matrixWrap) {
+        matrixWrap.className = fitNoScroll ? 'overflow-x-auto lg:overflow-x-hidden' : 'overflow-x-auto';
+      }
+
+      const cellBadgeSize = fitNoScroll ? 'w-6 h-6 text-[10px] rounded-md' : 'w-7 h-7 text-xs rounded-lg';
+
+      // Render tiêu đề bảng ma trận (gộp Điểm + Tiến độ gọn để dành tối đa chiều rộng cho 28 câu)
       headEl.innerHTML = `
         <tr>
-          <th class="py-3 px-3 sticky left-0 bg-slate-50 z-10 min-w-[180px] border-r border-slate-200">Học sinh / Trạng thái</th>
-          <th class="py-3 px-3 text-center whitespace-nowrap">Tiến độ</th>
-          <th class="py-3 px-3 text-center whitespace-nowrap">Điểm</th>
+          <th class="py-2.5 px-2.5 sticky left-0 bg-slate-50 z-10 ${fitNoScroll ? 'w-[168px]' : 'min-w-[175px]'} border-r border-slate-200">Học sinh / Trạng thái</th>
+          <th class="py-2.5 px-1 text-center ${fitNoScroll ? 'w-[62px]' : 'whitespace-nowrap px-2.5'} border-r border-slate-200">
+            <div class="text-[10px] font-extrabold text-slate-700">Điểm</div>
+            <div class="text-[9px] font-medium text-slate-400">Tiến độ</div>
+          </th>
           ${questions.map((q, i) => `
-            <th class="py-3 px-1.5 text-center min-w-[38px]" title="Câu ${i + 1} (${q.type === 'mcq' ? 'Trắc nghiệm' : 'Đúng/Sai'})">
-              <div class="text-[11px] font-extrabold text-slate-700">C${i + 1}</div>
-              <div class="text-[9px] font-medium text-slate-400">${q.type === 'mcq' ? 'ABCD' : (q.type === 'tf' ? 'Đ/S' : 'TLN')}</div>
+            <th class="py-2 px-0 text-center ${fitNoScroll ? '' : 'min-w-[34px] px-1'}" title="Câu ${i + 1} (${q.type === 'mcq' ? 'Trắc nghiệm ABCD' : (q.type === 'tf' ? 'Đúng/Sai' : 'Trả lời ngắn')})">
+              <div class="text-[10px] font-extrabold text-slate-700 leading-tight">${i + 1}</div>
+              <div class="text-[8px] font-semibold ${q.type === 'tf' ? 'text-purple-600' : (q.type === 'short' ? 'text-teal-600' : 'text-slate-400')} leading-none mt-0.5">${q.type === 'mcq' ? 'I' : (q.type === 'tf' ? 'ĐS' : 'III')}</div>
             </th>
           `).join('')}
-          <th class="py-3 px-3 text-right">Thao tác</th>
+          <th class="py-2.5 px-1.5 text-center ${fitNoScroll ? 'w-[46px]' : 'w-[68px]'} border-l border-slate-200" title="Cho phép thi lại">
+            <span class="text-[10px]">Lại</span>
+          </th>
         </tr>
       `;
 
       if (rows.length === 0) {
-        bodyEl.innerHTML = `<tr><td colspan="${questions.length + 4}" class="py-10 text-center text-slate-400">Chưa có học sinh nào trong danh sách.</td></tr>`;
+        bodyEl.innerHTML = `<tr><td colspan="${questions.length + 3}" class="py-10 text-center text-slate-400">Chưa có học sinh nào trong danh sách.</td></tr>`;
         return;
       }
 
       bodyEl.innerHTML = rows.map(({ stu, sess, evalRes }) => {
-        let statusBadge = `<span class="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-400"><span class="w-2 h-2 rounded-full bg-slate-300"></span>Chưa thi</span>`;
+        let statusBadge = `<span class="inline-flex items-center gap-1 text-[10px] font-semibold text-slate-400"><span class="w-1.5 h-1.5 rounded-full bg-slate-300"></span>Chưa thi</span>`;
         if (sess?.status === 'in_progress') {
-          statusBadge = `<span class="inline-flex items-center gap-1 text-[11px] font-bold text-brand-700"><span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse-dot"></span>Đang làm bài</span>`;
+          statusBadge = `<span class="inline-flex items-center gap-1 text-[10px] font-bold text-brand-700"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse-dot"></span>Đang thi</span>`;
         } else if (sess?.status === 'submitted') {
           const t = sess.submittedAt ? new Date(sess.submittedAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : '';
-          statusBadge = `<span class="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700"><i data-lucide="check-circle" class="w-3 h-3"></i>Đã nộp ${t}</span>`;
+          statusBadge = `<span class="inline-flex items-center gap-0.5 text-[10px] font-bold text-emerald-700"><i data-lucide="check-circle" class="w-3 h-3"></i>${t}</span>`;
         }
 
-        const progressHtml = evalRes
-          ? `<span class="text-xs font-bold text-slate-700">${evalRes.answeredCount}/${questions.length}</span>`
-          : `<span class="text-xs text-slate-300">-</span>`;
-
-        const scoreHtml = evalRes
-          ? `<span class="px-2.5 py-1 rounded-lg font-extrabold text-xs ${evalRes.score >= (selectedExam.maxScore * 0.5) ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}">${evalRes.score.toFixed(2)}</span>`
+        const scoreAndProgressHtml = evalRes
+          ? `<div class="leading-tight">
+               <span class="inline-block px-1.5 py-0.5 rounded font-extrabold text-[11px] ${evalRes.score >= (selectedExam.maxScore * 0.5) ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}">${evalRes.score.toFixed(2)}</span>
+               <div class="text-[10px] font-semibold text-slate-500 mt-0.5">${evalRes.answeredCount}/${questions.length}</div>
+             </div>`
           : `<span class="text-xs text-slate-300">-</span>`;
 
         const cellsHtml = questions.map((q, qi) => {
           if (!evalRes) {
-            return `<td class="py-2.5 px-1 text-center"><span class="w-7 h-7 rounded-lg bg-slate-50 text-slate-300 border border-slate-100 inline-flex items-center justify-center text-xs">·</span></td>`;
+            return `<td class="py-2 px-0 text-center"><span class="${cellBadgeSize} bg-slate-50 text-slate-300 border border-slate-100 inline-flex items-center justify-center">·</span></td>`;
           }
           const cell = evalRes.perOrigQ[qi];
           if (cell.status === 'correct') {
-            return `<td class="py-2.5 px-1 text-center" title="Câu ${qi + 1}: Đúng (+${cell.earned.toFixed(2)}đ)"><span class="w-7 h-7 rounded-lg bg-emerald-500 text-white font-bold inline-flex items-center justify-center text-xs shadow-sm">✓</span></td>`;
+            return `<td class="py-2 px-0 text-center" title="Câu ${qi + 1}: Đúng (+${cell.earned.toFixed(2)}đ)"><span class="${cellBadgeSize} bg-emerald-500 text-white font-bold inline-flex items-center justify-center shadow-sm">✓</span></td>`;
           }
           if (cell.status === 'partial') {
-            return `<td class="py-2.5 px-1 text-center" title="Câu ${qi + 1}: Đúng ${cell.correctSubs}/${cell.totalSubs} ý (+${cell.earned.toFixed(2)}đ)"><span class="w-7 h-7 rounded-lg bg-amber-400 text-amber-950 font-extrabold inline-flex items-center justify-center text-[10px] shadow-sm">${cell.correctSubs}/${cell.totalSubs}</span></td>`;
+            return `<td class="py-2 px-0 text-center" title="Câu ${qi + 1}: Đúng ${cell.correctSubs}/${cell.totalSubs} ý (+${cell.earned.toFixed(2)}đ)"><span class="${cellBadgeSize} bg-amber-400 text-amber-950 font-extrabold inline-flex items-center justify-center text-[9px] shadow-sm">${cell.correctSubs}/${cell.totalSubs}</span></td>`;
           }
           if (cell.status === 'wrong') {
-            return `<td class="py-2.5 px-1 text-center" title="Câu ${qi + 1}: Sai"><span class="w-7 h-7 rounded-lg bg-rose-500 text-white font-bold inline-flex items-center justify-center text-xs shadow-sm">✗</span></td>`;
+            return `<td class="py-2 px-0 text-center" title="Câu ${qi + 1}: Sai"><span class="${cellBadgeSize} bg-rose-500 text-white font-bold inline-flex items-center justify-center shadow-sm">✗</span></td>`;
           }
-          return `<td class="py-2.5 px-1 text-center" title="Câu ${qi + 1}: Chưa làm"><span class="w-7 h-7 rounded-lg bg-slate-100 text-slate-400 border border-slate-200 inline-flex items-center justify-center text-xs">·</span></td>`;
+          return `<td class="py-2 px-0 text-center" title="Câu ${qi + 1}: Chưa làm"><span class="${cellBadgeSize} bg-slate-100 text-slate-400 border border-slate-200 inline-flex items-center justify-center">·</span></td>`;
         }).join('');
 
         return `
           <tr class="hover:bg-blue-50/30 transition">
-            <td class="py-3 px-3 sticky left-0 bg-white z-10 border-r border-slate-100">
-              <div class="font-bold text-slate-800 text-sm">${sess ? `<button type="button" onclick="openStudentAttemptDetailModal('${escapeHtml(selectedExam.id)}', '${escapeHtml(stu.username)}')" class="text-left hover:text-brand-700 hover:underline">${escapeHtml(stu.name)}</button>` : escapeHtml(stu.name)}</div>
-              <div class="flex flex-wrap items-center gap-1.5 mt-0.5">
-                <span class="text-[11px] font-semibold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded">${escapeHtml(stu.className)}</span>
+            <td class="py-2 px-2.5 sticky left-0 bg-white z-10 border-r border-slate-100 overflow-hidden">
+              <div class="font-bold text-slate-800 text-xs truncate" title="${escapeHtml(stu.name)}">${sess ? `<button type="button" onclick="openStudentAttemptDetailModal('${escapeHtml(selectedExam.id)}', '${escapeHtml(stu.username)}')" class="text-left hover:text-brand-700 hover:underline truncate max-w-full">${escapeHtml(stu.name)}</button>` : escapeHtml(stu.name)}</div>
+              <div class="flex flex-wrap items-center gap-1 mt-0.5">
+                <span class="text-[10px] font-semibold text-slate-500 bg-slate-100 px-1 py-0.2 rounded">${escapeHtml(stu.className)}</span>
                 ${statusBadge}
-                ${sess && (sess.exitCount || 0) > 0 ? `<span class="text-[10px] font-bold px-1.5 py-0.5 rounded ${sess.violated ? 'bg-rose-100 text-rose-700' : 'bg-amber-100 text-amber-800'}" title="Số lượt thoát màn hình">⚠ Thoát: ${sess.exitCount}</span>` : ''}
-                ${sess && sess.assignedExamCode ? `<span class="text-[10px] font-mono font-extrabold px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-800">Mã ${escapeHtml(sess.assignedExamCode)}</span>` : ''}
-                ${sess && sess.violated ? `<span class="text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-rose-600 text-white">VI PHẠM</span>` : ''}
+                ${sess && (sess.exitCount || 0) > 0 ? `<span class="text-[9px] font-bold px-1 py-0.2 rounded ${sess.violated ? 'bg-rose-100 text-rose-700' : 'bg-amber-100 text-amber-800'}" title="Số lượt thoát màn hình">⚠${sess.exitCount}</span>` : ''}
+                ${sess && sess.assignedExamCode ? `<span class="text-[9px] font-mono font-extrabold px-1 py-0.2 rounded bg-indigo-100 text-indigo-800">${escapeHtml(sess.assignedExamCode)}</span>` : ''}
+                ${sess && sess.violated ? `<span class="text-[9px] font-extrabold px-1 py-0.2 rounded bg-rose-600 text-white">VP</span>` : ''}
               </div>
             </td>
-            <td class="py-3 px-3 text-center">${progressHtml}</td>
-            <td class="py-3 px-3 text-center">${scoreHtml}</td>
+            <td class="py-2 px-1 text-center border-r border-slate-100">${scoreAndProgressHtml}</td>
             ${cellsHtml}
-            <td class="py-3 px-3 text-right whitespace-nowrap">
-              ${sess ? `<button onclick="confirmResetStudentSession('${escapeHtml(sess.id)}', '${escapeHtml(stu.name)}')" class="text-xs px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-rose-100 hover:text-rose-700 text-slate-600 font-semibold transition" title="Cho phép học sinh thi lại">Thi lại</button>` : '<span class="text-xs text-slate-300">--</span>'}
+            <td class="py-2 px-1 text-center border-l border-slate-100">
+              ${sess ? `<button onclick="confirmResetStudentSession('${escapeHtml(sess.id)}', '${escapeHtml(stu.name)}')" class="p-1.5 rounded-lg bg-slate-100 hover:bg-rose-100 hover:text-rose-700 text-slate-600 transition inline-flex items-center justify-center" title="Cho phép học sinh thi lại"><i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i></button>` : '<span class="text-xs text-slate-300">-</span>'}
             </td>
           </tr>
         `;
@@ -11261,6 +11569,7 @@ ${sourceText.slice(0, 32000)}`;
         return showToast('Chỉ Quản trị gốc (admin) hoặc Quản trị viên toàn quyền mới được cấp tài khoản Giáo viên!', 'warning');
       }
       const name = document.getElementById('adm-name').value.trim();
+      const unit = (document.getElementById('adm-unit')?.value || '').trim();
       const subject = document.getElementById('adm-subject').value.trim();
       const educationLevel = (document.getElementById('adm-level')?.value || 'THPT').trim();
       const username = document.getElementById('adm-username').value.trim().toLowerCase().replace(/\s+/g, '');
@@ -11281,6 +11590,7 @@ ${sourceText.slice(0, 32000)}`;
           username,
           password,
           name,
+          unit,
           subject,
           educationLevel,
           assignedGrades: getGradesForEducationLevel(educationLevel),
@@ -11315,9 +11625,15 @@ ${sourceText.slice(0, 32000)}`;
         const name = parts[0].trim();
         const subject = (parts[1] || 'Chung').trim();
         let educationLevel = 'THPT';
+        let unit = '';
         let username = '';
         let password = '123456';
-        if (parts.length >= 5) {
+        if (parts.length >= 6) {
+          educationLevel = parts[2].trim() || 'THPT';
+          unit = parts[3].trim();
+          username = parts[4].trim().toLowerCase().replace(/\s+/g, '');
+          password = (parts[5] || '123456').trim();
+        } else if (parts.length === 5) {
           educationLevel = parts[2].trim() || 'THPT';
           username = parts[3].trim().toLowerCase().replace(/\s+/g, '');
           password = (parts[4] || '123456').trim();
@@ -11334,6 +11650,7 @@ ${sourceText.slice(0, 32000)}`;
           username,
           password,
           name,
+          unit,
           subject,
           educationLevel,
           assignedGrades: getGradesForEducationLevel(educationLevel),
@@ -11387,6 +11704,7 @@ ${sourceText.slice(0, 32000)}`;
       const allAdmins = [primaryRow, ...state.admins].filter(a =>
         !kw ||
         (a.name || '').toLowerCase().includes(kw) ||
+        (a.unit || '').toLowerCase().includes(kw) ||
         (a.subject || '').toLowerCase().includes(kw) ||
         (a.username || '').toLowerCase().includes(kw)
       );
@@ -11418,7 +11736,8 @@ ${sourceText.slice(0, 32000)}`;
             <td class="py-3 px-4 text-slate-400 font-medium">${idx + 1}</td>
             <td class="py-3 px-4">
               <div class="font-semibold text-slate-800">${escapeHtml(a.name)}</div>
-              ${a.isSuperAdmin && !a.isRoot ? '<span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-800">Toàn quyền</span>' : ''}
+              ${a.unit ? `<div class="text-[11px] text-slate-500 mt-0.5 flex items-center gap-1"><i data-lucide="school" class="w-3 h-3 text-brand-600 shrink-0"></i><span>${escapeHtml(a.unit)}</span></div>` : ''}
+              ${a.isSuperAdmin && !a.isRoot ? '<span class="inline-block mt-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-800">Toàn quyền</span>' : ''}
             </td>
             <td class="py-3 px-4">
               <div class="flex flex-wrap items-center gap-1">
@@ -11470,6 +11789,10 @@ ${sourceText.slice(0, 32000)}`;
               <label class="block text-xs font-bold text-slate-600 mb-1">Họ và tên Giáo viên</label>
               <input id="edit-adm-name" type="text" value="${escapeHtml(adm.name)}" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm" />
             </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">Đơn vị công tác</label>
+              <input id="edit-adm-unit" type="text" value="${escapeHtml(adm.unit || '')}" placeholder="VD: Trường THPT Gia Viễn B" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm" />
+            </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label class="block text-xs font-bold text-slate-600 mb-1">Môn học phụ trách</label>
@@ -11501,12 +11824,13 @@ ${sourceText.slice(0, 32000)}`;
             className: 'px-5 py-2 rounded-xl bg-brand-700 hover:bg-brand-800 text-white text-sm font-bold',
             onClick: async () => {
               const name = document.getElementById('edit-adm-name').value.trim();
+              const unit = (document.getElementById('edit-adm-unit')?.value || '').trim();
               const subject = document.getElementById('edit-adm-subject').value.trim();
               const educationLevel = (document.getElementById('edit-adm-level')?.value || 'THPT').trim();
               const password = document.getElementById('edit-adm-pass').value.trim();
               const isSuperAdmin = !!document.getElementById('edit-adm-super').checked;
               if (!name || !subject || !password) return;
-              await saveDocData('admins', adm.id, { ...adm, name, subject, educationLevel, assignedGrades: getGradesForEducationLevel(educationLevel), password, isSuperAdmin });
+              await saveDocData('admins', adm.id, { ...adm, name, unit, subject, educationLevel, assignedGrades: getGradesForEducationLevel(educationLevel), password, isSuperAdmin });
               const prov = await provisionCurriculumForTeacher(subject, educationLevel);
               closeModal();
               showToast(`Đã cập nhật tài khoản Giáo viên (${subject} • ${educationLevel})${prov.added > 0 ? ` và cấp thêm ${prov.added} tiểu chủ đề CT 2018` : ''}!`, 'success');
