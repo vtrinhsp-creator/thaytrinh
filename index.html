@@ -562,7 +562,7 @@
             <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
             Đồng bộ Cloud trực tiếp
           </span>
-          <span id="app-version-label">Phiên bản 2026.11.22-v33</span>
+          <span id="app-version-label">Phiên bản 2026.11.22-v34</span>
         </div>
       </div>
 
@@ -3395,7 +3395,7 @@ Cô Trần Thu Hà, Vật lí, gv_ha, 123456" class="w-full p-3 rounded-xl borde
     const EMBEDDED_FIREBASE_CONFIG = /*__EMBEDDED_FIREBASE_CONFIG__*/{"apiKey":"AIzaSyAK4osCrc_vtzPd3SWBSIoCg99W5vqab9g","authDomain":"toanthaytrinh-af1c8.firebaseapp.com","projectId":"toanthaytrinh-af1c8","storageBucket":"toanthaytrinh-af1c8.firebasestorage.app","messagingSenderId":"797090111064","appId":"1:797090111064:web:bad5dae3a6cab29fad342d","measurementId":"G-TWN1BMQH3N"}/*__END_EMBEDDED_FIREBASE_CONFIG__*/;
     const EMBEDDED_APP_ID = /*__EMBEDDED_APP_ID__*/"hoctoan-pro"/*__END_EMBEDDED_APP_ID__*/;
     const EMBEDDED_ADMIN_PASSWORD = /*__EMBEDDED_ADMIN_PASSWORD__*/"123456"/*__END_EMBEDDED_ADMIN_PASSWORD__*/;
-    const APP_BUILD_VERSION = /*__APP_BUILD_VERSION__*/"2026.11.22-v33"/*__END_APP_BUILD_VERSION__*/;
+    const APP_BUILD_VERSION = /*__APP_BUILD_VERSION__*/"2026.11.22-v34"/*__END_APP_BUILD_VERSION__*/;
 
     const LS_KEYS = {
       FB_CONFIG: 'eduexam_custom_fb_config_v2',
@@ -6458,11 +6458,15 @@ ${extractedPdfText.slice(0, 12000)}` : ''}`;
 
     function renderStudentLobby() {
       const container = document.getElementById('student-exam-cards');
-      const stuOwner = state.currentUser?.ownerUsername || 'admin';
+      // Đồng bộ lại ownerUsername mới nhất từ danh sách học sinh (phòng trường hợp vừa được cập nhật)
+      const latestStu = state.students.find(s => (s.username || '').toLowerCase() === (state.currentUser?.username || '').toLowerCase());
+      const stuOwner = ((latestStu?.ownerUsername || state.currentUser?.ownerUsername || 'admin') + '').trim().toLowerCase();
+      if (state.currentUser) state.currentUser.ownerUsername = stuOwner;
+
       const openExams = state.exams.filter(e => {
         if (!e.active) return false;
-        const exOwner = e.createdBy || 'admin';
-        return exOwner === 'admin' || exOwner === stuOwner;
+        const exOwner = ((e.createdBy || 'admin') + '').trim().toLowerCase();
+        return exOwner === stuOwner;
       });
 
       if (openExams.length === 0) {
@@ -9954,8 +9958,14 @@ ${sourceText.slice(0, 32000)}`;
 
     function getStudentVisibleAnnouncements() {
       const stuClass = state.currentUser?.className || '';
+      const latestStu = state.students.find(s => (s.username || '').toLowerCase() === (state.currentUser?.username || '').toLowerCase());
+      const stuOwner = ((latestStu?.ownerUsername || state.currentUser?.ownerUsername || 'admin') + '').trim().toLowerCase();
       return [...(state.announcements || [])]
-        .filter(a => !a.targetClass || a.targetClass === 'ALL' || a.targetClass === stuClass)
+        .filter(a => {
+          const annOwner = ((a.createdBy || 'admin') + '').trim().toLowerCase();
+          if (annOwner !== stuOwner) return false;
+          return !a.targetClass || a.targetClass === 'ALL' || a.targetClass === stuClass;
+        })
         .sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0) || (b.createdAt || 0) - (a.createdAt || 0));
     }
 
