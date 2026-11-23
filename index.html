@@ -562,7 +562,7 @@
             <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
             Đồng bộ Cloud trực tiếp
           </span>
-          <span id="app-version-label">Phiên bản 2026.11.23-v41</span>
+          <span id="app-version-label">Phiên bản 2026.11.23-v42</span>
         </div>
       </div>
 
@@ -3159,7 +3159,7 @@ Cô Trần Thu Hà, Vật lí, THPT, THPT Gia Viễn B, gv_ha, 123456" class="w-
           <button id="btn-exam-app-rotate" type="button" onclick="toggleExamAppRotation()" title="Chế độ App toàn màn hình & Xoay ngang trên điện thoại" class="hidden px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-bold transition flex items-center gap-1.5">
             <i data-lucide="smartphone" class="w-4 h-4"></i> <span id="btn-exam-app-rotate-label">Xoay App</span>
           </button>
-          <button id="btn-submit-exam-top" onclick="confirmSubmitExam()" class="hidden px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold shadow-sm transition flex items-center gap-1.5">
+          <button id="btn-submit-exam-top" type="button" onclick="confirmSubmitExam()" class="hidden shrink-0 whitespace-nowrap px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-xs sm:text-sm font-bold shadow-sm transition flex items-center gap-1.5">
             <i data-lucide="check-check" class="w-4 h-4"></i> Nộp bài
           </button>
           <div class="relative" id="btn-student-settings-wrap">
@@ -3496,7 +3496,7 @@ Cô Trần Thu Hà, Vật lí, THPT, THPT Gia Viễn B, gv_ha, 123456" class="w-
     const EMBEDDED_FIREBASE_CONFIG = /*__EMBEDDED_FIREBASE_CONFIG__*/{"apiKey":"AIzaSyAK4osCrc_vtzPd3SWBSIoCg99W5vqab9g","authDomain":"toanthaytrinh-af1c8.firebaseapp.com","projectId":"toanthaytrinh-af1c8","storageBucket":"toanthaytrinh-af1c8.firebasestorage.app","messagingSenderId":"797090111064","appId":"1:797090111064:web:bad5dae3a6cab29fad342d","measurementId":"G-TWN1BMQH3N"}/*__END_EMBEDDED_FIREBASE_CONFIG__*/;
     const EMBEDDED_APP_ID = /*__EMBEDDED_APP_ID__*/"hoctoan-pro"/*__END_EMBEDDED_APP_ID__*/;
     const EMBEDDED_ADMIN_PASSWORD = /*__EMBEDDED_ADMIN_PASSWORD__*/"123456"/*__END_EMBEDDED_ADMIN_PASSWORD__*/;
-    const APP_BUILD_VERSION = /*__APP_BUILD_VERSION__*/"2026.11.23-v41"/*__END_APP_BUILD_VERSION__*/;
+    const APP_BUILD_VERSION = /*__APP_BUILD_VERSION__*/"2026.11.23-v42"/*__END_APP_BUILD_VERSION__*/;
 
     const LS_KEYS = {
       FB_CONFIG: 'eduexam_custom_fb_config_v2',
@@ -3752,7 +3752,7 @@ Cô Trần Thu Hà, Vật lí, THPT, THPT Gia Viễn B, gv_ha, 123456" class="w-
       el.className = `pointer-events-auto flex items-center gap-2.5 px-4 py-3 rounded-xl shadow-lg border text-sm font-medium transition-all duration-300 translate-x-4 opacity-0 ${colors[type] || colors.info}`;
       el.innerHTML = `<i data-lucide="${icons[type] || 'info'}" class="w-4 h-4 shrink-0"></i><span>${message}</span>`;
       container.appendChild(el);
-      lucide.createIcons({ nodes: [el] });
+      if (window.lucide) lucide.createIcons({ nodes: [el] });
       requestAnimationFrame(() => {
         el.classList.remove('translate-x-4', 'opacity-0');
       });
@@ -3790,7 +3790,7 @@ Cô Trần Thu Hà, Vật lí, THPT, THPT Gia Viễn B, gv_ha, 123456" class="w-
 
       backdrop.classList.remove('hidden');
       backdrop.classList.add('flex');
-      lucide.createIcons({ nodes: [backdrop] });
+      if (window.lucide) lucide.createIcons({ nodes: [backdrop] });
     }
 
     function closeModal() {
@@ -7213,7 +7213,7 @@ ${extractedPdfText.slice(0, 12000)}` : ''}`;
       const nextBtn = document.getElementById('btn-next-q');
       if (displayIdx === sess.questionOrder.length - 1) {
         nextBtn.innerHTML = `Nộp bài <i data-lucide="check-check" class="w-4 h-4"></i>`;
-        nextBtn.onclick = confirmSubmitExam;
+        nextBtn.onclick = () => window.confirmSubmitExam();
       } else {
         nextBtn.innerHTML = `Câu tiếp theo <i data-lucide="chevron-right" class="w-4 h-4"></i>`;
         nextBtn.onclick = () => navigateQuestion(1);
@@ -7497,11 +7497,20 @@ ${extractedPdfText.slice(0, 12000)}` : ''}`;
       document.getElementById('runner-progress-bar').style.width = `${total > 0 ? Math.round((completedCount / total) * 100) : 0}%`;
     }
 
+    let isSubmittingExam = false;
+
     // Xác nhận nộp bài bằng Modal tùy chỉnh
     window.confirmSubmitExam = function() {
+      if (!state.activeExam || !state.activeSession) {
+        showToast('Không tìm thấy phiên làm bài hiện tại. Vui lòng tải lại bài thi!', 'warning');
+        return;
+      }
+      if (isSubmittingExam) return;
+
+      const qs = getSessionQuestions(state.activeExam, state.activeSession);
       const ev = evaluateSession(state.activeExam, state.activeSession);
-      const total = state.activeExam.questions.length;
-      const unanswered = total - ev.answeredCount;
+      const total = qs.length;
+      const unanswered = Math.max(0, total - ev.answeredCount);
 
       openModal({
         title: 'Xác nhận nộp bài kiểm tra',
@@ -7527,23 +7536,63 @@ ${extractedPdfText.slice(0, 12000)}` : ''}`;
     };
 
     async function submitExamNow() {
-      if (state.timerInterval) clearInterval(state.timerInterval);
-      if (sessionSyncDebounceTimer) {
-        clearTimeout(sessionSyncDebounceTimer);
-        sessionSyncDebounceTimer = null;
-      }
-      const ev = evaluateSession(state.activeExam, state.activeSession);
-      state.activeSession.status = 'submitted';
-      state.activeSession.submittedAt = Date.now();
-      state.activeSession.score = ev.score;
+      if (isSubmittingExam || !state.activeExam || !state.activeSession) return;
+      isSubmittingExam = true;
+      try {
+        if (state.timerInterval) {
+          clearInterval(state.timerInterval);
+          state.timerInterval = null;
+        }
+        if (sessionSyncDebounceTimer) {
+          clearTimeout(sessionSyncDebounceTimer);
+          sessionSyncDebounceTimer = null;
+        }
 
-      await saveDocData('sessions', state.activeSession.id, state.activeSession);
-      clearSessionDraftLocally(state.activeSession.id);
-      const localIdx = state.sessions.findIndex(s => s.id === state.activeSession.id);
-      if (localIdx >= 0) state.sessions[localIdx] = { ...state.activeSession };
-      else state.sessions.push({ ...state.activeSession });
-      showToast('Đã nộp bài thành công!', 'success');
-      showStudentResultScreen(state.activeExam, state.activeSession);
+        const ev = evaluateSession(state.activeExam, state.activeSession);
+        state.activeSession.status = 'submitted';
+        state.activeSession.submittedAt = Date.now();
+        state.activeSession.score = Number(ev.score) || 0;
+
+        // Loại bỏ hoàn toàn giá trị undefined để Firestore không từ chối lệnh setDoc
+        const cleanSession = JSON.parse(JSON.stringify(state.activeSession));
+        state.activeSession = cleanSession;
+        saveSessionDraftLocally(cleanSession);
+
+        const localIdx = state.sessions.findIndex(s => s.id === cleanSession.id);
+        if (localIdx >= 0) state.sessions[localIdx] = { ...cleanSession };
+        else state.sessions.push({ ...cleanSession });
+
+        let syncedCloud = false;
+        try {
+          await Promise.race([
+            saveDocData('sessions', cleanSession.id, cleanSession),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('Quá thời gian đồng bộ Cloud (8s)')), 8000))
+          ]);
+          syncedCloud = true;
+          clearSessionDraftLocally(cleanSession.id);
+        } catch (err) {
+          console.error('Lỗi đồng bộ bài nộp lên Cloud:', err);
+          // Tự động thử đồng bộ nền lại nếu mạng đang chập chờn
+          setTimeout(() => {
+            saveDocData('sessions', cleanSession.id, cleanSession)
+              .then(() => clearSessionDraftLocally(cleanSession.id))
+              .catch(() => {});
+          }, 3000);
+        }
+
+        showToast(
+          syncedCloud
+            ? 'Đã nộp bài thành công!'
+            : 'Đã chấm điểm & lưu bài trên máy, hệ thống đang đồng bộ lại lên máy chủ...',
+          syncedCloud ? 'success' : 'warning'
+        );
+        showStudentResultScreen(state.activeExam, cleanSession);
+      } catch (err) {
+        console.error('Lỗi khi nộp bài:', err);
+        showToast('Có lỗi khi nộp bài: ' + (err?.message || 'Vui lòng thử lại!'), 'error');
+      } finally {
+        isSubmittingExam = false;
+      }
     }
 
     window.viewSubmittedResult = function(examId) {
@@ -7617,11 +7666,17 @@ ${extractedPdfText.slice(0, 12000)}` : ''}`;
       const listEl = document.getElementById('result-detail-list');
       const labelsMcq = ['A', 'B', 'C', 'D'];
       const labelsTf = ['a', 'b', 'c', 'd'];
+      const questions = getSessionQuestions(exam, session);
+      const qOrder = (Array.isArray(session.questionOrder) && session.questionOrder.length > 0)
+        ? session.questionOrder
+        : questions.map((_, i) => i);
 
-      listEl.innerHTML = (session.questionOrder || []).map((origQIdx, dispIdx) => {
-        const q = exam.questions[origQIdx];
+      listEl.innerHTML = qOrder.map((origQIdx, dispIdx) => {
+        const q = questions[origQIdx];
         const cell = ev.perOrigQ[origQIdx];
-        const optOrder = (session.optionOrders || {})[String(origQIdx)] || q.options.map((_, i) => i);
+        if (!q || !cell) return '';
+        const qOpts = Array.isArray(q.options) ? q.options : [];
+        const optOrder = (session.optionOrders || {})[String(origQIdx)] || qOpts.map((_, i) => i);
         const ans = (session.answers || {})[String(origQIdx)];
 
         let statusPill = `<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-500">Chưa làm (0đ)</span>`;
@@ -7652,7 +7707,7 @@ ${extractedPdfText.slice(0, 12000)}` : ''}`;
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-2">
               ${optOrder.map((origOptIdx, dispOptIdx) => {
                 const chosen = subMap[String(origOptIdx)];
-                const truth = q.options[origOptIdx].isTrue;
+                const truth = qOpts[origOptIdx]?.isTrue;
                 const ok = chosen === truth;
                 return `
                   <div class="p-2 rounded-lg border text-xs ${ok ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-rose-50 border-rose-200 text-rose-800'}">
@@ -7670,12 +7725,12 @@ ${extractedPdfText.slice(0, 12000)}` : ''}`;
               <span class="font-bold text-slate-800 text-sm">Câu ${dispIdx + 1}</span>
               ${statusPill}
             </div>
-            <div class="text-xs text-slate-700 exam-render-content line-clamp-3">${q.promptHtml}</div>
+            ${q.promptHtml ? `<div class="text-xs text-slate-700 exam-render-content line-clamp-3">${q.promptHtml}</div>` : ''}
             ${detailLine}
           </div>
         `;
       }).join('');
-      lucide.createIcons();
+      if (window.lucide) lucide.createIcons();
     }
 
 
