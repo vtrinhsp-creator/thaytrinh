@@ -562,7 +562,7 @@
             <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
             Đồng bộ Cloud trực tiếp
           </span>
-          <span id="app-version-label">Phiên bản 2026.11.22-v39</span>
+          <span id="app-version-label">Phiên bản 2026.11.23-v40</span>
         </div>
       </div>
 
@@ -2631,6 +2631,9 @@ Cô Trần Thu Hà, Vật lí, THPT, THPT Gia Viễn B, gv_ha, 123456" class="w-
               <div id="rep-kpi-avg" class="text-2xl font-black text-brand-800 mt-1">0.00</div>
             </div>
           </div>
+
+          <!-- Thống kê tổng hợp Số câu trả lời Đúng & Sai của đợt thi -->
+          <div id="rep-correct-wrong-summary" class="mt-4 pt-4 border-t border-slate-100"></div>
         </div>
 
         <!-- Phổ điểm & Xếp loại -->
@@ -2727,16 +2730,18 @@ Cô Trần Thu Hà, Vật lí, THPT, THPT Gia Viễn B, gv_ha, 123456" class="w-
             <table class="w-full text-left border-collapse text-sm">
               <thead class="bg-slate-50 text-xs uppercase font-bold text-slate-600 border-b border-slate-200">
                 <tr>
-                  <th class="py-3 px-4">STT</th>
-                  <th class="py-3 px-4">Họ và tên</th>
-                  <th class="py-3 px-4">Lớp</th>
-                  <th class="py-3 px-4 text-center">Trạng thái</th>
-                  <th class="py-3 px-4 text-center">Số câu đúng</th>
-                  <th class="py-3 px-4 text-center">Thoát MH</th>
-                  <th class="py-3 px-4 text-center">Vi phạm</th>
-                  <th class="py-3 px-4 text-center">Điểm</th>
-                  <th class="py-3 px-4 text-right">Giờ nộp</th>
-                  <th class="py-3 px-4 text-right no-print">Chi tiết bài làm</th>
+                  <th class="py-3 px-3">STT</th>
+                  <th class="py-3 px-3">Họ và tên</th>
+                  <th class="py-3 px-3">Lớp</th>
+                  <th class="py-3 px-3 text-center">Trạng thái</th>
+                  <th class="py-3 px-3 text-center text-emerald-700 whitespace-nowrap">Câu đúng</th>
+                  <th class="py-3 px-3 text-center text-rose-700 whitespace-nowrap">Câu sai</th>
+                  <th class="py-3 px-3 text-center whitespace-nowrap">Thoát MH</th>
+                  <th class="py-3 px-3 text-center">Vi phạm</th>
+                  <th class="py-3 px-3 text-center">Điểm</th>
+                  <th class="py-3 px-3 text-center whitespace-nowrap">Bắt đầu</th>
+                  <th class="py-3 px-3 text-center whitespace-nowrap">Kết thúc / Thời lượng</th>
+                  <th class="py-3 px-3 text-right no-print whitespace-nowrap">Chi tiết</th>
                 </tr>
               </thead>
               <tbody id="report-scores-tbody" class="divide-y divide-slate-100"></tbody>
@@ -3491,7 +3496,7 @@ Cô Trần Thu Hà, Vật lí, THPT, THPT Gia Viễn B, gv_ha, 123456" class="w-
     const EMBEDDED_FIREBASE_CONFIG = /*__EMBEDDED_FIREBASE_CONFIG__*/{"apiKey":"AIzaSyAK4osCrc_vtzPd3SWBSIoCg99W5vqab9g","authDomain":"toanthaytrinh-af1c8.firebaseapp.com","projectId":"toanthaytrinh-af1c8","storageBucket":"toanthaytrinh-af1c8.firebasestorage.app","messagingSenderId":"797090111064","appId":"1:797090111064:web:bad5dae3a6cab29fad342d","measurementId":"G-TWN1BMQH3N"}/*__END_EMBEDDED_FIREBASE_CONFIG__*/;
     const EMBEDDED_APP_ID = /*__EMBEDDED_APP_ID__*/"hoctoan-pro"/*__END_EMBEDDED_APP_ID__*/;
     const EMBEDDED_ADMIN_PASSWORD = /*__EMBEDDED_ADMIN_PASSWORD__*/"123456"/*__END_EMBEDDED_ADMIN_PASSWORD__*/;
-    const APP_BUILD_VERSION = /*__APP_BUILD_VERSION__*/"2026.11.22-v39"/*__END_APP_BUILD_VERSION__*/;
+    const APP_BUILD_VERSION = /*__APP_BUILD_VERSION__*/"2026.11.23-v40"/*__END_APP_BUILD_VERSION__*/;
 
     const LS_KEYS = {
       FB_CONFIG: 'eduexam_custom_fb_config_v2',
@@ -6603,6 +6608,38 @@ ${extractedPdfText.slice(0, 12000)}` : ''}`;
     // =========================================================================
     // 9. BẢNG ĐIỀU KHIỂN GIÁM SÁT THỜI GIAN THỰC CHO ADMIN (LIVE DASHBOARD)
     // =========================================================================
+    function formatClockHMS(ts) {
+      if (!ts) return '--';
+      try {
+        return new Date(ts).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      } catch (e) { return '--'; }
+    }
+
+    function formatElapsedTime(startTs, endTs) {
+      if (!startTs) return '--';
+      const end = endTs || Date.now();
+      const diffSec = Math.max(0, Math.floor((end - startTs) / 1000));
+      const h = Math.floor(diffSec / 3600);
+      const m = Math.floor((diffSec % 3600) / 60);
+      const s = diffSec % 60;
+      const p2 = (v) => String(v).padStart(2, '0');
+      return h > 0 ? `${h}:${p2(m)}:${p2(s)}` : `${p2(m)}:${p2(s)}`;
+    }
+
+    // Bộ đếm thời gian thực 1 giây/lần cho các học sinh đang làm bài (không re-render cả bảng)
+    if (!window.__eduExamLiveClockTicker) {
+      window.__eduExamLiveClockTicker = setInterval(() => {
+        if (!state.currentUser || state.currentUser.role === 'student') return;
+        const els = document.querySelectorAll('[data-live-start]');
+        if (!els.length) return;
+        const now = Date.now();
+        els.forEach(el => {
+          const st = Number(el.getAttribute('data-live-start'));
+          if (st > 0) el.textContent = formatElapsedTime(st, now);
+        });
+      }, 1000);
+    }
+
     window.renderAdminDashboard = function() {
       const examSelect = document.getElementById('dashboard-exam-select');
       const classSelect = document.getElementById('dashboard-class-filter');
@@ -6710,11 +6747,18 @@ ${extractedPdfText.slice(0, 12000)}` : ''}`;
 
       bodyEl.innerHTML = rows.map(({ stu, sess, evalRes }) => {
         let statusBadge = `<span class="inline-flex items-center gap-1 text-[10px] font-semibold text-slate-400"><span class="w-1.5 h-1.5 rounded-full bg-slate-300"></span>Chưa thi</span>`;
+        let liveTimeHtml = '';
         if (sess?.status === 'in_progress') {
           statusBadge = `<span class="inline-flex items-center gap-1 text-[10px] font-bold text-brand-700"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse-dot"></span>Đang thi</span>`;
+          const startStr = formatClockHMS(sess.startedAt);
+          const elapsedStr = formatElapsedTime(sess.startedAt, Date.now());
+          liveTimeHtml = `<div class="text-[9.5px] font-mono text-brand-700 mt-0.5 flex items-center gap-1 truncate" title="Bắt đầu lúc ${startStr} — Đang làm bài"><span>▶${startStr}</span><span class="px-1 rounded bg-blue-50 text-brand-800 font-bold" data-live-start="${sess.startedAt || ''}">${elapsedStr}</span></div>`;
         } else if (sess?.status === 'submitted') {
-          const t = sess.submittedAt ? new Date(sess.submittedAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : '';
-          statusBadge = `<span class="inline-flex items-center gap-0.5 text-[10px] font-bold text-emerald-700"><i data-lucide="check-circle" class="w-3 h-3"></i>${t}</span>`;
+          const startStr = formatClockHMS(sess.startedAt);
+          const endStr = formatClockHMS(sess.submittedAt);
+          const durStr = formatElapsedTime(sess.startedAt, sess.submittedAt);
+          statusBadge = `<span class="inline-flex items-center gap-0.5 text-[10px] font-bold text-emerald-700"><i data-lucide="check-circle" class="w-3 h-3"></i>Đã nộp</span>`;
+          liveTimeHtml = `<div class="text-[9.5px] font-mono text-slate-500 mt-0.5 truncate" title="Bắt đầu: ${startStr} • Kết thúc: ${endStr} • Thời lượng: ${durStr}">▶${startStr}→■${endStr}${durStr !== '--' ? ` (${durStr})` : ''}</div>`;
         }
 
         const scoreAndProgressHtml = evalRes
@@ -6752,6 +6796,7 @@ ${extractedPdfText.slice(0, 12000)}` : ''}`;
                 ${sess && sess.assignedExamCode ? `<span class="text-[9px] font-mono font-extrabold px-1 py-0.2 rounded bg-indigo-100 text-indigo-800">${escapeHtml(sess.assignedExamCode)}</span>` : ''}
                 ${sess && sess.violated ? `<span class="text-[9px] font-extrabold px-1 py-0.2 rounded bg-rose-600 text-white">VP</span>` : ''}
               </div>
+              ${liveTimeHtml}
             </td>
             <td class="py-2 px-1 text-center border-r border-slate-100">${scoreAndProgressHtml}</td>
             ${cellsHtml}
@@ -6793,13 +6838,17 @@ ${extractedPdfText.slice(0, 12000)}` : ''}`;
       }
 
       const questions = exam.questions || [];
-      const headers = ['STT', 'Họ và tên', 'Lớp', 'Tài khoản', 'Trạng thái', 'Số câu đã làm', 'Điểm', ...questions.map((_, i) => `Câu ${i + 1}`)];
+      const headers = ['STT', 'Họ và tên', 'Lớp', 'Tài khoản', 'Trạng thái', 'Giờ bắt đầu', 'Giờ kết thúc', 'Thời gian làm bài', 'Số câu đã làm', 'Số câu đúng', 'Đúng 1 phần', 'Số câu sai', 'Chưa làm', 'Điểm', ...questions.map((_, i) => `Câu ${i + 1}`)];
       const csvRows = [headers.join(',')];
 
-      state.students.forEach((stu, idx) => {
+      getVisibleStudents().forEach((stu, idx) => {
         const sess = state.sessions.find(s => s.examId === exam.id && s.studentUsername === stu.username);
         const ev = sess ? evaluateSession(exam, sess) : null;
         const statusText = !sess ? 'Chưa thi' : (sess.status === 'submitted' ? 'Đã nộp bài' : 'Đang làm bài');
+        const startStr = sess?.startedAt ? new Date(sess.startedAt).toLocaleString('vi-VN') : '';
+        const endStr = sess?.submittedAt ? new Date(sess.submittedAt).toLocaleString('vi-VN') : '';
+        const durStr = sess?.startedAt ? formatElapsedTime(sess.startedAt, sess.submittedAt || Date.now()) : '';
+        const unans = ev ? Math.max(0, questions.length - ev.correctCount - ev.partialCount - ev.wrongCount) : 0;
         const qCells = questions.map((_, qi) => {
           if (!ev) return '';
           const c = ev.perOrigQ[qi];
@@ -6815,7 +6864,14 @@ ${extractedPdfText.slice(0, 12000)}` : ''}`;
           `"${(stu.className || '').replace(/"/g, '""')}"`,
           stu.username,
           `"${statusText}"`,
+          `"${startStr}"`,
+          `"${endStr}"`,
+          `"${durStr}"`,
           ev ? `${ev.answeredCount}/${questions.length}` : '0',
+          ev ? ev.correctCount : '',
+          ev ? ev.partialCount : '',
+          ev ? ev.wrongCount : '',
+          ev ? unans : '',
           ev ? ev.score.toFixed(2) : '',
           ...qCells
         ];
@@ -9283,31 +9339,90 @@ ${(state.pdfBuilder.keyText || '').slice(0, 12000)}`;
         ...attendedRows.sort((a, b) => b.ev.score - a.ev.score),
         ...absentStudents.map(stu => ({ stu, sess: null, ev: null, exits: 0, isViolated: false }))
       ];
+      // Thống kê tổng hợp Số câu trả lời Đúng & Sai của toàn bộ thí sinh dự thi
+      const cwSummaryEl = document.getElementById('rep-correct-wrong-summary');
+      if (cwSummaryEl) {
+        const totalQ = (exam.questions || []).length;
+        let sumCorrect = 0, sumWrong = 0, sumPartial = 0, sumUnans = 0;
+        attendedRows.forEach(r => {
+          if (!r.ev) return;
+          sumCorrect += r.ev.correctCount || 0;
+          sumWrong += r.ev.wrongCount || 0;
+          sumPartial += r.ev.partialCount || 0;
+          sumUnans += Math.max(0, totalQ - (r.ev.correctCount || 0) - (r.ev.partialCount || 0) - (r.ev.wrongCount || 0));
+        });
+        const totalTurns = sumCorrect + sumWrong + sumPartial + sumUnans;
+        const pctCorrect = totalTurns > 0 ? ((sumCorrect / totalTurns) * 100).toFixed(1) : '0.0';
+        const pctPartial = totalTurns > 0 ? ((sumPartial / totalTurns) * 100).toFixed(1) : '0.0';
+        const pctWrong = totalTurns > 0 ? ((sumWrong / totalTurns) * 100).toFixed(1) : '0.0';
+        const pctUnans = totalTurns > 0 ? ((sumUnans / totalTurns) * 100).toFixed(1) : '0.0';
+        const avgCorrect = attendedRows.length ? (sumCorrect / attendedRows.length).toFixed(1) : '0.0';
+        const avgWrong = attendedRows.length ? (sumWrong / attendedRows.length).toFixed(1) : '0.0';
+
+        cwSummaryEl.innerHTML = `
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2.5">
+            <div class="text-xs font-extrabold text-slate-700 uppercase tracking-wide flex items-center gap-1.5">
+              <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600"></i> Thống kê Số câu trả lời Đúng &amp; Sai (${attendedRows.length} bài thi × ${totalQ} câu)
+            </div>
+            <div class="flex flex-wrap items-center gap-3 text-xs font-bold">
+              <span class="text-emerald-700">✓ Đúng: ${sumCorrect} lượt (${pctCorrect}% • TB ${avgCorrect} câu/HS)</span>
+              <span class="text-rose-700">✗ Sai: ${sumWrong} lượt (${pctWrong}% • TB ${avgWrong} câu/HS)</span>
+              ${sumPartial > 0 ? `<span class="text-amber-700">◐ Đúng 1 phần: ${sumPartial} (${pctPartial}%)</span>` : ''}
+              ${sumUnans > 0 ? `<span class="text-slate-500">○ Chưa làm: ${sumUnans} (${pctUnans}%)</span>` : ''}
+            </div>
+          </div>
+          <div class="w-full h-3 rounded-full bg-slate-100 overflow-hidden flex border border-slate-200">
+            <div class="bg-emerald-500 h-full transition-all" style="width:${pctCorrect}%" title="Đúng: ${pctCorrect}%"></div>
+            <div class="bg-amber-400 h-full transition-all" style="width:${pctPartial}%" title="Đúng 1 phần: ${pctPartial}%"></div>
+            <div class="bg-rose-500 h-full transition-all" style="width:${pctWrong}%" title="Sai: ${pctWrong}%"></div>
+            <div class="bg-slate-300 h-full transition-all" style="width:${pctUnans}%" title="Chưa làm: ${pctUnans}%"></div>
+          </div>
+        `;
+      }
+
       document.getElementById('report-scores-tbody').innerHTML = allScoreRows.map((r, idx) => {
+        const totalQ = (exam.questions || []).length;
         const statusHtml = !r.sess
           ? '<span class="text-xs font-semibold text-slate-400">Vắng thi</span>'
           : (r.sess.status === 'submitted'
             ? '<span class="text-xs font-bold text-emerald-700">Đã nộp</span>'
-            : '<span class="text-xs font-bold text-brand-700">Đang làm</span>');
-        const submitTime = r.sess?.submittedAt
-          ? new Date(r.sess.submittedAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
-          : '--';
+            : '<span class="inline-flex items-center gap-1 text-xs font-bold text-brand-700"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse-dot"></span>Đang làm</span>');
+        const startTime = r.sess?.startedAt ? formatClockHMS(r.sess.startedAt) : '--';
+        let endAndDurHtml = '<span class="text-slate-300">--</span>';
+        if (r.sess?.status === 'submitted') {
+          const endStr = formatClockHMS(r.sess.submittedAt);
+          const durStr = formatElapsedTime(r.sess.startedAt, r.sess.submittedAt);
+          endAndDurHtml = `<div class="font-mono text-xs font-semibold text-slate-700">${endStr}</div><div class="text-[10px] text-emerald-700 font-bold">Thời lượng: ${durStr}</div>`;
+        } else if (r.sess?.status === 'in_progress') {
+          const durStr = formatElapsedTime(r.sess.startedAt, Date.now());
+          endAndDurHtml = `<div class="text-[10px] font-bold text-brand-700">Đang làm bài</div><div class="font-mono text-xs font-extrabold text-brand-800" data-live-start="${r.sess.startedAt || ''}">${durStr}</div>`;
+        }
+        const unansCount = r.ev ? Math.max(0, totalQ - (r.ev.correctCount || 0) - (r.ev.partialCount || 0) - (r.ev.wrongCount || 0)) : 0;
+        const correctHtml = r.ev
+          ? `<span class="px-2 py-0.5 rounded-lg bg-emerald-50 text-emerald-700 font-extrabold text-xs">${r.ev.correctCount}/${totalQ}</span>${r.ev.partialCount > 0 ? `<div class="text-[10px] text-amber-600 font-bold mt-0.5">+${r.ev.partialCount} 1 phần</div>` : ''}`
+          : '<span class="text-slate-300">-</span>';
+        const wrongHtml = r.ev
+          ? `<span class="px-2 py-0.5 rounded-lg bg-rose-50 text-rose-700 font-extrabold text-xs">${r.ev.wrongCount}</span>${unansCount > 0 ? `<div class="text-[10px] text-slate-400 font-semibold mt-0.5">+${unansCount} trống</div>` : ''}`
+          : '<span class="text-slate-300">-</span>';
+
         return `
           <tr class="hover:bg-slate-50">
-            <td class="py-2.5 px-4 text-slate-400">${idx + 1}</td>
-            <td class="py-2.5 px-4 font-semibold text-slate-800">
+            <td class="py-2.5 px-3 text-slate-400">${idx + 1}</td>
+            <td class="py-2.5 px-3 font-semibold text-slate-800">
               ${r.sess
                 ? `<button type="button" onclick="openStudentAttemptDetailModal('${escapeHtml(exam.id)}', '${escapeHtml(r.stu.username)}')" class="text-left hover:text-brand-700 hover:underline font-semibold">${escapeHtml(r.stu.name)}</button>`
                 : escapeHtml(r.stu.name)}
             </td>
-            <td class="py-2.5 px-4 text-xs font-semibold text-slate-600">${escapeHtml(r.stu.className)}</td>
-            <td class="py-2.5 px-4 text-center">${statusHtml}</td>
-            <td class="py-2.5 px-4 text-center text-xs font-bold text-slate-700">${r.ev ? `${r.ev.correctCount}/${exam.questions.length}` : '-'}</td>
-            <td class="py-2.5 px-4 text-center text-xs font-bold ${r.exits > 0 ? 'text-amber-700' : 'text-slate-400'}">${r.sess ? r.exits : '-'}</td>
-            <td class="py-2.5 px-4 text-center">${r.isViolated ? '<span class="px-2 py-0.5 rounded bg-rose-100 text-rose-700 text-[11px] font-bold">Vi phạm</span>' : '<span class="text-xs text-slate-400">Không</span>'}</td>
-            <td class="py-2.5 px-4 text-center font-extrabold ${r.ev ? 'text-brand-800' : 'text-slate-300'}">${r.ev ? r.ev.score.toFixed(2) : '-'}</td>
-            <td class="py-2.5 px-4 text-right font-mono text-xs text-slate-500">${submitTime}</td>
-            <td class="py-2.5 px-4 text-right no-print whitespace-nowrap">
+            <td class="py-2.5 px-3 text-xs font-semibold text-slate-600">${escapeHtml(r.stu.className)}</td>
+            <td class="py-2.5 px-3 text-center whitespace-nowrap">${statusHtml}</td>
+            <td class="py-2.5 px-3 text-center whitespace-nowrap">${correctHtml}</td>
+            <td class="py-2.5 px-3 text-center whitespace-nowrap">${wrongHtml}</td>
+            <td class="py-2.5 px-3 text-center text-xs font-bold ${r.exits > 0 ? 'text-amber-700' : 'text-slate-400'}">${r.sess ? r.exits : '-'}</td>
+            <td class="py-2.5 px-3 text-center">${r.isViolated ? '<span class="px-2 py-0.5 rounded bg-rose-100 text-rose-700 text-[11px] font-bold">Vi phạm</span>' : '<span class="text-xs text-slate-400">Không</span>'}</td>
+            <td class="py-2.5 px-3 text-center font-extrabold ${r.ev ? 'text-brand-800' : 'text-slate-300'}">${r.ev ? r.ev.score.toFixed(2) : '-'}</td>
+            <td class="py-2.5 px-3 text-center font-mono text-xs text-slate-600 whitespace-nowrap">${startTime}</td>
+            <td class="py-2.5 px-3 text-center whitespace-nowrap">${endAndDurHtml}</td>
+            <td class="py-2.5 px-3 text-right no-print whitespace-nowrap">
               ${r.sess
                 ? `<button type="button" onclick="openStudentAttemptDetailModal('${escapeHtml(exam.id)}', '${escapeHtml(r.stu.username)}')" class="px-2.5 py-1.5 rounded-lg bg-brand-50 hover:bg-brand-100 text-brand-700 border border-brand-200 text-xs font-bold transition inline-flex items-center gap-1"><i data-lucide="file-search" class="w-3.5 h-3.5"></i> Xem chi tiết</button>`
                 : '<span class="text-xs text-slate-300">--</span>'}
@@ -9340,8 +9455,9 @@ ${(state.pdfBuilder.keyText || '').slice(0, 12000)}`;
       const sessByUser = {};
       state.sessions.filter(s => s.examId === exam.id).forEach(s => { sessByUser[s.studentUsername] = s; });
 
-      const headers = ['STT', 'Họ và tên', 'Lớp', 'Tài khoản', 'Trạng thái', 'Số câu đúng', 'Số lượt thoát màn hình', 'Vi phạm quy chế', 'Điểm', 'Thời gian nộp'];
+      const headers = ['STT', 'Họ và tên', 'Lớp', 'Tài khoản', 'Trạng thái', 'Số câu đúng', 'Đúng 1 phần', 'Số câu sai', 'Chưa làm', 'Số lượt thoát màn hình', 'Vi phạm quy chế', 'Điểm', 'Giờ bắt đầu', 'Giờ kết thúc', 'Thời gian làm bài'];
       const rows = [headers.join(',')];
+      const totalQ = (exam.questions || []).length;
 
       students.forEach((stu, idx) => {
         const sess = sessByUser[stu.username];
@@ -9349,18 +9465,26 @@ ${(state.pdfBuilder.keyText || '').slice(0, 12000)}`;
         const exits = sess?.exitCount || 0;
         const violated = sess && (sess.violated || exits >= (exam.maxViolations || 3));
         const statusText = !sess ? 'Vắng thi' : (sess.status === 'submitted' ? 'Đã nộp bài' : 'Đang làm bài');
+        const startStr = sess?.startedAt ? new Date(sess.startedAt).toLocaleString('vi-VN') : '';
         const submitStr = sess?.submittedAt ? new Date(sess.submittedAt).toLocaleString('vi-VN') : '';
+        const durStr = sess?.startedAt ? formatElapsedTime(sess.startedAt, sess.submittedAt || Date.now()) : '';
+        const unans = ev ? Math.max(0, totalQ - ev.correctCount - ev.partialCount - ev.wrongCount) : 0;
         rows.push([
           idx + 1,
           `"${(stu.name || '').replace(/"/g, '""')}"`,
           `"${(stu.className || '').replace(/"/g, '""')}"`,
           stu.username,
           `"${statusText}"`,
-          ev ? `${ev.correctCount}/${exam.questions.length}` : '',
+          ev ? ev.correctCount : '',
+          ev ? ev.partialCount : '',
+          ev ? ev.wrongCount : '',
+          ev ? unans : '',
           sess ? exits : '',
           violated ? 'Vi phạm quy chế' : 'Không',
           ev ? ev.score.toFixed(2) : '',
-          `"${submitStr}"`
+          `"${startStr}"`,
+          `"${submitStr}"`,
+          `"${durStr}"`
         ].join(','));
       });
 
@@ -13476,7 +13600,7 @@ ${sourceText.slice(0, 32000)}`;
         const list = byClass[cls].sort((a, b) => (a.name || '').localeCompare(b.name || ''));
         lines.push('');
         lines.push([qCsv(`CHI TIẾT LỚP: ${cls} (${list.length} học sinh)`)].join(','));
-        lines.push(['STT', 'Họ và tên', 'Lớp', 'Tài khoản', 'Mã đề', 'Trạng thái', 'Số câu đúng', 'Điểm', 'Thoát MH', 'Vi phạm', 'Thời gian nộp'].map(qCsv).join(','));
+        lines.push(['STT', 'Họ và tên', 'Lớp', 'Tài khoản', 'Mã đề', 'Trạng thái', 'Số câu đúng', 'Đúng 1 phần', 'Số câu sai', 'Chưa làm', 'Điểm', 'Thoát MH', 'Vi phạm', 'Giờ bắt đầu', 'Giờ kết thúc', 'Thời gian làm bài'].map(qCsv).join(','));
 
         list.forEach((stu, idx) => {
           const s = sessByUser[stu.username];
@@ -13485,7 +13609,10 @@ ${sourceText.slice(0, 32000)}`;
           const exits = s?.exitCount || 0;
           const violated = s && (s.violated || exits >= (exam.maxViolations || 3));
           const statusTxt = !s ? 'Vắng thi' : (s.status === 'submitted' ? 'Đã nộp bài' : 'Đang làm bài');
+          const startTime = s?.startedAt ? new Date(s.startedAt).toLocaleString('vi-VN') : '';
           const subTime = s?.submittedAt ? new Date(s.submittedAt).toLocaleString('vi-VN') : '';
+          const durTime = s?.startedAt ? formatElapsedTime(s.startedAt, s.submittedAt || Date.now()) : '';
+          const unans = ev ? Math.max(0, qs.length - ev.correctCount - ev.partialCount - ev.wrongCount) : 0;
           lines.push([
             idx + 1,
             stu.name || '',
@@ -13493,11 +13620,16 @@ ${sourceText.slice(0, 32000)}`;
             stu.username || '',
             s?.assignedExamCode || exam.examCode || '',
             statusTxt,
-            ev ? `${ev.correctCount}/${qs.length}` : '',
+            ev ? ev.correctCount : '',
+            ev ? ev.partialCount : '',
+            ev ? ev.wrongCount : '',
+            ev ? unans : '',
             ev ? ev.score.toFixed(2) : '',
             s ? exits : '',
             violated ? 'Vi phạm' : 'Không',
-            subTime
+            startTime,
+            subTime,
+            durTime
           ].map(qCsv).join(','));
         });
       });
