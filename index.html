@@ -562,7 +562,7 @@
             <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
             Đồng bộ Cloud trực tiếp
           </span>
-          <span id="app-version-label">Phiên bản 2026.11.23-v40</span>
+          <span id="app-version-label">Phiên bản 2026.11.23-v41</span>
         </div>
       </div>
 
@@ -3496,7 +3496,7 @@ Cô Trần Thu Hà, Vật lí, THPT, THPT Gia Viễn B, gv_ha, 123456" class="w-
     const EMBEDDED_FIREBASE_CONFIG = /*__EMBEDDED_FIREBASE_CONFIG__*/{"apiKey":"AIzaSyAK4osCrc_vtzPd3SWBSIoCg99W5vqab9g","authDomain":"toanthaytrinh-af1c8.firebaseapp.com","projectId":"toanthaytrinh-af1c8","storageBucket":"toanthaytrinh-af1c8.firebasestorage.app","messagingSenderId":"797090111064","appId":"1:797090111064:web:bad5dae3a6cab29fad342d","measurementId":"G-TWN1BMQH3N"}/*__END_EMBEDDED_FIREBASE_CONFIG__*/;
     const EMBEDDED_APP_ID = /*__EMBEDDED_APP_ID__*/"hoctoan-pro"/*__END_EMBEDDED_APP_ID__*/;
     const EMBEDDED_ADMIN_PASSWORD = /*__EMBEDDED_ADMIN_PASSWORD__*/"123456"/*__END_EMBEDDED_ADMIN_PASSWORD__*/;
-    const APP_BUILD_VERSION = /*__APP_BUILD_VERSION__*/"2026.11.23-v40"/*__END_APP_BUILD_VERSION__*/;
+    const APP_BUILD_VERSION = /*__APP_BUILD_VERSION__*/"2026.11.23-v41"/*__END_APP_BUILD_VERSION__*/;
 
     const LS_KEYS = {
       FB_CONFIG: 'eduexam_custom_fb_config_v2',
@@ -6672,8 +6672,12 @@ ${extractedPdfText.slice(0, 12000)}` : ''}`;
       const bodyEl = document.getElementById('live-matrix-body');
 
       if (!selectedExam) {
+        document.getElementById('kpi-in-progress').textContent = '0';
+        document.getElementById('kpi-submitted').textContent = '0';
+        document.getElementById('kpi-avg-score').textContent = '0.00';
+        document.getElementById('kpi-total-students').textContent = studentsFiltered.length;
         headEl.innerHTML = '';
-        bodyEl.innerHTML = `<tr><td class="py-10 text-center text-slate-400">Vui lòng nạp hoặc chọn một đề thi để bắt đầu giám sát.</td></tr>`;
+        bodyEl.innerHTML = `<tr><td class="py-10 text-center text-slate-400">Bạn chưa giao đề thi nào. Hãy vào mục <b>Nạp đề</b> hoặc <b>Ngân hàng</b> để tạo và giao bài cho học sinh.</td></tr>`;
         return;
       }
 
@@ -9191,7 +9195,25 @@ ${(state.pdfBuilder.keyText || '').slice(0, 12000)}`;
       renderProgressReport();
       renderReportStatsByExam();
       const ctx = getReportContext();
-      if (!ctx || !ctx.exam) return;
+      if (!ctx || !ctx.exam) {
+        const setTxt = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+        setTxt('report-subtitle', 'Chưa có đề thi nào để thống kê');
+        setTxt('rep-kpi-total', '0');
+        setTxt('rep-kpi-attended', '0');
+        setTxt('rep-kpi-absent', '0');
+        setTxt('rep-kpi-violated', '0');
+        setTxt('rep-kpi-exits', '0');
+        setTxt('rep-kpi-avg', '0.00');
+        setTxt('rep-score-max', '--');
+        setTxt('rep-score-min', '--');
+        setTxt('rep-pass-rate', '0%');
+        setTxt('rep-absent-count-title', '0');
+        ['rep-correct-wrong-summary', 'report-grade-bands', 'report-histogram', 'report-violations-tbody', 'report-absent-tbody', 'report-scores-tbody', 'report-top-wrong-tbody', 'report-pedagogy-summary', 'report-item-analysis-tbody', 'report-student-answers-thead', 'report-student-answers-tbody'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.innerHTML = '';
+        });
+        return;
+      }
       const { exam, cls, students } = ctx;
 
       document.getElementById('report-subtitle').textContent =
