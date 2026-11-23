@@ -562,7 +562,7 @@
             <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
             Đồng bộ Cloud trực tiếp
           </span>
-          <span id="app-version-label">Phiên bản 2026.11.23-v42</span>
+          <span id="app-version-label">Phiên bản 2026.11.23-v43</span>
         </div>
       </div>
 
@@ -718,6 +718,10 @@
                 <span class="flex items-center gap-2"><i data-lucide="message-square-warning" class="w-4 h-4 text-amber-600"></i> Phản hồi từ HS</span>
                 <span id="admin-settings-fb-badge" class="hidden px-1.5 py-0.5 rounded-full bg-rose-500 text-white text-[10px] font-black">0</span>
               </button>
+              <button id="btn-admin-open-backup" type="button" onclick="closeAllSettingsMenus(); openAdminBackupSection();" class="w-full px-3.5 py-2.5 text-left text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-900 flex items-center justify-between gap-2 transition">
+                <span class="flex items-center gap-2"><i data-lucide="hard-drive-download" class="w-4 h-4 text-emerald-600"></i> Sao lưu định kỳ</span>
+                <span id="admin-settings-backup-dot" class="hidden w-2 h-2 rounded-full bg-emerald-500"></span>
+              </button>
               <div class="my-1 border-t border-slate-100"></div>
               <button type="button" onclick="closeAllSettingsMenus(); logout();" class="w-full px-3.5 py-2.5 text-left text-xs font-bold text-rose-600 hover:bg-rose-50 flex items-center gap-2 transition">
                 <i data-lucide="log-out" class="w-4 h-4"></i> Đăng xuất
@@ -754,6 +758,30 @@
     </header>
 
     <main class="max-w-7xl w-full mx-auto px-4 sm:px-6 py-5 flex-1 space-y-5">
+
+      <!-- BANNER THÔNG BÁO SAO LƯU ĐỊNH KỲ (CHỈ HIỆN VỚI ADMIN KHI CÓ BẢN SAO LƯU MỚI / ĐẾN HẠN) -->
+      <div id="admin-backup-due-banner" class="hidden no-print bg-gradient-to-r from-emerald-50 via-teal-50 to-blue-50 border border-emerald-300 rounded-2xl px-4 py-3 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div class="flex items-center gap-3 min-w-0">
+          <span class="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-sm">
+            <i data-lucide="hard-drive-download" class="w-5 h-5"></i>
+          </span>
+          <div class="min-w-0">
+            <div id="admin-backup-due-title" class="text-xs sm:text-sm font-extrabold text-emerald-950">Đã tạo bản sao lưu định kỳ tự động!</div>
+            <div id="admin-backup-due-desc" class="text-[11px] text-emerald-800/90 mt-0.5">Bạn nên tải tệp sao lưu (.json) về máy tính để lưu trữ dự phòng an toàn ngoài trình duyệt.</div>
+          </div>
+        </div>
+        <div class="flex flex-wrap items-center gap-2 shrink-0">
+          <button type="button" onclick="downloadLatestAutoBackup()" class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold shadow-sm transition inline-flex items-center gap-1.5">
+            <i data-lucide="download" class="w-3.5 h-3.5"></i> Tải file sao lưu (.json)
+          </button>
+          <button type="button" onclick="openAdminBackupSection()" class="px-3 py-2 rounded-xl bg-white hover:bg-emerald-100 text-emerald-900 border border-emerald-200 text-xs font-bold transition">
+            Quản lý sao lưu
+          </button>
+          <button type="button" onclick="document.getElementById('admin-backup-due-banner').classList.add('hidden')" class="p-1.5 rounded-lg text-emerald-700 hover:bg-emerald-100 transition" title="Đóng thông báo">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
 
       <!-- ======================================================= -->
       <!-- TRUNG TÂM ĐIỀU PHỐI QUẢN TRỊ (CHỌN MÔN • GIÁO VIÊN • 4 KHU VỰC) -->
@@ -3116,6 +3144,122 @@ Cô Trần Thu Hà, Vật lí, THPT, THPT Gia Viễn B, gv_ha, 123456" class="w-
             </div>
           </div>
         </div>
+
+        <!-- 3. SAO LƯU & KHÔI PHỤC DỮ LIỆU ĐỊNH KỲ (DÀNH RIÊNG CHO ADMIN) -->
+        <div id="admin-backup-panel" class="bg-white rounded-2xl shadow-sm border border-emerald-200 overflow-hidden">
+          <div class="px-5 py-4 bg-gradient-to-r from-emerald-900 via-teal-800 to-brand-900 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <div class="text-[11px] font-bold uppercase tracking-wider text-emerald-200 flex items-center gap-1.5">
+                <i data-lucide="shield-check" class="w-4 h-4 text-emerald-300"></i> An toàn dữ liệu hệ thống (Chỉ Admin)
+              </div>
+              <h3 class="text-base sm:text-lg font-extrabold mt-0.5 flex items-center gap-2">
+                <i data-lucide="hard-drive-download" class="w-5 h-5 text-amber-300"></i> 3. Sao lưu &amp; Khôi phục dữ liệu định kỳ
+              </h3>
+              <p class="text-xs text-emerald-100/90 mt-0.5">Tự động chụp toàn bộ dữ liệu (Học sinh, Giáo viên, Đề thi, Bài làm, Ngân hàng câu hỏi, Chủ đề CT 2018, Thông báo, Phản hồi) theo lịch định kỳ.</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2 shrink-0">
+              <button type="button" onclick="runAdminBackupNow(true, 'manual')" class="px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs sm:text-sm font-extrabold shadow-md transition inline-flex items-center gap-1.5">
+                <i data-lucide="download-cloud" class="w-4 h-4"></i> Sao lưu ngay (.json)
+              </button>
+              <button type="button" onclick="document.getElementById('admin-backup-restore-input').click()" class="px-4 py-2.5 rounded-xl bg-white/15 hover:bg-white/25 text-white border border-white/20 text-xs sm:text-sm font-bold transition inline-flex items-center gap-1.5">
+                <i data-lucide="upload-cloud" class="w-4 h-4"></i> Khôi phục từ file
+              </button>
+              <input type="file" id="admin-backup-restore-input" accept=".json" class="hidden" onchange="handleAdminRestoreFileUpload(event)">
+            </div>
+          </div>
+
+          <div class="p-5 sm:p-6 space-y-5">
+            <!-- Thanh trạng thái sao lưu -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div class="p-3.5 rounded-xl bg-emerald-50/80 border border-emerald-200">
+                <div class="text-[11px] font-bold text-emerald-700 uppercase">Lần sao lưu gần nhất</div>
+                <div id="backup-last-time-label" class="text-sm font-extrabold text-emerald-950 mt-1">Chưa có bản sao lưu</div>
+              </div>
+              <div class="p-3.5 rounded-xl bg-blue-50/80 border border-blue-200">
+                <div class="text-[11px] font-bold text-brand-700 uppercase">Lịch sao lưu tiếp theo</div>
+                <div id="backup-next-time-label" class="text-sm font-extrabold text-brand-900 mt-1">Đang tắt</div>
+              </div>
+              <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+                <div class="text-[11px] font-bold text-slate-600 uppercase">Bản lưu dự phòng trên máy</div>
+                <div id="backup-snapshot-count-label" class="text-sm font-extrabold text-slate-800 mt-1">0 bản</div>
+              </div>
+            </div>
+
+            <!-- Form cấu hình lịch sao lưu định kỳ -->
+            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3.5">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <h4 class="text-xs sm:text-sm font-extrabold text-slate-800 flex items-center gap-1.5">
+                  <i data-lucide="calendar-clock" class="w-4 h-4 text-brand-600"></i> Cấu hình Lịch sao lưu định kỳ tự động
+                </h4>
+                <span id="backup-cfg-status-pill" class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800">Đang bật</span>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 items-end">
+                <label class="flex items-center gap-2.5 cursor-pointer bg-white px-3.5 py-2.5 rounded-xl border border-slate-300">
+                  <input id="backup-cfg-enabled" type="checkbox" checked="" class="w-4 h-4 accent-emerald-600 rounded">
+                  <span class="text-xs font-bold text-slate-800">Bật tự động định kỳ</span>
+                </label>
+
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-600 mb-1">Chu kỳ sao lưu</label>
+                  <select id="backup-cfg-interval" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-white text-xs font-bold text-slate-800 outline-none focus:border-brand-600">
+                    <option value="1">Mỗi 1 giờ (Khi đang mở trang)</option>
+                    <option value="24" selected="">Hàng ngày (24 giờ / lần)</option>
+                    <option value="72">Mỗi 3 ngày (72 giờ / lần)</option>
+                    <option value="168">Hàng tuần (7 ngày / lần)</option>
+                    <option value="720">Hàng tháng (30 ngày / lần)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-600 mb-1">Số bản tự động giữ lại</label>
+                  <select id="backup-cfg-keep" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-white text-xs font-bold text-slate-800 outline-none focus:border-brand-600">
+                    <option value="3">3 bản gần nhất</option>
+                    <option value="5" selected="">5 bản gần nhất</option>
+                    <option value="10">10 bản gần nhất</option>
+                    <option value="20">20 bản gần nhất</option>
+                  </select>
+                </div>
+
+                <button type="button" onclick="saveAdminBackupConfig()" class="py-2.5 px-4 rounded-xl bg-brand-700 hover:bg-brand-800 text-white text-xs font-extrabold shadow-sm transition inline-flex items-center justify-center gap-1.5">
+                  <i data-lucide="save" class="w-4 h-4"></i> Lưu lịch sao lưu
+                </button>
+              </div>
+
+              <div class="flex flex-wrap items-center gap-4 pt-1 text-xs">
+                <label class="inline-flex items-center gap-2 cursor-pointer font-semibold text-slate-700">
+                  <input id="backup-cfg-autodownload" type="checkbox" class="w-3.5 h-3.5 accent-emerald-600 rounded">
+                  <span>Tự động tải file <code>.json</code> về máy tính mỗi khi đến lịch (nếu tắt sẽ lưu ngầm trong trình duyệt &amp; hiện thông báo nhắc tải)</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Danh sách lịch sử các bản sao lưu -->
+            <div class="space-y-2.5">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <h4 class="text-xs sm:text-sm font-extrabold text-slate-800 flex items-center gap-1.5">
+                  <i data-lucide="history" class="w-4 h-4 text-indigo-600"></i> Lịch sử các bản sao lưu trên máy (<span id="backup-history-count">0</span>)
+                </h4>
+                <button type="button" onclick="clearOldAdminBackups()" class="text-[11px] font-bold text-rose-600 hover:underline">Xóa tất cả bản lưu cũ</button>
+              </div>
+              <div class="overflow-x-auto rounded-xl border border-slate-200">
+                <table class="w-full text-left border-collapse text-xs">
+                  <thead class="bg-slate-50 text-[11px] uppercase font-bold text-slate-600 border-b border-slate-200">
+                    <tr>
+                      <th class="py-2.5 px-3">STT</th>
+                      <th class="py-2.5 px-3 whitespace-nowrap">Thời gian sao lưu</th>
+                      <th class="py-2.5 px-3 whitespace-nowrap">Loại</th>
+                      <th class="py-2.5 px-3">Nội dung dữ liệu</th>
+                      <th class="py-2.5 px-3 text-center whitespace-nowrap">Dung lượng</th>
+                      <th class="py-2.5 px-3 text-right whitespace-nowrap">Thao tác</th>
+                    </tr>
+                  </thead>
+                  <tbody id="backup-history-tbody" class="divide-y divide-slate-100"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
     </main>
@@ -3496,7 +3640,7 @@ Cô Trần Thu Hà, Vật lí, THPT, THPT Gia Viễn B, gv_ha, 123456" class="w-
     const EMBEDDED_FIREBASE_CONFIG = /*__EMBEDDED_FIREBASE_CONFIG__*/{"apiKey":"AIzaSyAK4osCrc_vtzPd3SWBSIoCg99W5vqab9g","authDomain":"toanthaytrinh-af1c8.firebaseapp.com","projectId":"toanthaytrinh-af1c8","storageBucket":"toanthaytrinh-af1c8.firebasestorage.app","messagingSenderId":"797090111064","appId":"1:797090111064:web:bad5dae3a6cab29fad342d","measurementId":"G-TWN1BMQH3N"}/*__END_EMBEDDED_FIREBASE_CONFIG__*/;
     const EMBEDDED_APP_ID = /*__EMBEDDED_APP_ID__*/"hoctoan-pro"/*__END_EMBEDDED_APP_ID__*/;
     const EMBEDDED_ADMIN_PASSWORD = /*__EMBEDDED_ADMIN_PASSWORD__*/"123456"/*__END_EMBEDDED_ADMIN_PASSWORD__*/;
-    const APP_BUILD_VERSION = /*__APP_BUILD_VERSION__*/"2026.11.23-v42"/*__END_APP_BUILD_VERSION__*/;
+    const APP_BUILD_VERSION = /*__APP_BUILD_VERSION__*/"2026.11.23-v43"/*__END_APP_BUILD_VERSION__*/;
 
     const LS_KEYS = {
       FB_CONFIG: 'eduexam_custom_fb_config_v2',
@@ -3506,7 +3650,8 @@ Cô Trần Thu Hà, Vật lí, THPT, THPT Gia Viễn B, gv_ha, 123456" class="w-
       GEMINI_KEY: 'eduexam_gemini_api_key_v3',
       READ_ANN: 'eduexam_read_announcements_v1',
       ZALO_CFG: 'eduexam_zalo_notify_cfg_v1',
-      MATRIX_FORM: 'eduexam_matrix_form_tpl_v1'
+      MATRIX_FORM: 'eduexam_matrix_form_tpl_v1',
+      BACKUP_CFG: 'eduexam_admin_backup_cfg_v1'
     };
 
     let CLEAN_INITIAL_HTML = '';
@@ -3813,10 +3958,10 @@ Cô Trần Thu Hà, Vật lí, THPT, THPT Gia Viễn B, gv_ha, 123456" class="w-
     // =========================================================================
     function openLocalIDB() {
       return new Promise((resolve, reject) => {
-        const req = indexedDB.open('EduExamPro_LocalDB_v2', 7);
+        const req = indexedDB.open('EduExamPro_LocalDB_v2', 8);
         req.onupgradeneeded = (e) => {
           const idb = e.target.result;
-          ['students', 'admins', 'exams', 'sessions', 'exam_pages', 'question_bank', 'curriculum_topics', 'announcements', 'feedbacks'].forEach(store => {
+          ['students', 'admins', 'exams', 'sessions', 'exam_pages', 'question_bank', 'curriculum_topics', 'announcements', 'feedbacks', 'backups'].forEach(store => {
             if (!idb.objectStoreNames.contains(store)) {
               idb.createObjectStore(store, { keyPath: 'id' });
             }
@@ -4698,6 +4843,7 @@ Cô Trần Thu Hà, Vật lí, THPT, THPT Gia Viễn B, gv_ha, 123456" class="w-
         clearTimeout(sessionSyncDebounceTimer);
         sessionSyncDebounceTimer = null;
       }
+      stopAdminBackupScheduler();
       detachAllListeners();
       state.currentUser = null;
       state.activeExam = null;
@@ -4730,6 +4876,10 @@ Cô Trần Thu Hà, Vật lí, THPT, THPT Gia Viễn B, gv_ha, 123456" class="w-
       document.querySelectorAll('[data-admin-tab="sync"]').forEach(b => b.classList.toggle('hidden', !isAdm));
       const syncBadge = document.getElementById('admin-sync-badge');
       if (syncBadge && syncBadge.parentElement) syncBadge.parentElement.classList.toggle('hidden', !isAdm);
+      const btnOpenBackup = document.getElementById('btn-admin-open-backup');
+      if (btnOpenBackup) btnOpenBackup.classList.toggle('hidden', !isAdm);
+      if (isAdm) initAdminBackupScheduler();
+      else stopAdminBackupScheduler();
       const subtabBar = document.getElementById('accounts-subtab-bar');
       if (subtabBar) subtabBar.classList.toggle('hidden', !isAdm);
       if (!isAdm) switchAccountsSubTab('students');
@@ -4787,6 +4937,7 @@ Cô Trần Thu Hà, Vật lí, THPT, THPT Gia Viễn B, gv_ha, 123456" class="w-
         updateSyncStatusUI();
         const gk = document.getElementById('sync-gemini-key-input');
         if (gk) gk.value = localStorage.getItem(LS_KEYS.GEMINI_KEY) || '';
+        renderAdminBackupPanel();
       }
       lucide.createIcons();
     };
@@ -16418,6 +16569,475 @@ Giải đáp của Giáo viên: `;
         showToast(`Đã xuất hồ sơ tiến bộ của ${stu.name}!`, 'success');
       }
     };
+
+
+    // =========================================================================
+    // HỆ THỐNG SAO LƯU & KHÔI PHỤC DỮ LIỆU ĐỊNH KỲ (CHỈ ADMIN)
+    // =========================================================================
+    const BACKUP_COLLECTIONS = ['students', 'admins', 'exams', 'sessions', 'question_bank', 'curriculum_topics', 'announcements', 'feedbacks'];
+    let adminBackupTimer = null;
+    let adminBackupInitialTimeout = null;
+    let latestAutoBackupId = null;
+
+    function getAdminBackupConfig() {
+      const defaults = {
+        enabled: true,
+        intervalHours: 24,
+        keepCount: 5,
+        autoDownload: false,
+        lastBackupAt: 0,
+        lastBackupBy: ''
+      };
+      try {
+        const raw = localStorage.getItem(LS_KEYS.BACKUP_CFG);
+        if (raw) return { ...defaults, ...JSON.parse(raw) };
+      } catch (e) {}
+      return defaults;
+    }
+
+    function setAdminBackupConfigLocal(cfg) {
+      try {
+        localStorage.setItem(LS_KEYS.BACKUP_CFG, JSON.stringify(cfg));
+      } catch (e) {}
+    }
+
+    async function syncBackupConfigFromCloud() {
+      if (!useCloudMode || !fbUser || !db || !isSystemAdmin()) return;
+      try {
+        const snap = await getDoc(getDocRef('settings', 'backup_schedule'));
+        if (snap.exists() && snap.data()) {
+          const cur = getAdminBackupConfig();
+          const remote = snap.data();
+          const merged = {
+            ...cur,
+            enabled: remote.enabled !== undefined ? !!remote.enabled : cur.enabled,
+            intervalHours: Number(remote.intervalHours) || cur.intervalHours,
+            keepCount: Number(remote.keepCount) || cur.keepCount,
+            autoDownload: remote.autoDownload !== undefined ? !!remote.autoDownload : cur.autoDownload,
+            lastBackupAt: Math.max(Number(cur.lastBackupAt) || 0, Number(remote.lastBackupAt) || 0),
+            lastBackupBy: remote.lastBackupBy || cur.lastBackupBy
+          };
+          setAdminBackupConfigLocal(merged);
+        }
+      } catch (e) {}
+    }
+
+    async function persistBackupConfigToCloud(cfg) {
+      if (!useCloudMode || !fbUser || !db || !isSystemAdmin()) return;
+      try {
+        await setDoc(getDocRef('settings', 'backup_schedule'), {
+          ...cfg,
+          updatedAt: Date.now()
+        });
+      } catch (e) {
+        console.warn('Không đồng bộ được cấu hình sao lưu lên Cloud:', e);
+      }
+    }
+
+    function stopAdminBackupScheduler() {
+      if (adminBackupTimer) { clearInterval(adminBackupTimer); adminBackupTimer = null; }
+      if (adminBackupInitialTimeout) { clearTimeout(adminBackupInitialTimeout); adminBackupInitialTimeout = null; }
+      const banner = document.getElementById('admin-backup-due-banner');
+      if (banner) banner.classList.add('hidden');
+    }
+
+    async function initAdminBackupScheduler() {
+      stopAdminBackupScheduler();
+      if (!isSystemAdmin()) return;
+      await syncBackupConfigFromCloud();
+      renderAdminBackupPanel();
+      // Kiểm tra sau 3 giây khi dữ liệu Cloud đã đồng bộ đầy đủ
+      adminBackupInitialTimeout = setTimeout(() => {
+        checkAndRunScheduledBackup();
+      }, 3000);
+      // Kiểm tra định kỳ mỗi 5 phút khi Admin đang mở trang
+      adminBackupTimer = setInterval(() => {
+        checkAndRunScheduledBackup();
+      }, 5 * 60 * 1000);
+    }
+
+    async function checkAndRunScheduledBackup() {
+      if (!isSystemAdmin()) return;
+      const cfg = getAdminBackupConfig();
+      if (!cfg.enabled) return;
+
+      const intervalMs = Math.max(1, Number(cfg.intervalHours) || 24) * 3600 * 1000;
+      const elapsed = Date.now() - (Number(cfg.lastBackupAt) || 0);
+      if (elapsed >= intervalMs) {
+        await runAdminBackupNow(!!cfg.autoDownload, 'auto');
+      }
+    }
+
+    function buildFullBackupPayload(triggerType = 'manual') {
+      const now = Date.now();
+      const data = {};
+      const counts = {};
+      BACKUP_COLLECTIONS.forEach(col => {
+        const arr = Array.isArray(state[col]) ? state[col] : [];
+        data[col] = JSON.parse(JSON.stringify(arr));
+        counts[col] = arr.length;
+      });
+      return {
+        id: 'backup-' + now,
+        schemaVersion: 1,
+        appName: 'HOC_CUNG_THAY_TRINH',
+        appId,
+        appVersion: APP_BUILD_VERSION,
+        createdAt: now,
+        createdBy: state.currentUser?.username || 'admin',
+        triggerType, // 'auto' | 'manual'
+        counts,
+        data
+      };
+    }
+
+    function triggerBackupJsonDownload(payload) {
+      const d = new Date(payload.createdAt || Date.now());
+      const p2 = (n) => String(n).padStart(2, '0');
+      const stamp = `${d.getFullYear()}${p2(d.getMonth() + 1)}${p2(d.getDate())}_${p2(d.getHours())}${p2(d.getMinutes())}`;
+      const jsonStr = JSON.stringify(payload, null, 2);
+      const blob = new Blob([jsonStr], { type: 'application/json;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `SaoLuu_HocCungThayTrinh_${appId}_${stamp}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    async function pruneOldBackups(keepCount) {
+      const all = await idbGetAll('backups');
+      if (all.length <= keepCount) return;
+      all.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+      const toDelete = all.slice(keepCount);
+      for (const item of toDelete) {
+        try { await idbDelete('backups', item.id); } catch (e) {}
+      }
+    }
+
+    window.runAdminBackupNow = async function(downloadFile = true, triggerType = 'manual') {
+      if (!isSystemAdmin()) {
+        showToast('Chỉ tài khoản Quản trị viên (Admin) mới có quyền sao lưu dữ liệu!', 'warning');
+        return;
+      }
+      try {
+        const payload = buildFullBackupPayload(triggerType);
+        const approxBytes = new Blob([JSON.stringify(payload)]).size;
+        payload.sizeBytes = approxBytes;
+
+        await idbPut('backups', payload);
+        const cfg = getAdminBackupConfig();
+        await pruneOldBackups(Math.max(1, Number(cfg.keepCount) || 5));
+
+        cfg.lastBackupAt = payload.createdAt;
+        cfg.lastBackupBy = payload.createdBy;
+        setAdminBackupConfigLocal(cfg);
+        persistBackupConfigToCloud(cfg);
+
+        latestAutoBackupId = payload.id;
+
+        if (downloadFile) {
+          triggerBackupJsonDownload(payload);
+          showToast(
+            triggerType === 'auto'
+              ? 'Đã tự động sao lưu định kỳ & tải tệp .json về máy!'
+              : 'Đã sao lưu toàn bộ dữ liệu & tải tệp .json thành công!',
+            'success'
+          );
+          const banner = document.getElementById('admin-backup-due-banner');
+          if (banner) banner.classList.add('hidden');
+        } else if (triggerType === 'auto') {
+          showToast('Hệ thống đã tự động sao lưu định kỳ vào bộ nhớ trình duyệt.', 'info');
+          const banner = document.getElementById('admin-backup-due-banner');
+          const titleEl = document.getElementById('admin-backup-due-title');
+          const descEl = document.getElementById('admin-backup-due-desc');
+          if (banner) {
+            if (titleEl) titleEl.textContent = `Đã tự động sao lưu định kỳ lúc ${new Date(payload.createdAt).toLocaleTimeString('vi-VN')}!`;
+            if (descEl) descEl.textContent = `Đã lưu ${payload.counts.students || 0} HS, ${payload.counts.exams || 0} đề thi, ${payload.counts.sessions || 0} bài làm, ${payload.counts.question_bank || 0} câu ngân hàng (${(approxBytes / 1024).toFixed(1)} KB). Bấm tải về máy tính để lưu dự phòng.`;
+            banner.classList.remove('hidden');
+            if (window.lucide) lucide.createIcons({ nodes: [banner] });
+          }
+        }
+
+        await renderAdminBackupPanel();
+      } catch (err) {
+        console.error('Lỗi sao lưu dữ liệu:', err);
+        showToast('Lỗi khi sao lưu dữ liệu: ' + (err?.message || 'Không rõ nguyên nhân'), 'error');
+      }
+    };
+
+    window.downloadLatestAutoBackup = async function() {
+      const all = await idbGetAll('backups');
+      if (!all.length) return runAdminBackupNow(true, 'manual');
+      all.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+      const target = (latestAutoBackupId && all.find(x => x.id === latestAutoBackupId)) || all[0];
+      triggerBackupJsonDownload(target);
+      showToast('Đã tải bản sao lưu định kỳ mới nhất về máy tính!', 'success');
+      const banner = document.getElementById('admin-backup-due-banner');
+      if (banner) banner.classList.add('hidden');
+    };
+
+    window.openAdminBackupSection = function() {
+      if (!isSystemAdmin()) return;
+      switchAdminTab('sync');
+      setTimeout(() => {
+        const el = document.getElementById('admin-backup-panel');
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 120);
+    };
+
+    window.saveAdminBackupConfig = async function() {
+      if (!isSystemAdmin()) return;
+      const cur = getAdminBackupConfig();
+      const nextCfg = {
+        ...cur,
+        enabled: !!document.getElementById('backup-cfg-enabled')?.checked,
+        intervalHours: Number(document.getElementById('backup-cfg-interval')?.value || 24),
+        keepCount: Number(document.getElementById('backup-cfg-keep')?.value || 5),
+        autoDownload: !!document.getElementById('backup-cfg-autodownload')?.checked
+      };
+      setAdminBackupConfigLocal(nextCfg);
+      await persistBackupConfigToCloud(nextCfg);
+      await pruneOldBackups(nextCfg.keepCount);
+      await renderAdminBackupPanel();
+      showToast(
+        nextCfg.enabled
+          ? `Đã lưu lịch sao lưu định kỳ: mỗi ${nextCfg.intervalHours >= 24 ? (nextCfg.intervalHours / 24) + ' ngày' : nextCfg.intervalHours + ' giờ'}/lần.`
+          : 'Đã tắt chế độ tự động sao lưu định kỳ.',
+        'success'
+      );
+    };
+
+    window.renderAdminBackupPanel = async function() {
+      const panel = document.getElementById('admin-backup-panel');
+      if (!panel) return;
+      if (!isSystemAdmin()) {
+        panel.classList.add('hidden');
+        return;
+      }
+      panel.classList.remove('hidden');
+
+      const cfg = getAdminBackupConfig();
+      const enEl = document.getElementById('backup-cfg-enabled');
+      const intEl = document.getElementById('backup-cfg-interval');
+      const keepEl = document.getElementById('backup-cfg-keep');
+      const autoDlEl = document.getElementById('backup-cfg-autodownload');
+      const statusPill = document.getElementById('backup-cfg-status-pill');
+      const lastLbl = document.getElementById('backup-last-time-label');
+      const nextLbl = document.getElementById('backup-next-time-label');
+      const countLbl = document.getElementById('backup-snapshot-count-label');
+      const histCountEl = document.getElementById('backup-history-count');
+      const dotEl = document.getElementById('admin-settings-backup-dot');
+
+      if (enEl) enEl.checked = !!cfg.enabled;
+      if (intEl) intEl.value = String(cfg.intervalHours || 24);
+      if (keepEl) keepEl.value = String(cfg.keepCount || 5);
+      if (autoDlEl) autoDlEl.checked = !!cfg.autoDownload;
+
+      if (statusPill) {
+        statusPill.textContent = cfg.enabled ? 'Đang bật tự động' : 'Đang tắt';
+        statusPill.className = cfg.enabled
+          ? 'px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800'
+          : 'px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-slate-200 text-slate-600';
+      }
+      if (dotEl) dotEl.classList.toggle('hidden', !cfg.enabled);
+
+      if (lastLbl) {
+        lastLbl.textContent = cfg.lastBackupAt
+          ? new Date(cfg.lastBackupAt).toLocaleString('vi-VN')
+          : 'Chưa từng sao lưu';
+      }
+      if (nextLbl) {
+        if (!cfg.enabled) {
+          nextLbl.textContent = 'Đang tắt';
+        } else {
+          const nextTs = (cfg.lastBackupAt || Date.now()) + (Number(cfg.intervalHours) || 24) * 3600 * 1000;
+          nextLbl.textContent = nextTs <= Date.now()
+            ? 'Đến hạn (sẽ chạy ngay)'
+            : new Date(nextTs).toLocaleString('vi-VN');
+        }
+      }
+
+      const snapshots = (await idbGetAll('backups')).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+      if (countLbl) countLbl.textContent = `${snapshots.length} / ${cfg.keepCount || 5} bản`;
+      if (histCountEl) histCountEl.textContent = snapshots.length;
+
+      const tbody = document.getElementById('backup-history-tbody');
+      if (!tbody) return;
+      if (snapshots.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-400">Chưa có bản sao lưu nào được lưu trên máy này. Hãy bấm <b>Sao lưu ngay (.json)</b> để tạo bản đầu tiên.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = snapshots.map((b, idx) => {
+        const c = b.counts || {};
+        const sizeKb = b.sizeBytes ? `${(b.sizeBytes / 1024).toFixed(1)} KB` : '--';
+        const typeBadge = b.triggerType === 'auto'
+          ? '<span class="px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200 text-[10px] font-bold">Tự động định kỳ</span>'
+          : '<span class="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold">Thủ công</span>';
+        return `
+          <tr class="hover:bg-slate-50 transition">
+            <td class="py-2.5 px-3 text-slate-400 font-semibold">${idx + 1}</td>
+            <td class="py-2.5 px-3 font-mono font-bold text-slate-700 whitespace-nowrap">${new Date(b.createdAt).toLocaleString('vi-VN')}</td>
+            <td class="py-2.5 px-3 whitespace-nowrap">${typeBadge}</td>
+            <td class="py-2.5 px-3 text-[11px] text-slate-600">
+              <b>${c.students || 0}</b> HS • <b>${c.admins || 0}</b> GV • <b>${c.exams || 0}</b> Đề • <b>${c.sessions || 0}</b> Bài làm • <b>${c.question_bank || 0}</b> Câu NH
+            </td>
+            <td class="py-2.5 px-3 text-center font-mono text-slate-500 whitespace-nowrap">${sizeKb}</td>
+            <td class="py-2.5 px-3 text-right whitespace-nowrap space-x-1">
+              <button type="button" onclick="downloadBackupSnapshotById('${escapeHtml(b.id)}')" class="px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-[11px] font-bold transition">Tải .json</button>
+              <button type="button" onclick="confirmRestoreBackupSnapshot('${escapeHtml(b.id)}')" class="px-2.5 py-1 rounded-lg bg-brand-50 hover:bg-brand-100 text-brand-800 border border-brand-200 text-[11px] font-bold transition">Khôi phục</button>
+              <button type="button" onclick="deleteBackupSnapshotById('${escapeHtml(b.id)}')" class="px-2 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-[11px] font-bold transition" title="Xóa bản lưu này">Xóa</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+      if (window.lucide) lucide.createIcons({ nodes: [tbody] });
+    };
+
+    window.downloadBackupSnapshotById = async function(backupId) {
+      const all = await idbGetAll('backups');
+      const found = all.find(b => b.id === backupId);
+      if (!found) return showToast('Không tìm thấy bản sao lưu này!', 'error');
+      triggerBackupJsonDownload(found);
+      showToast('Đã tải tệp sao lưu .json về máy tính!', 'success');
+    };
+
+    window.deleteBackupSnapshotById = async function(backupId) {
+      await idbDelete('backups', backupId);
+      await renderAdminBackupPanel();
+      showToast('Đã xóa bản sao lưu.', 'info');
+    };
+
+    window.clearOldAdminBackups = function() {
+      openModal({
+        title: 'Xóa lịch sử sao lưu trên máy',
+        bodyHtml: '<p>Bạn có chắc chắn muốn xóa toàn bộ các bản sao lưu lưu trong trình duyệt này không? (Dữ liệu chính của hệ thống vẫn giữ nguyên.)</p>',
+        buttons: [
+          { label: 'Hủy', className: 'px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold', onClick: closeModal },
+          {
+            label: 'Xóa toàn bộ lịch sử',
+            className: 'px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-sm font-bold',
+            onClick: async () => {
+              const all = await idbGetAll('backups');
+              for (const b of all) await idbDelete('backups', b.id);
+              closeModal();
+              await renderAdminBackupPanel();
+              showToast('Đã xóa toàn bộ lịch sử sao lưu trên máy.', 'info');
+            }
+          }
+        ]
+      });
+    };
+
+    window.handleAdminRestoreFileUpload = async function(event) {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      event.target.value = '';
+      try {
+        const text = await file.text();
+        const parsed = JSON.parse(text);
+        if (!parsed || !parsed.data || typeof parsed.data !== 'object') {
+          throw new Error('File không đúng cấu trúc sao lưu của HỌC CÙNG THẦY TRỊNH.');
+        }
+        openRestoreConfirmModal(parsed, `tệp "${file.name}"`);
+      } catch (err) {
+        showToast('Không thể đọc file sao lưu: ' + err.message, 'error');
+      }
+    };
+
+    window.confirmRestoreBackupSnapshot = async function(backupId) {
+      const all = await idbGetAll('backups');
+      const found = all.find(b => b.id === backupId);
+      if (!found) return showToast('Không tìm thấy bản sao lưu này!', 'error');
+      openRestoreConfirmModal(found, `bản lưu lúc ${new Date(found.createdAt).toLocaleString('vi-VN')}`);
+    };
+
+    function openRestoreConfirmModal(backupObj, sourceLabel) {
+      const d = backupObj.data || {};
+      const cnt = (k) => Array.isArray(d[k]) ? d[k].length : 0;
+      openModal({
+        title: 'Xác nhận Khôi phục dữ liệu hệ thống',
+        bodyHtml: `
+          <div class="space-y-3.5 text-xs">
+            <div class="p-3 rounded-xl bg-blue-50 border border-blue-200 text-brand-900">
+              Nguồn khôi phục: <b>${escapeHtml(sourceLabel)}</b><br>
+              Thời điểm tạo: <b>${backupObj.createdAt ? new Date(backupObj.createdAt).toLocaleString('vi-VN') : 'Không rõ'}</b>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
+              <div class="p-2 rounded-lg bg-slate-50 border border-slate-200"><div class="text-slate-500">Học sinh</div><div class="text-base font-extrabold text-slate-800">${cnt('students')}</div></div>
+              <div class="p-2 rounded-lg bg-slate-50 border border-slate-200"><div class="text-slate-500">Giáo viên</div><div class="text-base font-extrabold text-slate-800">${cnt('admins')}</div></div>
+              <div class="p-2 rounded-lg bg-slate-50 border border-slate-200"><div class="text-slate-500">Đề thi</div><div class="text-base font-extrabold text-slate-800">${cnt('exams')}</div></div>
+              <div class="p-2 rounded-lg bg-slate-50 border border-slate-200"><div class="text-slate-500">Bài làm</div><div class="text-base font-extrabold text-slate-800">${cnt('sessions')}</div></div>
+              <div class="p-2 rounded-lg bg-slate-50 border border-slate-200"><div class="text-slate-500">Ngân hàng</div><div class="text-base font-extrabold text-slate-800">${cnt('question_bank')}</div></div>
+              <div class="p-2 rounded-lg bg-slate-50 border border-slate-200"><div class="text-slate-500">Chủ đề 2018</div><div class="text-base font-extrabold text-slate-800">${cnt('curriculum_topics')}</div></div>
+              <div class="p-2 rounded-lg bg-slate-50 border border-slate-200"><div class="text-slate-500">Thông báo</div><div class="text-base font-extrabold text-slate-800">${cnt('announcements')}</div></div>
+              <div class="p-2 rounded-lg bg-slate-50 border border-slate-200"><div class="text-slate-500">Phản hồi</div><div class="text-base font-extrabold text-slate-800">${cnt('feedbacks')}</div></div>
+            </div>
+            <div class="space-y-2 pt-1">
+              <label class="flex items-start gap-2 cursor-pointer p-2.5 rounded-xl border border-emerald-200 bg-emerald-50/70">
+                <input type="radio" name="restore-mode" value="merge" checked="" class="mt-0.5 accent-emerald-600">
+                <span><b>Gộp bổ sung (Khuyên dùng):</b> Khôi phục và cập nhật các bản ghi từ file sao lưu, giữ nguyên các dữ liệu mới tạo gần đây.</span>
+              </label>
+              <label class="flex items-start gap-2 cursor-pointer p-2.5 rounded-xl border border-rose-200 bg-rose-50/60">
+                <input type="radio" name="restore-mode" value="overwrite" class="mt-0.5 accent-rose-600">
+                <span><b>Ghi đè hoàn toàn:</b> Xóa các bản ghi hiện không có trong file sao lưu để đưa hệ thống về đúng trạng thái tại thời điểm sao lưu.</span>
+              </label>
+            </div>
+          </div>
+        `,
+        buttons: [
+          { label: 'Hủy', className: 'px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold', onClick: closeModal },
+          {
+            label: 'Tiến hành khôi phục',
+            className: 'px-5 py-2 rounded-xl bg-brand-700 hover:bg-brand-800 text-white text-sm font-bold',
+            onClick: async () => {
+              const mode = document.querySelector('input[name="restore-mode"]:checked')?.value || 'merge';
+              closeModal();
+              await executeAdminRestore(backupObj, mode);
+            }
+          }
+        ]
+      });
+    }
+
+    async function executeAdminRestore(backupObj, mode = 'merge') {
+      if (!isSystemAdmin()) return;
+      showToast('Đang khôi phục dữ liệu... Vui lòng không đóng trình duyệt.', 'info');
+      let restoredCount = 0;
+      try {
+        const d = backupObj.data || {};
+        for (const col of BACKUP_COLLECTIONS) {
+          const incoming = Array.isArray(d[col]) ? d[col] : [];
+          if (mode === 'overwrite') {
+            const incomingIds = new Set(incoming.map(item => String(item.id || item.username || '')));
+            const currentArr = Array.isArray(state[col]) ? [...state[col]] : [];
+            for (const curItem of currentArr) {
+              if (!incomingIds.has(String(curItem.id))) {
+                await deleteDocData(col, curItem.id);
+              }
+            }
+          }
+          for (const item of incoming) {
+            const docId = String(item.id || item.username || `${col}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`);
+            await saveDocData(col, docId, item);
+            restoredCount++;
+          }
+        }
+        renderAdminCommandCenter();
+        renderAdminDashboard();
+        renderStudentTable();
+        renderAdminAccountsTable();
+        renderAdminExamList();
+        renderQuestionBank();
+        renderCurriculumTable();
+        renderAdminAnnouncements();
+        showToast(`Đã khôi phục thành công ${restoredCount} bản ghi dữ liệu!`, 'success');
+      } catch (err) {
+        console.error('Lỗi khôi phục dữ liệu:', err);
+        showToast('Có lỗi trong quá trình khôi phục: ' + (err?.message || ''), 'error');
+      }
+    }
 
     // Khởi chạy ứng dụng khi trang tải xong
     window.addEventListener('DOMContentLoaded', () => {
