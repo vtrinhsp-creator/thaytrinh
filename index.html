@@ -330,6 +330,7 @@
     /* TỐI ƯU HÓA GIAO DIỆN HIỆN ĐẠI, MƯỢT MÀ & THÂN THIỆN DI ĐỘNG          */
     /* ===================================================================== */
     body {
+      overflow-x: clip;
       background-color: #f1f5f9;
       background-image: radial-gradient(at 0% 0%, rgba(37, 99, 235, 0.05) 0px, transparent 50%),
                         radial-gradient(at 100% 0%, rgba(79, 70, 229, 0.04) 0px, transparent 45%);
@@ -483,6 +484,54 @@
   </div>
 
 
+
+  <!-- MODAL HƯỚNG DẪN SỬ DỤNG CHI TIẾT (TƯƠNG TÁC, TÌM KIẾM & XUẤT FILE WORD) -->
+  <div id="user-guide-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/60 backdrop-blur-sm p-2 sm:p-4">
+    <div class="bg-white rounded-3xl shadow-2xl border border-slate-200 max-w-5xl w-full h-[88vh] flex flex-col overflow-hidden">
+      <!-- Header Modal -->
+      <div class="px-5 py-4 bg-gradient-to-r from-brand-900 via-brand-800 to-indigo-900 text-white flex flex-wrap items-center justify-between gap-3 shrink-0">
+        <div class="flex items-center gap-3 min-w-0">
+          <div class="w-10 h-10 rounded-2xl bg-white/15 border border-white/15 flex items-center justify-center shrink-0">
+            <i data-lucide="book-open-text" class="w-5 h-5 text-amber-300"></i>
+          </div>
+          <div class="min-w-0">
+            <h3 id="guide-modal-title" class="text-base sm:text-lg font-extrabold tracking-tight truncate">Hướng dẫn sử dụng — Tài khoản Giáo viên</h3>
+            <p class="text-[11px] sm:text-xs text-blue-200/90 truncate">Hệ thống HỌC CÙNG THẦY TRỊNH • Tra cứu nhanh thao tác theo từng tính năng</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 shrink-0">
+          <button type="button" onclick="downloadTeacherGuideWordDoc()" class="px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-extrabold shadow-sm transition inline-flex items-center gap-1.5">
+            <i data-lucide="file-down" class="w-3.5 h-3.5"></i> <span class="hidden sm:inline">Tải file Word (.doc)</span>
+          </button>
+          <button type="button" onclick="closeUserGuideModal()" class="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition" title="Đóng hướng dẫn (Esc)">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Thanh tìm kiếm trong hướng dẫn -->
+      <div class="px-4 sm:px-5 py-3 bg-slate-50 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center gap-2.5 shrink-0">
+        <div class="relative flex-1">
+          <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+          <input id="guide-search-input" type="text" oninput="filterUserGuideSections(this.value)" placeholder="Tìm nhanh trong hướng dẫn (VD: gạch chân, 24 mã đề, 7991, Zalo, Excel, vi phạm...)" class="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-300 bg-white text-xs sm:text-sm outline-none focus:border-brand-600 transition">
+        </div>
+        <span id="guide-context-hint" class="text-[11px] font-semibold text-indigo-700 bg-indigo-50 border border-indigo-200 px-3 py-1.5 rounded-xl whitespace-nowrap">Gợi ý theo mục đang mở</span>
+      </div>
+
+      <!-- Thân Modal: Cột trái mục lục + Cột phải nội dung chi tiết -->
+      <div class="flex-1 min-h-0 grid grid-cols-1 md:grid-cols-12 overflow-hidden">
+        <aside id="guide-sidebar" class="md:col-span-4 lg:col-span-3 border-b md:border-b-0 md:border-r border-slate-200 bg-slate-50/70 p-2.5 sm:p-3 overflow-x-auto md:overflow-y-auto flex md:flex-col gap-1.5 shrink-0 no-scrollbar"></aside>
+        <div id="guide-content-pane" class="md:col-span-8 lg:col-span-9 p-4 sm:p-6 overflow-y-auto bg-white space-y-4 text-sm text-slate-700 leading-relaxed"></div>
+      </div>
+
+      <!-- Footer -->
+      <div class="px-5 py-3 bg-slate-50 border-t border-slate-200 flex flex-wrap items-center justify-between gap-2 shrink-0 text-xs">
+        <div class="text-slate-500">Hỗ trợ kỹ thuật: <b class="text-brand-800">Thầy Phạm Văn Trịnh</b> — SĐT/Zalo <a href="tel:0918918826" class="font-bold text-brand-700 hover:underline">0918.918.826</a></div>
+        <button type="button" onclick="closeUserGuideModal()" class="px-4 py-2 rounded-xl bg-brand-700 hover:bg-brand-800 text-white font-bold transition">Đã hiểu, đóng lại</button>
+      </div>
+    </div>
+  </div>
+
   <!-- LIGHTBOX PHÓNG TO ẢNH CÂU HỎI TRÊN ĐIỆN THOẠI -->
   <div id="image-lightbox" class="fixed inset-0 z-50 hidden bg-slate-950/90 backdrop-blur-sm flex-col">
     <div class="flex items-center justify-between px-4 py-3 bg-slate-900 text-white border-b border-white/10">
@@ -562,7 +611,7 @@
             <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
             Đồng bộ Cloud trực tiếp
           </span>
-          <span id="app-version-label">Phiên bản 2026.11.23-v43</span>
+          <span id="app-version-label">Phiên bản 2026.11.24-v45</span>
         </div>
       </div>
 
@@ -638,53 +687,53 @@
   <!-- VIEW 2: CỔNG QUẢN TRỊ GIÁO VIÊN (ADMIN PORTAL)            -->
   <!-- ========================================================= -->
   <section id="view-admin" class="hidden flex-1 flex flex-col min-h-screen">
-    <!-- Header Admin (Căn thẳng hàng max-w-7xl, chia 3 cụm hài hòa, đồng bộ chiều cao h-9) -->
+    <!-- Header Admin (Căn thẳng hàng tuyệt đối 2 mép trái-phải theo khung max-w-7xl, 3 cụm cân đối) -->
     <header class="bg-brand-900/95 backdrop-blur text-white sticky top-0 z-30 shadow-md border-b border-white/10">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
+      <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-2 xl:gap-3">
         <!-- Cụm trái: Logo & Tên tài khoản -->
-        <div class="flex items-center gap-2.5 shrink-0">
+        <div class="flex items-center gap-2 shrink-0 min-w-0">
           <div class="w-9 h-9 rounded-xl bg-white/15 flex items-center justify-center shrink-0 border border-white/15 shadow-sm">
             <i data-lucide="graduation-cap" class="w-5 h-5 text-blue-200"></i>
           </div>
           <div class="min-w-0">
-            <div class="font-extrabold text-sm leading-tight whitespace-nowrap tracking-tight">HỌC CÙNG THẦY TRỊNH</div>
-            <div id="admin-header-subtitle" class="text-[11px] text-blue-200/90 truncate max-w-[165px] xl:max-w-[195px]">Bảng điều khiển Giáo viên</div>
+            <div class="font-extrabold text-[13px] xl:text-sm leading-tight whitespace-nowrap tracking-tight">HỌC CÙNG THẦY TRỊNH</div>
+            <div id="admin-header-subtitle" class="text-[11px] text-blue-200/90 truncate max-w-[155px] xl:max-w-[175px]">Bảng điều khiển Giáo viên</div>
           </div>
         </div>
 
         <!-- Cụm giữa: 6 Tab điều hướng cân đối -->
-        <nav class="hidden lg:flex items-center gap-0.5 bg-white/10 p-1 rounded-xl border border-white/10 h-9">
-          <button onclick="switchAdminTab('dashboard')" data-admin-tab="dashboard" class="admin-nav-btn shrink-0 whitespace-nowrap h-7 px-3 rounded-lg text-xs font-bold transition inline-flex items-center gap-1.5 bg-white text-brand-900 shadow-sm">
-            <i data-lucide="activity" class="w-3.5 h-3.5"></i> Giám sát
+        <nav class="hidden lg:flex items-center gap-0.5 bg-white/10 p-1 rounded-xl border border-white/10 h-9 shrink-0">
+          <button onclick="switchAdminTab('dashboard')" data-admin-tab="dashboard" class="admin-nav-btn shrink-0 whitespace-nowrap h-7 px-2 xl:px-2.5 rounded-lg text-[11px] xl:text-xs font-bold transition inline-flex items-center gap-1 xl:gap-1.5 bg-white text-brand-900 shadow-sm">
+            <i data-lucide="activity" class="w-3.5 h-3.5 shrink-0"></i> Giám sát
           </button>
-          <button onclick="switchAdminTab('exams')" data-admin-tab="exams" class="admin-nav-btn shrink-0 whitespace-nowrap h-7 px-3 rounded-lg text-xs font-semibold transition inline-flex items-center gap-1.5 text-blue-100 hover:bg-white/10">
-            <i data-lucide="file-text" class="w-3.5 h-3.5"></i> Nạp đề
+          <button onclick="switchAdminTab('exams')" data-admin-tab="exams" class="admin-nav-btn shrink-0 whitespace-nowrap h-7 px-2 xl:px-2.5 rounded-lg text-[11px] xl:text-xs font-semibold transition inline-flex items-center gap-1 xl:gap-1.5 text-blue-100 hover:bg-white/10">
+            <i data-lucide="file-text" class="w-3.5 h-3.5 shrink-0"></i> Nạp đề
           </button>
-          <button onclick="switchAdminTab('bank')" data-admin-tab="bank" class="admin-nav-btn shrink-0 whitespace-nowrap h-7 px-3 rounded-lg text-xs font-semibold transition inline-flex items-center gap-1.5 text-blue-100 hover:bg-white/10">
-            <i data-lucide="library" class="w-3.5 h-3.5"></i> Ngân hàng
+          <button onclick="switchAdminTab('bank')" data-admin-tab="bank" class="admin-nav-btn shrink-0 whitespace-nowrap h-7 px-2 xl:px-2.5 rounded-lg text-[11px] xl:text-xs font-semibold transition inline-flex items-center gap-1 xl:gap-1.5 text-blue-100 hover:bg-white/10">
+            <i data-lucide="library" class="w-3.5 h-3.5 shrink-0"></i> Ngân hàng
           </button>
-          <button onclick="switchAdminTab('students')" data-admin-tab="students" class="admin-nav-btn shrink-0 whitespace-nowrap h-7 px-3 rounded-lg text-xs font-semibold transition inline-flex items-center gap-1.5 text-blue-100 hover:bg-white/10">
-            <i data-lucide="users" class="w-3.5 h-3.5"></i> Tài khoản
+          <button onclick="switchAdminTab('students')" data-admin-tab="students" class="admin-nav-btn shrink-0 whitespace-nowrap h-7 px-2 xl:px-2.5 rounded-lg text-[11px] xl:text-xs font-semibold transition inline-flex items-center gap-1 xl:gap-1.5 text-blue-100 hover:bg-white/10">
+            <i data-lucide="users" class="w-3.5 h-3.5 shrink-0"></i> Tài khoản
           </button>
-          <button onclick="switchAdminTab('announcements')" data-admin-tab="announcements" class="admin-nav-btn relative shrink-0 whitespace-nowrap h-7 px-3 rounded-lg text-xs font-semibold transition inline-flex items-center gap-1.5 text-blue-100 hover:bg-white/10">
-            <i data-lucide="megaphone" class="w-3.5 h-3.5"></i> Thông báo
+          <button onclick="switchAdminTab('announcements')" data-admin-tab="announcements" class="admin-nav-btn relative shrink-0 whitespace-nowrap h-7 px-2 xl:px-2.5 rounded-lg text-[11px] xl:text-xs font-semibold transition inline-flex items-center gap-1 xl:gap-1.5 text-blue-100 hover:bg-white/10">
+            <i data-lucide="megaphone" class="w-3.5 h-3.5 shrink-0"></i> Thông báo
             <span id="admin-feedback-nav-badge" class="hidden px-1.5 py-0.5 rounded-full bg-rose-500 text-white text-[10px] font-black leading-none">0</span>
           </button>
-          <button onclick="switchAdminTab('reports')" data-admin-tab="reports" class="admin-nav-btn shrink-0 whitespace-nowrap h-7 px-3 rounded-lg text-xs font-semibold transition inline-flex items-center gap-1.5 text-blue-100 hover:bg-white/10">
-            <i data-lucide="bar-chart-3" class="w-3.5 h-3.5"></i> Báo cáo
+          <button onclick="switchAdminTab('reports')" data-admin-tab="reports" class="admin-nav-btn shrink-0 whitespace-nowrap h-7 px-2 xl:px-2.5 rounded-lg text-[11px] xl:text-xs font-semibold transition inline-flex items-center gap-1 xl:gap-1.5 text-blue-100 hover:bg-white/10">
+            <i data-lucide="bar-chart-3" class="w-3.5 h-3.5 shrink-0"></i> Báo cáo
           </button>
         </nav>
 
-        <!-- Cụm phải: Tìm kiếm toàn cục + Nút Cài đặt đồng bộ chiều cao h-9 -->
-        <div class="flex items-center gap-2 shrink-0">
+        <!-- Cụm phải: Tìm kiếm + Hướng dẫn + Cài đặt (Căn phẳng mép phải theo max-w-7xl) -->
+        <div class="flex items-center gap-1.5 shrink-0">
           <!-- Ô Tìm kiếm toàn cục trong App -->
-          <div id="admin-global-search-wrap" class="relative w-36 sm:w-48 xl:w-56">
-            <i data-lucide="search" class="w-3.5 h-3.5 text-blue-200/90 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+          <div id="admin-global-search-wrap" class="relative w-32 sm:w-44 lg:w-36 xl:w-44">
+            <i data-lucide="search" class="w-3.5 h-3.5 text-blue-200/90 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
             <input id="admin-global-search-input" type="text" autocomplete="off"
               oninput="handleAdminGlobalSearch(this.value)"
               onfocus="handleAdminGlobalSearch(this.value)"
               placeholder="Tìm đề, HS... (Ctrl+K)"
-              class="w-full h-9 pl-8 pr-7 rounded-xl bg-white/10 hover:bg-white/15 focus:bg-white text-white focus:text-slate-900 placeholder:text-blue-200/80 focus:placeholder:text-slate-400 text-xs font-medium border border-white/15 focus:border-white outline-none transition" />
+              class="w-full h-9 pl-8 pr-6 rounded-xl bg-white/10 hover:bg-white/15 focus:bg-white text-white focus:text-slate-900 placeholder:text-blue-200/80 focus:placeholder:text-slate-400 text-xs font-medium border border-white/15 focus:border-white outline-none transition" />
             <button id="admin-global-search-clear" type="button" onclick="clearAdminGlobalSearch()" class="hidden absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 p-0.5">
               <i data-lucide="x" class="w-3.5 h-3.5"></i>
             </button>
@@ -692,9 +741,15 @@
             <div id="admin-global-search-results" class="hidden absolute right-0 mt-2 w-80 sm:w-96 max-h-[70vh] overflow-y-auto bg-white rounded-2xl shadow-2xl border border-slate-200 text-slate-800 z-50 divide-y divide-slate-100"></div>
           </div>
 
+          <!-- Nút Hướng dẫn sử dụng (Tự động mở đúng mục đang thao tác) -->
+          <button type="button" onclick="openUserGuideModal()" title="Hướng dẫn sử dụng chi tiết cho Giáo viên" class="h-9 px-2.5 rounded-xl bg-amber-400/20 hover:bg-amber-400/30 text-amber-200 hover:text-white text-xs font-bold transition inline-flex items-center gap-1.5 whitespace-nowrap border border-amber-300/30">
+            <i data-lucide="help-circle" class="w-4 h-4 shrink-0"></i>
+            <span class="hidden xl:inline">Hướng dẫn</span>
+          </button>
+
           <!-- Nút Cài đặt (Gộp Cloud / Đồng bộ, Đổi mật khẩu, Phản hồi HS & Đăng xuất) -->
           <div class="relative" id="admin-settings-dropdown-wrap">
-            <button type="button" onclick="toggleSettingsMenu('admin-settings-menu')" class="h-9 px-3.5 rounded-xl bg-white/15 hover:bg-white/25 text-white text-xs font-bold transition inline-flex items-center gap-1.5 whitespace-nowrap border border-white/15">
+            <button type="button" onclick="toggleSettingsMenu('admin-settings-menu')" class="h-9 px-2.5 xl:px-3 rounded-xl bg-white/15 hover:bg-white/25 text-white text-xs font-bold transition inline-flex items-center gap-1.5 whitespace-nowrap border border-white/15">
               <i data-lucide="settings" class="w-3.5 h-3.5 shrink-0"></i>
               <span class="hidden sm:inline">Cài đặt</span>
               <i data-lucide="chevron-down" class="w-3.5 h-3.5 shrink-0 opacity-80"></i>
@@ -721,6 +776,9 @@
               <button id="btn-admin-open-backup" type="button" onclick="closeAllSettingsMenus(); openAdminBackupSection();" class="w-full px-3.5 py-2.5 text-left text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-900 flex items-center justify-between gap-2 transition">
                 <span class="flex items-center gap-2"><i data-lucide="hard-drive-download" class="w-4 h-4 text-emerald-600"></i> Sao lưu định kỳ</span>
                 <span id="admin-settings-backup-dot" class="hidden w-2 h-2 rounded-full bg-emerald-500"></span>
+              </button>
+              <button type="button" onclick="closeAllSettingsMenus(); openUserGuideModal();" class="w-full px-3.5 py-2.5 text-left text-xs font-semibold text-slate-700 hover:bg-blue-50 hover:text-brand-800 flex items-center gap-2 transition">
+                <i data-lucide="book-open-text" class="w-4 h-4 text-indigo-600"></i> Hướng dẫn sử dụng
               </button>
               <div class="my-1 border-t border-slate-100"></div>
               <button type="button" onclick="closeAllSettingsMenus(); logout();" class="w-full px-3.5 py-2.5 text-left text-xs font-bold text-rose-600 hover:bg-rose-50 flex items-center gap-2 transition">
@@ -753,6 +811,9 @@
         </button>
         <button onclick="switchAdminTab('sync')" data-admin-tab="sync" class="admin-nav-btn shrink-0 whitespace-nowrap py-1.5 px-3 rounded-xl text-xs font-semibold flex items-center gap-1.5 text-blue-100 hover:bg-white/10">
           <i data-lucide="cloud-cog" class="w-3.5 h-3.5"></i> Đồng bộ
+        </button>
+        <button type="button" onclick="openUserGuideModal()" class="shrink-0 whitespace-nowrap py-1.5 px-3 rounded-xl text-xs font-bold flex items-center gap-1.5 bg-amber-400/20 text-amber-200 hover:bg-amber-400/30 border border-amber-300/25">
+          <i data-lucide="help-circle" class="w-3.5 h-3.5"></i> Hướng dẫn
         </button>
       </div>
     </header>
@@ -799,8 +860,18 @@
                   <h2 class="text-sm sm:text-base font-extrabold tracking-tight text-white">Trung tâm Điều phối Quản trị</h2>
                   <span id="admin-scope-active-pill" class="px-2.5 py-0.5 rounded-full bg-emerald-400/20 text-emerald-200 border border-emerald-400/30 text-[11px] font-bold">Toàn hệ thống</span>
                 </div>
-                <p class="text-[11px] sm:text-xs text-blue-200/90 mt-0.5 truncate">Lọc nhanh theo Môn học &amp; Giáo viên để giám sát đề thi, xây dựng ma trận 7991, quản lý ngân hàng câu hỏi và học sinh.</p>
+                <p id="admin-command-subtitle" class="text-[11px] sm:text-xs text-blue-200/90 mt-0.5 leading-snug">Lọc nhanh theo Môn học &amp; Giáo viên để giám sát đề thi, xây dựng ma trận 7991, quản lý ngân hàng câu hỏi và học sinh.</p>
               </div>
+            </div>
+
+            <!-- Thao tác nhanh cân đối bên phải khi đăng nhập bằng tài khoản Giáo viên -->
+            <div id="teacher-command-quick-actions" class="hidden flex flex-wrap items-center gap-2 shrink-0">
+              <button type="button" onclick="switchAdminTab('exams'); resetExamBuilder();" class="h-9 px-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-extrabold shadow-sm transition inline-flex items-center gap-1.5 whitespace-nowrap">
+                <i data-lucide="file-plus-2" class="w-4 h-4"></i> Nạp đề mới
+              </button>
+              <button type="button" onclick="openUserGuideModal()" class="h-9 px-3.5 rounded-xl bg-white/15 hover:bg-white/25 text-white border border-white/15 text-xs font-bold transition inline-flex items-center gap-1.5 whitespace-nowrap">
+                <i data-lucide="book-open-text" class="w-4 h-4 text-amber-300"></i> Xem hướng dẫn
+              </button>
             </div>
 
             <!-- Bộ lọc Chọn Môn + Chọn Giáo viên -->
@@ -3315,6 +3386,9 @@ Cô Trần Thu Hà, Vật lí, THPT, THPT Gia Viễn B, gv_ha, 123456" class="w-
               <button id="btn-student-change-pass" type="button" onclick="closeAllSettingsMenus(); openChangePasswordModal();" class="w-full px-3.5 py-2.5 text-left text-xs font-semibold text-slate-700 hover:bg-brand-50 hover:text-brand-800 flex items-center gap-2 transition">
                 <i data-lucide="key-round" class="w-4 h-4 text-brand-600"></i> Đổi mật khẩu
               </button>
+              <button type="button" onclick="closeAllSettingsMenus(); openStudentGuideModal();" class="w-full px-3.5 py-2.5 text-left text-xs font-semibold text-slate-700 hover:bg-amber-50 hover:text-amber-900 flex items-center gap-2 transition">
+                <i data-lucide="help-circle" class="w-4 h-4 text-amber-600"></i> Hướng dẫn làm bài
+              </button>
               <div class="my-1 border-t border-slate-100"></div>
               <button id="btn-student-logout" type="button" onclick="closeAllSettingsMenus(); logout();" class="w-full px-3.5 py-2.5 text-left text-xs font-bold text-rose-600 hover:bg-rose-50 flex items-center gap-2 transition">
                 <i data-lucide="log-out" class="w-4 h-4"></i> Đăng xuất
@@ -3640,7 +3714,7 @@ Cô Trần Thu Hà, Vật lí, THPT, THPT Gia Viễn B, gv_ha, 123456" class="w-
     const EMBEDDED_FIREBASE_CONFIG = /*__EMBEDDED_FIREBASE_CONFIG__*/{"apiKey":"AIzaSyAK4osCrc_vtzPd3SWBSIoCg99W5vqab9g","authDomain":"toanthaytrinh-af1c8.firebaseapp.com","projectId":"toanthaytrinh-af1c8","storageBucket":"toanthaytrinh-af1c8.firebasestorage.app","messagingSenderId":"797090111064","appId":"1:797090111064:web:bad5dae3a6cab29fad342d","measurementId":"G-TWN1BMQH3N"}/*__END_EMBEDDED_FIREBASE_CONFIG__*/;
     const EMBEDDED_APP_ID = /*__EMBEDDED_APP_ID__*/"hoctoan-pro"/*__END_EMBEDDED_APP_ID__*/;
     const EMBEDDED_ADMIN_PASSWORD = /*__EMBEDDED_ADMIN_PASSWORD__*/"123456"/*__END_EMBEDDED_ADMIN_PASSWORD__*/;
-    const APP_BUILD_VERSION = /*__APP_BUILD_VERSION__*/"2026.11.23-v43"/*__END_APP_BUILD_VERSION__*/;
+    const APP_BUILD_VERSION = /*__APP_BUILD_VERSION__*/"2026.11.24-v45"/*__END_APP_BUILD_VERSION__*/;
 
     const LS_KEYS = {
       FB_CONFIG: 'eduexam_custom_fb_config_v2',
@@ -4867,7 +4941,9 @@ Cô Trần Thu Hà, Vật lí, THPT, THPT Gia Viễn B, gv_ha, 123456" class="w-
       const isAdm = isSystemAdmin();
       const subEl = document.getElementById('admin-header-subtitle');
       if (subEl && state.currentUser) {
-        subEl.textContent = `${isAdm ? 'Quản trị (Admin)' : 'Giáo viên'} • ${state.currentUser.name} • ${state.currentUser.subject || 'Chung'} (${state.currentUser.username})`;
+        const subLabel = `${state.currentUser.name} • ${state.currentUser.subject || (isAdm ? 'Quản trị' : 'Giáo viên')}`;
+        subEl.textContent = subLabel;
+        subEl.title = `${isAdm ? 'Quản trị (Admin)' : 'Giáo viên'} • ${subLabel} (${state.currentUser.username})`;
       }
       const setUserLbl = document.getElementById('admin-settings-user-label');
       if (setUserLbl && state.currentUser) setUserLbl.textContent = `${state.currentUser.name} (${state.currentUser.username})`;
@@ -15893,6 +15969,14 @@ Giải đáp của Giáo viên: `;
 
       const isAdm = isSystemAdmin();
       if (filtersWrap) filtersWrap.classList.toggle('hidden', !isAdm);
+      const teacherQuick = document.getElementById('teacher-command-quick-actions');
+      if (teacherQuick) teacherQuick.classList.toggle('hidden', isAdm);
+      const cmdSub = document.getElementById('admin-command-subtitle');
+      if (cmdSub) {
+        cmdSub.textContent = isAdm
+          ? 'Lọc nhanh theo Môn học & Giáo viên để giám sát đề thi, xây dựng ma trận 7991, quản lý ngân hàng câu hỏi và học sinh.'
+          : 'Không gian giảng dạy chuyên môn: giám sát đề thi, xây dựng ma trận 7991, quản lý ngân hàng câu hỏi và danh sách học sinh.';
+      }
 
       if (isAdm) {
         // Tổng hợp toàn bộ Môn học từ Giáo viên, Đề thi, Ngân hàng, Chương trình 2018
@@ -17038,6 +17122,432 @@ Giải đáp của Giáo viên: `;
         showToast('Có lỗi trong quá trình khôi phục: ' + (err?.message || ''), 'error');
       }
     }
+
+
+    // =========================================================================
+    // HỆ THỐNG HƯỚNG DẪN SỬ DỤNG TÍCH HỢP TRÊN MENU (GIÁO VIÊN / ADMIN / HỌC SINH)
+    // =========================================================================
+    let activeGuideSectionId = 'overview';
+
+    function getTeacherGuideSections(includeAdminSection = false) {
+      const sections = [
+        {
+          id: 'overview',
+          tabMatch: '',
+          icon: 'compass',
+          shortTitle: '1. Tổng quan & Đăng nhập',
+          title: '1. Đăng nhập & Làm quen giao diện Giáo viên',
+          keywords: 'dang nhap giao dien tim kiem ctrl k cai dat doi mat khau phan quyen',
+          html: `
+            <div class="p-3.5 rounded-2xl bg-blue-50 border border-blue-200 text-xs text-brand-900 leading-relaxed">
+              <b>Không gian độc lập:</b> Tài khoản Giáo viên chỉ nhìn thấy và quản lý danh sách học sinh, đề thi, ngân hàng câu hỏi, thông báo, phản hồi và báo cáo do chính mình tạo hoặc phụ trách.
+            </div>
+            <div class="space-y-3">
+              <h4 class="font-extrabold text-slate-800 text-sm">Các khu vực chính trên thanh Menu:</h4>
+              <ul class="space-y-2 text-xs sm:text-sm list-disc pl-5 text-slate-700">
+                <li><b>6 Tab điều hướng chính:</b> <code>Giám sát</code>, <code>Nạp đề</code>, <code>Ngân hàng</code>, <code>Tài khoản</code>, <code>Thông báo</code>, <code>Báo cáo</code>.</li>
+                <li><b>Ô Tìm kiếm nhanh (<code>Ctrl + K</code>):</b> Tìm tức thì đề thi hoặc học sinh ở bất kỳ màn hình nào.</li>
+                <li><b>Nút Hướng dẫn (biểu tượng ?):</b> Mở nhanh tài liệu hướng dẫn đúng với tab thầy/cô đang thao tác mà không làm mất dữ liệu đang nhập.</li>
+                <li><b>Nút Cài đặt:</b> Chứa mục <b>Đổi mật khẩu</b>, <b>Phản hồi từ HS</b> (có chấm đỏ khi có báo lỗi mới), <b>Hướng dẫn sử dụng</b> và <b>Đăng xuất</b>.</li>
+                <li><b>4 Thẻ Trung tâm Điều phối:</b> Hiển thị số liệu tổng quan và chuyển nhanh tới Đề giám sát, Ma trận 7991, Ngân hàng câu hỏi và Danh sách học sinh.</li>
+              </ul>
+              <div class="p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-900">
+                <b>Mẹo bảo mật:</b> Lần đầu đăng nhập, hãy vào <b>Cài đặt → Đổi mật khẩu</b> để thay mật khẩu mặc định sang mật khẩu riêng.
+              </div>
+            </div>
+          `
+        },
+        {
+          id: 'students',
+          tabMatch: 'students',
+          icon: 'users',
+          shortTitle: '2. Tài khoản Học sinh',
+          title: '2. Quản lý & Cấp tài khoản Học sinh (Tab Tài khoản)',
+          keywords: 'hoc sinh cap tai khoan excel csv truong khoi lop loc tim kiem sua xoa',
+          html: `
+            <div class="space-y-3">
+              <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+                <h4 class="font-extrabold text-brand-900 text-sm">A. Cấp tài khoản từng học sinh</h4>
+                <p class="text-xs sm:text-sm">Nhập <b>Họ và tên</b>, <b>Trường</b> (tự điền sẵn đơn vị công tác của thầy/cô), <b>Lớp</b>, <b>Tên đăng nhập</b> (viết liền không dấu, VD: <code>hs05</code>), <b>Mật khẩu</b> (mặc định <code>123456</code>) → bấm <b>Thêm học sinh</b>.</p>
+              </div>
+              <div class="p-3.5 rounded-2xl bg-emerald-50/70 border border-emerald-200 space-y-2">
+                <h4 class="font-extrabold text-emerald-900 text-sm">B. Tạo hàng loạt từ Excel / CSV</h4>
+                <p class="text-xs sm:text-sm">Kiểm tra ô <b>Trường mặc định cho danh sách</b>, sau đó copy trực tiếp từ Excel và dán vào ô nhập theo 1 trong 2 mẫu:</p>
+                <div class="p-2.5 rounded-xl bg-white border border-emerald-200 font-mono text-xs text-slate-700 space-y-1">
+                  <div><b>Mẫu 4 cột:</b> Họ tên, Lớp, Tên đăng nhập, Mật khẩu</div>
+                  <div><b>Mẫu 5 cột:</b> Họ tên, Lớp, Trường, Tên đăng nhập, Mật khẩu</div>
+                </div>
+                <p class="text-xs text-emerald-800">Nhấn <b>Nhập danh sách học sinh</b> để tạo cùng lúc cả lớp trong vài giây.</p>
+              </div>
+              <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+                <h4 class="font-extrabold text-brand-900 text-sm">C. Bộ lọc 5 cấp & Tìm kiếm nhanh</h4>
+                <p class="text-xs sm:text-sm">Danh sách học sinh được ẩn mặc định để trang tải nhanh. Chọn bộ lọc liên hoàn <b>Trường → Khối → Lớp → Môn → Giáo viên</b>, gõ tên không dấu vào ô tìm kiếm nhanh, hoặc bấm <b>Hiện tất cả HS</b>. Nhấn biểu tượng bút chì để sửa thông tin/mật khẩu hoặc thùng rác để xóa.</p>
+              </div>
+            </div>
+          `
+        },
+        {
+          id: 'exams',
+          tabMatch: 'exams',
+          icon: 'file-text',
+          shortTitle: '3. Nạp đề & 24 Mã đề',
+          title: '3. Tạo và Xuất bản Đề thi (Tab Nạp đề)',
+          keywords: 'nap de word docx html pdf 24 ma de gach chan in dam ai da phuong thuc phieu tra loi nguong diem dat vi pham',
+          html: `
+            <div class="space-y-3.5">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div class="p-3.5 rounded-2xl bg-blue-50/70 border border-blue-200 space-y-1.5">
+                  <div class="font-extrabold text-brand-900 text-xs sm:text-sm">Chế độ 1: Đề Word (.docx) / HTML</div>
+                  <p class="text-xs text-slate-700">Giữ nguyên hình ảnh, công thức. Tự động <b>đảo câu hỏi &amp; đảo đáp án</b> độc lập cho từng học sinh và kết xuất ảnh câu hỏi chống sao chép.</p>
+                </div>
+                <div class="p-3.5 rounded-2xl bg-indigo-50/70 border border-indigo-200 space-y-1.5">
+                  <div class="font-extrabold text-indigo-950 text-xs sm:text-sm">Chế độ 2: Đề PDF + Phiếu OMR</div>
+                  <p class="text-xs text-slate-700">Chia đôi màn hình (trái xem đề PDF, phải tô phiếu chuẩn TN THPT). Hỗ trợ nạp cùng lúc tối đa <b>24 file PDF mã đề</b> để phát ngẫu nhiên.</p>
+                </div>
+              </div>
+
+              <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+                <h4 class="font-extrabold text-slate-800 text-sm">Quy tắc nhận diện đáp án tự động khi nạp Word (.docx):</h4>
+                <ul class="space-y-1.5 text-xs sm:text-sm list-disc pl-5">
+                  <li><b>Phần I (A, B, C, D):</b> Gạch chân chữ cái đầu (<u>A.</u>), in đậm đáp án đúng, tô màu đỏ/highlight, thêm dấu <code>*A.</code>, hoặc dòng <code>Đáp án: B</code>. Khi học sinh thi, hệ thống tự động xóa sạch dấu hiệu đáp án.</li>
+                  <li><b>Phần II (Đúng/Sai 4 ý):</b> Gạch chân <u>a)</u>, <u>b)</u>, <u>c)</u>, <u>d)</u> (hoặc tô màu đỏ, dấu <code>*a)</code>) cho các ý <b>Đúng</b>.</li>
+                  <li><b>Phần III (Trả lời ngắn):</b> Thêm <code>Đáp án: 12.5</code> (hệ thống tự chấp nhận cả dấu <code>.</code> và <code>,</code>).</li>
+                  <li><b>Nhận diện đa phương thức (AI):</b> Tải trực tiếp ảnh chụp đề (JPG/PNG) hoặc PDF scan có gạch chân/khoanh đáp án.</li>
+                </ul>
+              </div>
+
+              <div class="p-3.5 rounded-2xl bg-emerald-50/60 border border-emerald-200 space-y-1.5 text-xs sm:text-sm">
+                <h4 class="font-extrabold text-emerald-950">Cấu hình thi &amp; Chống gian lận:</h4>
+                <p>Thiết lập <b>Thời gian làm bài</b>, <b>Thang điểm</b> (hoặc cách chấm Chuẩn TN THPT), <b>Ngưỡng vi phạm</b> (số lần rời màn hình), tùy chọn <b>Tự động thu bài khi vi phạm</b> và <b>Ngưỡng điểm đạt</b> (bắt buộc làm lại nếu chưa đạt).</p>
+              </div>
+            </div>
+          `
+        },
+        {
+          id: 'bank',
+          tabMatch: 'bank',
+          icon: 'library',
+          shortTitle: '4. Ngân hàng & Ma trận 7991',
+          title: '4. Ngân hàng câu hỏi, AI từ SGK & Ma trận CV 7991 (Tab Ngân hàng)',
+          keywords: 'ngan hang cau hoi ai sgk ma hoa ct 2018 ma tran 7991 sinh de xuat word form mau rut ngau nhien json',
+          html: `
+            <div class="space-y-3">
+              <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-1.5">
+                <h4 class="font-extrabold text-brand-900 text-sm">4.1. Chủ đề CT 2018 &amp; Mã hóa câu hỏi</h4>
+                <p class="text-xs sm:text-sm">Xem danh sách Chủ đề, Tiểu chủ đề, Yêu cầu cần đạt theo môn/cấp học được phân công. Bấm <b>Sao chép HD</b> hoặc <b>Tải HD Mã hóa (.doc)</b> để gắn ký hiệu chuẩn (VD: <code>[CNCN-12.C1.1-1]</code> với mức <code>1=Biết</code>, <code>2=Hiểu</code>, <code>3=Vận dụng</code>) vào đầu câu hỏi.</p>
+              </div>
+              <div class="p-3.5 rounded-2xl bg-indigo-50/60 border border-indigo-200 space-y-1.5">
+                <h4 class="font-extrabold text-indigo-950 text-sm">4.2. AI Tạo câu hỏi từ SGK / Tài liệu</h4>
+                <p class="text-xs sm:text-sm">Tải file <b>PDF, Word (.docx), TXT</b> (có thể chọn <i>Từ trang → Đến trang</i> với SGK dày) hoặc dán văn bản bài học → chọn Môn, Khối, Chủ đề và số lượng câu Phần I/II/III → bấm <b>AI Xây dựng câu hỏi ngay</b>. Kiểm tra xong bấm <b>Bổ sung vào Ngân hàng</b> hoặc <b>Đưa thẳng vào Tạo đề</b>.</p>
+              </div>
+              <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-1.5">
+                <h4 class="font-extrabold text-brand-900 text-sm">4.3. Kho Ngân hàng câu hỏi</h4>
+                <p class="text-xs sm:text-sm">Bấm <b>Nạp file Word / HTML có mã</b> để tự động phân loại câu hỏi vào đúng Chủ đề/Tiểu chủ đề; bấm <b>Đồng bộ về CT 2018</b> để chuẩn hóa nhãn. Dùng bộ lọc 4 cấp hoặc nút <b>Rút ngẫu nhiên lập đề</b> → <b>Tạo đề từ câu đã chọn</b>. Hỗ trợ <b>Xuất/Nhập JSON</b> sao lưu kho cá nhân.</p>
+              </div>
+              <div class="p-3.5 rounded-2xl bg-amber-50/70 border border-amber-200 space-y-1.5">
+                <h4 class="font-extrabold text-amber-950 text-sm">4.4. Ma trận Công văn 7991 &amp; Tạo đề (3 bước)</h4>
+                <ol class="list-decimal pl-5 text-xs sm:text-sm space-y-1">
+                  <li><b>Bước 1:</b> Chọn Môn, Khối, Kỳ kiểm tra, tùy chỉnh <i>Form Ma trận &amp; Đề</i> (Sở, Trường, Năm học, Người lập/duyệt) và tích chọn Chủ đề/Tiểu chủ đề (xem sẵn tồn kho câu hỏi).</li>
+                  <li><b>Bước 2:</b> Điền số câu cho từng dạng thức (ABCD, Đúng-Sai theo lệnh hỏi, TL ngắn, Tự luận) × Mức độ (Biết/Hiểu/VD) hoặc chọn nút điền nhanh <b>Mẫu 7991</b> / <b>Mẫu TNKQ 100%</b>.</li>
+                  <li><b>Bước 3:</b> Bấm <b>Sinh Ma trận &amp; Sinh Đề thi ngay</b> → xuất <b>Ma trận (.doc)</b>, <b>Đề + Đáp án (.doc)</b>, <b>Trọn bộ (.doc)</b> hoặc <b>Đưa vào Phát đề Thi Online</b>.</li>
+                </ol>
+              </div>
+            </div>
+          `
+        },
+        {
+          id: 'dashboard',
+          tabMatch: 'dashboard',
+          icon: 'activity',
+          shortTitle: '5. Giám sát trực tiếp',
+          title: '5. Giám sát Phòng thi Thời gian thực (Tab Giám sát)',
+          keywords: 'giam sat truc tiep ma tran cau hoi thoi gian bat dau ket thuc dong ho online xuat excel lam lai bai',
+          html: `
+            <div class="space-y-3">
+              <p class="text-xs sm:text-sm">Chọn <b>Đề thi giám sát</b> và <b>Lớp</b> ở thanh trên cùng để theo dõi trực tiếp tiến độ làm bài của cả lớp:</p>
+              <ul class="space-y-2 text-xs sm:text-sm list-disc pl-5">
+                <li><b>4 thẻ KPI tức thời:</b> Đang làm bài, Đã nộp bài, Điểm trung bình, Tổng học sinh.</li>
+                <li><b>Ma trận từng câu hỏi theo đề gốc:</b> Dù hệ thống đã đảo thứ tự câu và đáp án cho từng học sinh, bảng giám sát luôn quy về thứ tự câu gốc để thầy/cô biết ngay câu nào nhiều em đang sai.</li>
+                <li><b>Ký hiệu trạng thái:</b> <span class="px-1.5 py-0.5 rounded bg-emerald-500 text-white font-bold text-[11px]">✓</span> Đúng • <span class="px-1.5 py-0.5 rounded bg-rose-500 text-white font-bold text-[11px]">✗</span> Sai • <span class="px-1.5 py-0.5 rounded bg-amber-400 text-amber-950 font-bold text-[11px]">◐</span> Đúng 1 phần (Đ/S) • <span class="px-1.5 py-0.5 rounded bg-slate-200 text-slate-600 font-bold text-[11px]">·</span> Chưa làm.</li>
+                <li><b>Theo dõi giờ Bắt đầu &amp; Kết thúc thời gian thực:</b> Dưới tên mỗi học sinh hiển thị giờ bắt đầu (<code>▶ HH:mm:ss</code>), đồng hồ đếm thời lượng làm bài chạy từng giây khi đang thi, và giờ kết thúc + tổng thời lượng khi nộp bài.</li>
+                <li><b>Thao tác chi tiết:</b> Nhấn vào tên học sinh để xem bài làm chi tiết hoặc bấm cho phép làm lại bài. Bấm <b>Xuất Excel (CSV)</b> để tải bảng giám sát đầy đủ.</li>
+              </ul>
+            </div>
+          `
+        },
+        {
+          id: 'announcements',
+          tabMatch: 'announcements',
+          icon: 'megaphone',
+          shortTitle: '6. Thông báo, Zalo & Phản hồi',
+          title: '6. Thông báo lớp học, Gửi Zalo & Hộp thư Phản hồi (Tab Thông báo)',
+          keywords: 'thong bao ghim lop zalo nhom webhook phan hoi bao loi cau hoi hoc sinh',
+          html: `
+            <div class="space-y-3">
+              <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-1.5">
+                <h4 class="font-extrabold text-brand-900 text-sm">A. Phát thông báo cho Học sinh</h4>
+                <p class="text-xs sm:text-sm">Nhập tiêu đề, chọn <b>Gửi tới lớp</b> (hoặc Tất cả các lớp), chọn mức độ ưu tiên (<i>Thông thường / Quan trọng / Khẩn cấp</i>) và tích <b>Ghim lên đầu trang</b> nếu cần nhắc lịch thi. Học sinh đăng nhập sẽ thấy ngay thông báo và chuông báo chưa đọc.</p>
+              </div>
+              <div class="p-3.5 rounded-2xl bg-blue-50/70 border border-blue-200 space-y-1.5">
+                <h4 class="font-extrabold text-brand-900 text-sm">B. Cấu hình gửi thông báo Zalo tự động</h4>
+                <p class="text-xs sm:text-sm">Nhập <b>Link nhóm Zalo lớp</b> hoặc <b>SĐT Zalo</b> (và Webhook nếu có), tích bật <i>Tự động mở hộp thoại gửi Zalo ngay sau khi xuất bản đề thi</i> để gửi nhanh thông tin đề + link thi vào nhóm lớp.</p>
+              </div>
+              <div class="p-3.5 rounded-2xl bg-amber-50/70 border border-amber-200 space-y-1.5">
+                <h4 class="font-extrabold text-amber-950 text-sm">C. Hộp thư Phản hồi / Báo lỗi từ Học sinh</h4>
+                <p class="text-xs sm:text-sm">Trong lúc làm bài, học sinh có thể bấm nút <b>Phản hồi</b> để báo lỗi chính tả, sai đáp án hoặc thắc mắc câu hỏi. Thầy/cô xem ngay tại mục <b>Phản hồi từ Học sinh</b>, lọc theo <i>Chưa xử lý / Đã xử lý</i> và đánh dấu hoàn tất.</p>
+              </div>
+            </div>
+          `
+        },
+        {
+          id: 'reports',
+          tabMatch: 'reports',
+          icon: 'bar-chart-3',
+          shortTitle: '7. Báo cáo & Phân tích',
+          title: '7. Báo cáo Kết quả & Phân tích Sư phạm (Tab Báo cáo)',
+          keywords: 'bao cao thong ke diem pho diem cau dung cau sai vi pham vang thi tien bo ca lop xuat excel csv in pdf',
+          html: `
+            <div class="space-y-3">
+              <ul class="space-y-2 text-xs sm:text-sm list-disc pl-5">
+                <li><b>Thống kê Cả lớp &amp; Tiến bộ 1 Học sinh:</b> Chuyển đổi giữa chế độ <i>Theo Cả lớp</i> (bảng điểm tổng hợp qua nhiều đề) và <i>Theo 1 Học sinh</i> (hồ sơ tiến bộ từng lần làm đề), có nút xuất Excel (CSV).</li>
+                <li><b>Thống kê theo từng Bài thi:</b> So sánh sĩ số dự thi, vắng, điểm TB, cao nhất/thấp nhất, tỷ lệ Đạt (≥5) và Giỏi (≥8) giữa tất cả các đề.</li>
+                <li><b>Báo cáo chi tiết 1 Đề thi:</b>
+                  <ul class="list-disc pl-5 mt-1 space-y-1 text-slate-600">
+                    <li>6 thẻ KPI + <b>Thanh thống kê tổng hợp Số câu trả lời Đúng &amp; Sai</b> toàn đợt thi.</li>
+                    <li>Biểu đồ <b>Phổ điểm thang 10</b> &amp; bảng <b>Xếp loại</b>.</li>
+                    <li>Bảng <b>Vi phạm quy chế &amp; Thoát màn hình</b> (ghi từng mốc giờ thoát, cho phép đánh dấu/gỡ vi phạm) và <b>Danh sách Vắng thi</b>.</li>
+                    <li><b>Bảng tổng hợp điểm chi tiết:</b> Đầy đủ cột <b>Câu đúng</b>, <b>Câu sai</b>, <b>Bắt đầu</b>, <b>Kết thúc / Thời lượng</b>, <b>Điểm</b> và nút <b>Xem chi tiết</b> bài làm từng em.</li>
+                    <li><b>Phân tích sư phạm:</b> Xếp hạng <i>Câu hỏi sai nhiều nhất</i>, <i>Phân tích từng câu &amp; gợi ý điều tiết dạy học</i>, và <i>Bảng đáp án toàn bộ học sinh</i>.</li>
+                  </ul>
+                </li>
+                <li><b>Xuất file &amp; In:</b> Hỗ trợ <code>Xuất File Điểm (CSV)</code>, <code>Xuất Điểm theo Lớp</code>, <code>Xuất Phân tích &amp; Đáp án HS</code>, <code>Xuất DS Vắng &amp; Vi phạm</code> và <code>In / Lưu PDF</code>.</li>
+              </ul>
+            </div>
+          `
+        }
+      ];
+
+      if (includeAdminSection) {
+        sections.push({
+          id: 'admin_only',
+          tabMatch: 'sync',
+          icon: 'shield-check',
+          shortTitle: '8. Quản trị & Sao lưu (Admin)',
+          title: '8. Tính năng dành riêng cho Quản trị viên (Admin)',
+          keywords: 'admin quan tri vien tao tai khoan giao vien dong bo firebase github pages sao luu dinh ky khoi phuc',
+          html: `
+            <div class="space-y-3">
+              <div class="p-3.5 rounded-2xl bg-indigo-50 border border-indigo-200 text-xs sm:text-sm text-indigo-950">
+                Mục này chỉ hiển thị đối với tài khoản <b>Quản trị viên (Admin)</b>.
+              </div>
+              <ul class="space-y-2 text-xs sm:text-sm list-disc pl-5">
+                <li><b>Phân quyền Tài khoản Giáo viên:</b> Tại tab <code>Tài khoản → Tài khoản Giáo viên / Admin</code>, cấp mới, khóa/mở hoặc nhập hàng loạt GV theo Môn &amp; Cấp học (tự cấp sẵn Chủ đề CT 2018 tương ứng).</li>
+                <li><b>Điều phối toàn hệ thống:</b> Dùng bộ lọc <code>Chọn môn</code> &amp; <code>Chọn giáo viên</code> ở đầu trang để xem dữ liệu toàn trường hoặc lọc riêng từng giáo viên; xem bảng Thống kê toàn hệ thống theo GV &amp; Môn trong tab <code>Báo cáo</code>.</li>
+                <li><b>Đồng bộ Cloud &amp; Xuất GitHub Pages (Tab Đồng bộ):</b> Dán <code>firebaseConfig</code> kết nối Firestore thời gian thực và bấm <b>Xuất file index.html</b> để đẩy lên GitHub Pages.</li>
+                <li><b>Sao lưu &amp; Khôi phục định kỳ:</b> Mở từ <code>Cài đặt → Sao lưu định kỳ</code> hoặc cuối tab <code>Đồng bộ</code> để cài lịch tự động (1 giờ / hàng ngày / hàng tuần / hàng tháng), tải tệp <code>.json</code> dự phòng và khôi phục theo chế độ <i>Gộp bổ sung</i> hoặc <i>Ghi đè hoàn toàn</i>.</li>
+              </ul>
+            </div>
+          `
+        });
+      }
+      return sections;
+    }
+
+    function getCurrentVisibleAdminTabName() {
+      const panels = document.querySelectorAll('.admin-tab-panel');
+      for (const p of panels) {
+        if (!p.classList.contains('hidden')) {
+          return (p.id || '').replace('admin-tab-', '');
+        }
+      }
+      return 'dashboard';
+    }
+
+    window.openUserGuideModal = function(forceSectionId = null) {
+      const modal = document.getElementById('user-guide-modal');
+      if (!modal) return;
+      const isAdm = isSystemAdmin();
+      const sections = getTeacherGuideSections(isAdm);
+
+      const titleEl = document.getElementById('guide-modal-title');
+      if (titleEl) {
+        titleEl.textContent = isAdm
+          ? 'Hướng dẫn sử dụng — Quản trị viên & Giáo viên'
+          : 'Hướng dẫn sử dụng — Tài khoản Giáo viên';
+      }
+
+      const searchEl = document.getElementById('guide-search-input');
+      if (searchEl) searchEl.value = '';
+
+      // Tự động mở đúng mục hướng dẫn tương ứng với tab đang đứng
+      let targetId = forceSectionId;
+      if (!targetId) {
+        const curTab = getCurrentVisibleAdminTabName();
+        const matched = sections.find(s => s.tabMatch === curTab);
+        targetId = matched ? matched.id : 'overview';
+      }
+      activeGuideSectionId = targetId;
+
+      const hintEl = document.getElementById('guide-context-hint');
+      if (hintEl) {
+        const found = sections.find(s => s.id === targetId);
+        hintEl.textContent = found ? `Đang xem: ${found.shortTitle}` : 'Tài liệu hướng dẫn';
+      }
+
+      renderUserGuideUI('');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      if (window.lucide) lucide.createIcons({ nodes: [modal] });
+    };
+
+    window.closeUserGuideModal = function() {
+      const modal = document.getElementById('user-guide-modal');
+      if (!modal) return;
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    };
+
+    window.selectUserGuideSection = function(secId) {
+      activeGuideSectionId = secId;
+      const kw = (document.getElementById('guide-search-input')?.value || '').trim();
+      renderUserGuideUI(kw);
+    };
+
+    window.filterUserGuideSections = function(keyword) {
+      renderUserGuideUI(keyword || '');
+    };
+
+    function renderUserGuideUI(keyword = '') {
+      const isAdm = isSystemAdmin();
+      const allSections = getTeacherGuideSections(isAdm);
+      const kwNorm = stripVnAccents((keyword || '').trim());
+
+      const filtered = kwNorm
+        ? allSections.filter(s => stripVnAccents(`${s.shortTitle} ${s.title} ${s.keywords} ${s.html.replace(/<[^>]+>/g, ' ')}`).includes(kwNorm))
+        : allSections;
+
+      if (filtered.length > 0 && !filtered.some(s => s.id === activeGuideSectionId)) {
+        activeGuideSectionId = filtered[0].id;
+      }
+
+      const sidebar = document.getElementById('guide-sidebar');
+      const contentPane = document.getElementById('guide-content-pane');
+      const hintEl = document.getElementById('guide-context-hint');
+      if (!sidebar || !contentPane) return;
+
+      sidebar.innerHTML = filtered.map(s => {
+        const active = s.id === activeGuideSectionId;
+        return `
+          <button type="button" onclick="selectUserGuideSection('${s.id}')" class="shrink-0 md:w-full text-left px-3 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 whitespace-nowrap md:whitespace-normal ${active ? 'bg-brand-700 text-white shadow-sm' : 'bg-white md:bg-transparent text-slate-700 hover:bg-slate-200/70 border md:border-0 border-slate-200'}">
+            <i data-lucide="${s.icon}" class="w-4 h-4 shrink-0 ${active ? 'text-amber-300' : 'text-brand-600'}"></i>
+            <span>${escapeHtml(s.shortTitle)}</span>
+          </button>
+        `;
+      }).join('');
+
+      if (filtered.length === 0) {
+        contentPane.innerHTML = `<div class="py-14 text-center text-slate-400 text-sm">Không tìm thấy mục hướng dẫn nào khớp với từ khóa "<b>${escapeHtml(keyword)}</b>".</div>`;
+      } else if (kwNorm) {
+        // Khi tìm kiếm, hiển thị tất cả các mục khớp để dễ đối chiếu
+        if (hintEl) hintEl.textContent = `Tìm thấy ${filtered.length} mục liên quan`;
+        contentPane.innerHTML = filtered.map(s => `
+          <section class="pb-5 border-b border-slate-100 last:border-0 space-y-3">
+            <h3 class="text-base sm:text-lg font-extrabold text-brand-900 flex items-center gap-2">
+              <i data-lucide="${s.icon}" class="w-5 h-5 text-brand-600 shrink-0"></i>
+              <span>${escapeHtml(s.title)}</span>
+            </h3>
+            ${s.html}
+          </section>
+        `).join('');
+      } else {
+        const cur = filtered.find(s => s.id === activeGuideSectionId) || filtered[0];
+        if (hintEl) hintEl.textContent = `Đang xem: ${cur.shortTitle}`;
+        const curIdx = allSections.findIndex(s => s.id === cur.id);
+        const prevSec = curIdx > 0 ? allSections[curIdx - 1] : null;
+        const nextSec = curIdx >= 0 && curIdx < allSections.length - 1 ? allSections[curIdx + 1] : null;
+
+        contentPane.innerHTML = `
+          <div class="space-y-4">
+            <div class="pb-3 border-b border-slate-100 flex items-center gap-2.5">
+              <span class="w-9 h-9 rounded-xl bg-brand-50 text-brand-700 flex items-center justify-center shrink-0">
+                <i data-lucide="${cur.icon}" class="w-5 h-5"></i>
+              </span>
+              <h3 class="text-base sm:text-lg font-extrabold text-brand-900">${escapeHtml(cur.title)}</h3>
+            </div>
+            ${cur.html}
+            <div class="pt-4 mt-4 border-t border-slate-100 flex items-center justify-between gap-2">
+              ${prevSec ? `<button type="button" onclick="selectUserGuideSection('${prevSec.id}')" class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition inline-flex items-center gap-1.5"><i data-lucide="chevron-left" class="w-4 h-4"></i> ${escapeHtml(prevSec.shortTitle)}</button>` : '<span></span>'}
+              ${nextSec ? `<button type="button" onclick="selectUserGuideSection('${nextSec.id}')" class="px-3.5 py-2 rounded-xl bg-brand-50 hover:bg-brand-100 text-brand-800 border border-brand-200 text-xs font-bold transition inline-flex items-center gap-1.5">${escapeHtml(nextSec.shortTitle)} <i data-lucide="chevron-right" class="w-4 h-4"></i></button>` : '<span></span>'}
+            </div>
+          </div>
+        `;
+      }
+
+      contentPane.scrollTop = 0;
+      if (window.lucide) lucide.createIcons({ nodes: [sidebar, contentPane] });
+    }
+
+    window.downloadTeacherGuideWordDoc = function() {
+      const sections = getTeacherGuideSections(isSystemAdmin());
+      const bodyParts = sections.map(s => `
+        <h2 style="color:#1e3a8a;border-bottom:1px solid #cbd5e1;padding-bottom:4px;margin-top:18px;">${escapeHtml(s.title)}</h2>
+        ${s.html}
+      `).join('\n');
+      const docHtml = `<!DOCTYPE html>
+<html lang="vi"><head><meta charset="utf-8"><title>Hướng dẫn sử dụng HỌC CÙNG THẦY TRỊNH</title>
+<style>
+  body { font-family: "Times New Roman", serif; font-size: 13pt; line-height: 1.5; color: #0f172a; margin: 24px; }
+  h1 { text-align: center; color: #1e3a8a; font-size: 16pt; margin-bottom: 4px; }
+  .sub { text-align: center; color: #475569; font-size: 11pt; margin-bottom: 18px; }
+  h2 { font-size: 14pt; }
+  h4 { font-size: 13pt; margin: 10px 0 4px; }
+  ul, ol { margin: 6px 0 10px 20px; }
+  li { margin-bottom: 4px; }
+  code { background: #f1f5f9; padding: 1px 4px; border-radius: 3px; font-family: Consolas, monospace; font-size: 11pt; }
+</style></head>
+<body>
+  <h1>HƯỚNG DẪN SỬ DỤNG HỆ THỐNG HỌC CÙNG THẦY TRỊNH</h1>
+  <div class="sub">Dành cho tài khoản Giáo viên • Phiên bản ${APP_BUILD_VERSION} • Hỗ trợ: Thầy Phạm Văn Trịnh (0918.918.826)</div>
+  ${bodyParts}
+</body></html>`;
+      const blob = new Blob(['\ufeff' + docHtml], { type: 'application/msword;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `HuongDanSuDung_GiaoVien_HocCungThayTrinh.doc`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('Đã tải tệp Hướng dẫn sử dụng (.doc)!', 'success');
+    };
+
+    window.openStudentGuideModal = function() {
+      openModal({
+        title: 'Hướng dẫn làm bài trực tuyến (Dành cho Học sinh)',
+        bodyHtml: `
+          <div class="space-y-3 text-xs sm:text-sm text-slate-700 leading-relaxed">
+            <div class="p-3 rounded-xl bg-blue-50 border border-blue-200 text-brand-900">
+              <b>1. Vào phòng thi:</b> Chọn bài kiểm tra đang mở ở danh sách và bấm <b>Bắt đầu làm bài</b>. Đồng hồ đếm ngược sẽ tự động chạy ngay khi vào đề.
+            </div>
+            <ul class="list-disc pl-5 space-y-2">
+              <li><b>Chọn đáp án:</b> Phần I chọn 1 đáp án <b>A/B/C/D</b>; Phần II chọn <b>Đúng</b> hoặc <b>Sai</b> cho từng ý a, b, c, d; Phần III nhập kết quả số (chấp nhận cả dấu <code>.</code> và <code>,</code>).</li>
+              <li><b>Làm bài trên điện thoại:</b> Dùng nút <b>A− / A+</b> hoặc <b>Phóng to</b> để đọc đề rõ hơn, hoặc bấm <b>Xoay App</b> ở góc trên để xoay ngang toàn màn hình.</li>
+              <li><b>Quy chế chống gian lận:</b> Không chuyển tab, không mở ứng dụng khác hoặc thu nhỏ trình duyệt trong lúc thi. Hệ thống sẽ tự động ghi nhận số lần thoát màn hình và báo về giáo viên.</li>
+              <li><b>Báo lỗi câu hỏi:</b> Nếu phát hiện đề bị lỗi hoặc mờ, bấm nút <b>Phản hồi</b> ngay trên thanh công cụ để gửi tin trực tiếp tới giáo viên.</li>
+              <li><b>Nộp bài &amp; Xem điểm:</b> Sau khi kiểm tra xong, bấm <b>Nộp bài</b> → xác nhận <b>Nộp bài ngay</b> để xem điểm và chi tiết đúng/sai từng câu.</li>
+            </ul>
+          </div>
+        `,
+        buttons: [{ label: 'Đã hiểu', className: 'px-5 py-2 rounded-xl bg-brand-700 hover:bg-brand-800 text-white text-sm font-bold', onClick: closeModal }]
+      });
+    };
+
+    // Nhấn phím Escape để đóng modal Hướng dẫn nhanh chóng
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        const gm = document.getElementById('user-guide-modal');
+        if (gm && !gm.classList.contains('hidden')) closeUserGuideModal();
+      }
+    });
 
     // Khởi chạy ứng dụng khi trang tải xong
     window.addEventListener('DOMContentLoaded', () => {
