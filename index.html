@@ -1113,7 +1113,7 @@
           </div>
           <div class="flex items-center justify-between gap-2 text-blue-200/85">
             <span>Trường THPT Gia Viễn B, Ninh Bình</span>
-            <span id="app-version-label" class="shrink-0 opacity-80">v2026.11.24-v56</span>
+            <span id="app-version-label" class="shrink-0 opacity-80">v2026.11.25-v57</span>
           </div>
         </div>
       </div>
@@ -1274,7 +1274,7 @@
               <button type="button" onclick="closeAllSettingsMenus(); openChangePasswordModal();" class="w-full px-3.5 py-2.5 text-left text-xs font-semibold text-slate-700 hover:bg-brand-50 hover:text-brand-800 flex items-center gap-2 transition">
                 <i data-lucide="key-round" class="w-4 h-4 text-brand-600"></i> Đổi mật khẩu
               </button>
-              <button type="button" onclick="closeAllSettingsMenus(); switchAdminTab('announcements'); switchAnnSubTab('feedbacks');" class="w-full px-3.5 py-2.5 text-left text-xs font-semibold text-slate-700 hover:bg-amber-50 hover:text-amber-900 flex items-center justify-between gap-2 transition">
+              <button id="admin-settings-fb-menu-btn" type="button" onclick="closeAllSettingsMenus(); switchAdminTab('announcements'); switchAnnSubTab('feedbacks');" class="w-full px-3.5 py-2.5 text-left text-xs font-semibold text-slate-700 hover:bg-amber-50 hover:text-amber-900 flex items-center justify-between gap-2 transition">
                 <span class="flex items-center gap-2"><i data-lucide="message-square-warning" class="w-4 h-4 text-amber-600"></i> Phản hồi từ HS</span>
                 <span id="admin-settings-fb-badge" class="hidden px-1.5 py-0.5 rounded-full bg-rose-500 text-white text-[10px] font-black">0</span>
               </button>
@@ -1371,6 +1371,7 @@
 
             <!-- Thao tác nhanh cân đối bên phải khi đăng nhập bằng tài khoản Giáo viên -->
             <div id="teacher-command-quick-actions" class="hidden flex flex-wrap items-center gap-2 shrink-0">
+              <div id="teacher-live-quota-strip" class="flex flex-wrap items-center gap-1.5 mr-1"></div>
               <button type="button" onclick="switchAdminTab('exams'); resetExamBuilder();" class="h-9 px-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-extrabold shadow-sm transition inline-flex items-center gap-1.5 whitespace-nowrap">
                 <i data-lucide="file-plus-2" class="w-4 h-4"></i> Nạp đề mới
               </button>
@@ -2195,6 +2196,19 @@ Lê Minh Quân, 12A2, Trường THPT Gia Viễn B, hs06, 123456" class="w-full p
                   <input id="adm-is-super" type="checkbox" class="w-4 h-4 accent-brand-700 rounded">
                   <span class="text-xs font-semibold text-slate-700">Cấp quyền Quản trị viên (được phép tạo/xóa tài khoản GV khác)</span>
                 </label>
+                <div class="rounded-2xl border border-indigo-200 bg-indigo-50/40 p-3 space-y-2.5">
+                  <div class="flex flex-wrap items-center justify-between gap-1.5">
+                    <span class="text-xs font-extrabold text-indigo-950 flex items-center gap-1.5">
+                      <i data-lucide="sliders-horizontal" class="w-3.5 h-3.5 text-indigo-600"></i> Phân quyền • Định mức • Hẹn giờ tắt
+                    </span>
+                    <div class="flex flex-wrap items-center gap-1">
+                      <button type="button" onclick="applyTeacherPermPreset('add', 'unlimited')" class="px-2 py-0.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-bold transition">Mở hết (KGH)</button>
+                      <button type="button" onclick="applyTeacherPermPreset('add', 'basic')" class="px-2 py-0.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-white text-[10px] font-bold transition">Cơ bản</button>
+                      <button type="button" onclick="applyTeacherPermPreset('add', 'trial7d')" class="px-2 py-0.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] font-bold transition">Dùng thử 7N</button>
+                    </div>
+                  </div>
+                  <div id="add-adm-permissions-matrix" class="space-y-1.5 max-h-[300px] overflow-y-auto pr-0.5"></div>
+                </div>
                 <button type="submit" class="w-full py-2.5 rounded-xl bg-brand-700 hover:bg-brand-800 text-white text-sm font-bold transition flex items-center justify-center gap-2">
                   <i data-lucide="shield-plus" class="w-4 h-4"></i> Tạo tài khoản Giáo viên
                 </button>
@@ -4239,7 +4253,7 @@ Cô Trần Thu Hà, Vật lí, THPT, THPT Gia Viễn B, gv_ha, 123456" class="w-
     const EMBEDDED_FIREBASE_CONFIG = /*__EMBEDDED_FIREBASE_CONFIG__*/{"apiKey":"AIzaSyAK4osCrc_vtzPd3SWBSIoCg99W5vqab9g","authDomain":"toanthaytrinh-af1c8.firebaseapp.com","projectId":"toanthaytrinh-af1c8","storageBucket":"toanthaytrinh-af1c8.firebasestorage.app","messagingSenderId":"797090111064","appId":"1:797090111064:web:bad5dae3a6cab29fad342d","measurementId":"G-TWN1BMQH3N"}/*__END_EMBEDDED_FIREBASE_CONFIG__*/;
     const EMBEDDED_APP_ID = /*__EMBEDDED_APP_ID__*/"hoctoan-pro"/*__END_EMBEDDED_APP_ID__*/;
     const EMBEDDED_ADMIN_PASSWORD = /*__EMBEDDED_ADMIN_PASSWORD__*/"123456"/*__END_EMBEDDED_ADMIN_PASSWORD__*/;
-    const APP_BUILD_VERSION = /*__APP_BUILD_VERSION__*/"2026.11.24-v56"/*__END_APP_BUILD_VERSION__*/;
+    const APP_BUILD_VERSION = /*__APP_BUILD_VERSION__*/"2026.11.26-v57"/*__END_APP_BUILD_VERSION__*/;
 
     const LS_KEYS = {
       FB_CONFIG: 'eduexam_custom_fb_config_v2',
@@ -4700,7 +4714,30 @@ Cô Trần Thu Hà, Vật lí, THPT, THPT Gia Viễn B, gv_ha, 123456" class="w-
           renderStudentTable();
           populateAnnouncementClassSelects();
         }
-        if (colName === 'admins') renderAdminAccountsTable();
+        if (colName === 'admins') {
+          if (state.currentUser && state.currentUser.username && state.currentUser.username !== 'admin') {
+            const latestAdm = (state.admins || []).find(a => a.username === state.currentUser.username);
+            if (latestAdm) {
+              if (latestAdm.active === false) {
+                showToast('Tài khoản của bạn vừa bị Quản trị viên tạm khóa!', 'error');
+                logout();
+                return;
+              }
+              state.currentUser.role = latestAdm.isSuperAdmin ? 'admin' : 'teacher';
+              state.currentUser.isSuperAdmin = !!latestAdm.isSuperAdmin;
+              state.currentUser.permissions = normalizeTeacherPermissions(latestAdm.permissions);
+              state.currentUser.usageStats = latestAdm.usageStats || state.currentUser.usageStats || {};
+              state.currentUser.quotaOffsets = latestAdm.quotaOffsets || state.currentUser.quotaOffsets || {};
+              applyTeacherFeatureRestrictionsUI();
+              const activePanel = document.querySelector('.admin-tab-panel:not(.hidden)');
+              const activeTabName = activePanel ? activePanel.id.replace('admin-tab-', '') : '';
+              if (activeTabName && activeTabName !== 'dashboard' && !isAdminTabAllowedForCurrentUser(activeTabName)) {
+                switchAdminTab('dashboard');
+              }
+            }
+          }
+          renderAdminAccountsTable();
+        }
         if (colName === 'exams') renderAdminExamList();
         if (colName === 'question_bank') renderQuestionBank();
         if (colName === 'curriculum_topics') renderCurriculumTable();
@@ -5501,7 +5538,10 @@ Cô Trần Thu Hà, Vật lí, THPT, THPT Gia Viễn B, gv_ha, 123456" class="w-
             unit: adminAcc.unit || '',
             subject: adminAcc.subject || 'Giáo viên bộ môn',
             educationLevel: adminAcc.educationLevel || 'THPT',
-            isSuperAdmin: !!adminAcc.isSuperAdmin
+            isSuperAdmin: !!adminAcc.isSuperAdmin,
+            permissions: normalizeTeacherPermissions(adminAcc.permissions),
+            usageStats: adminAcc.usageStats || {},
+            quotaOffsets: adminAcc.quotaOffsets || {}
           };
           enterAdminPortal();
           if (useCloudMode) attachRealtimeListeners();
@@ -5538,6 +5578,7 @@ Cô Trần Thu Hà, Vật lí, THPT, THPT Gia Viễn B, gv_ha, 123456" class="w-
         sessionSyncDebounceTimer = null;
       }
       stopAdminBackupScheduler();
+      stopTeacherPermExpiryWatcher();
       detachAllListeners();
       state.currentUser = null;
       state.activeExam = null;
@@ -5579,6 +5620,7 @@ Cô Trần Thu Hà, Vật lí, THPT, THPT Gia Viễn B, gv_ha, 123456" class="w-
       const subtabBar = document.getElementById('accounts-subtab-bar');
       if (subtabBar) subtabBar.classList.toggle('hidden', !isAdm);
       if (!isAdm) switchAccountsSubTab('students');
+      applyTeacherFeatureRestrictionsUI();
       switchAdminTab('dashboard');
       const defUnit = state.currentUser?.unit || 'Trường THPT Gia Viễn B';
       const stuSchEl = document.getElementById('stu-school');
@@ -5595,7 +5637,22 @@ Cô Trần Thu Hà, Vật lí, THPT, THPT Gia Viễn B, gv_ha, 123456" class="w-
       lucide.createIcons();
     }
 
+    function isAdminTabAllowedForCurrentUser(tabName) {
+      if (isSystemAdmin()) return true;
+      const can = (k) => checkTeacherFeatureAccess(k, 0, true).allowed;
+      if (tabName === 'sync') return false;
+      if (tabName === 'exams') return can('exam_word') || can('exam_pdf');
+      if (tabName === 'bank') return can('bank_ai') || can('bank_repo') || can('matrix_7991');
+      if (tabName === 'students') return can('student_mgmt');
+      if (tabName === 'announcements') return can('announcements');
+      return true;
+    }
+
     window.switchAdminTab = function(tabName) {
+      if (!isAdminTabAllowedForCurrentUser(tabName)) {
+        showToast('Bạn chưa được Quản trị viên cấp quyền truy cập mục này!', 'warning');
+        return;
+      }
       document.querySelectorAll('.admin-tab-panel').forEach(p => p.classList.add('hidden'));
       document.getElementById(`admin-tab-${tabName}`).classList.remove('hidden');
 
@@ -5641,6 +5698,7 @@ Cô Trần Thu Hà, Vật lí, THPT, THPT Gia Viễn B, gv_ha, 123456" class="w-
     // Thêm từng học sinh
     document.getElementById('add-student-form').addEventListener('submit', async (e) => {
       e.preventDefault();
+      if (!checkTeacherFeatureAccess('student_mgmt', 1).allowed) return;
       const name = document.getElementById('stu-name').value.trim();
       const school = (document.getElementById('stu-school')?.value || '').trim() || state.currentUser?.unit || 'Trường THPT Gia Viễn B';
       const className = document.getElementById('stu-class').value.trim();
@@ -5680,6 +5738,8 @@ Cô Trần Thu Hà, Vật lí, THPT, THPT Gia Viễn B, gv_ha, 123456" class="w-
     // Tạo hàng loạt từ Excel / CSV (hỗ trợ cả 4 cột và 5 cột có Trường)
     window.handleBulkAddStudents = async function() {
       const raw = document.getElementById('bulk-students-input').value.trim();
+      const estLines = raw ? raw.split(/\r?\n/).map(l => l.trim()).filter(Boolean).length : 1;
+      if (!checkTeacherFeatureAccess('student_mgmt', estLines).allowed) return;
       if (!raw) {
         showToast('Vui lòng dán danh sách học sinh vào ô nhập!', 'warning');
         return;
@@ -5964,6 +6024,7 @@ Cô Trần Thu Hà, Vật lí, THPT, THPT Gia Viễn B, gv_ha, 123456" class="w-
     };
 
     window.openEditStudentModal = function(stuId) {
+      if (!checkTeacherFeatureAccess('student_mgmt', 0).allowed) return;
       const stu = state.students.find(s => s.id === stuId);
       if (!stu) return;
       const meta = resolveStudentOwnerMeta(stu);
@@ -6012,6 +6073,7 @@ Cô Trần Thu Hà, Vật lí, THPT, THPT Gia Viễn B, gv_ha, 123456" class="w-
     };
 
     window.confirmDeleteStudent = function(stuId, name) {
+      if (!checkTeacherFeatureAccess('student_mgmt', 0).allowed) return;
       openModal({
         title: 'Xác nhận xóa tài khoản',
         bodyHtml: `<p>Bạn có chắc chắn muốn xóa tài khoản học sinh <b>${escapeHtml(name)}</b> (${escapeHtml(stuId)}) không?</p>`,
@@ -7096,6 +7158,8 @@ ${extractedPdfText.slice(0, 12000)}` : ''}`;
         return;
       }
 
+      const isNewExam = !state.editingExamId;
+      if (!checkTeacherFeatureAccess('exam_word', isNewExam ? 1 : 0).allowed) return;
       const examId = state.editingExamId || ('exam-' + Date.now());
       const maxViolations = Math.max(1, parseInt(document.getElementById('builder-max-violations')?.value) || 3);
       const autoSubmitOnViolation = !!document.getElementById('builder-auto-submit-violation')?.checked;
@@ -7736,6 +7800,7 @@ ${extractedPdfText.slice(0, 12000)}` : ''}`;
       a.download = `Ket_Qua_${exam.title.replace(/[^a-zA-Z0-9\u00C0-\u024F\u1E00-\u1EFF]+/g, '_').slice(0, 40)}.csv`;
       a.click();
       URL.revokeObjectURL(url);
+      incrementTeacherActionQuota('reports_export', 1);
       showToast('Đã xuất file kết quả Excel (.csv) thành công!', 'success');
     };
 
@@ -8663,6 +8728,8 @@ ${extractedPdfText.slice(0, 12000)}` : ''}`;
     };
 
     window.switchBuilderMode = function(mode) {
+      if (mode === 'word' && !checkTeacherFeatureAccess('exam_word', 0).allowed) return;
+      if (mode === 'pdf' && !checkTeacherFeatureAccess('exam_pdf', 0).allowed) return;
       state.builderMode = mode;
       const wordPanel = document.getElementById('builder-panel-word');
       const pdfPanel = document.getElementById('builder-panel-pdf');
@@ -9420,6 +9487,8 @@ ${(state.pdfBuilder.keyText || '').slice(0, 12000)}`;
     };
 
     window.publishPdfExam = async function() {
+      const isNewPdfExam = !state.editingExamId;
+      if (!checkTeacherFeatureAccess('exam_pdf', isNewPdfExam ? 1 : 0).allowed) return;
       const title = document.getElementById('pdf-builder-title').value.trim();
       const duration = Math.max(1, parseInt(document.getElementById('pdf-builder-duration').value) || 90);
       const scoringMode = document.getElementById('pdf-builder-scoring-mode').value || 'thpt2025';
@@ -10383,6 +10452,7 @@ ${(state.pdfBuilder.keyText || '').slice(0, 12000)}`;
     };
 
     window.exportReportScoresCSV = function() {
+      if (!checkTeacherFeatureAccess('reports_export', 1).allowed) return;
       const ctx = getReportContext();
       if (!ctx || !ctx.exam) return showToast('Chưa chọn đề thi!', 'warning');
       const { exam, students } = ctx;
@@ -10429,10 +10499,12 @@ ${(state.pdfBuilder.keyText || '').slice(0, 12000)}`;
       a.download = `BaoCao_Diem_${exam.title.replace(/[^a-zA-Z0-9\u00C0-\u024F\u1E00-\u1EFF]+/g, '_').slice(0, 35)}.csv`;
       a.click();
       URL.revokeObjectURL(url);
+      incrementTeacherActionQuota('reports_export', 1);
       showToast('Đã xuất File Điểm tổng hợp (.csv)!', 'success');
     };
 
     window.exportReportAbsentViolationCSV = function() {
+      if (!checkTeacherFeatureAccess('reports_export', 1).allowed) return;
       const ctx = getReportContext();
       if (!ctx || !ctx.exam) return showToast('Chưa chọn đề thi!', 'warning');
       const { exam, students } = ctx;
@@ -10464,6 +10536,7 @@ ${(state.pdfBuilder.keyText || '').slice(0, 12000)}`;
       a.download = `BaoCao_Vang_ViPham_${exam.title.replace(/[^a-zA-Z0-9\u00C0-\u024F\u1E00-\u1EFF]+/g, '_').slice(0, 30)}.csv`;
       a.click();
       URL.revokeObjectURL(url);
+      incrementTeacherActionQuota('reports_export', 1);
       showToast('Đã xuất danh sách Học sinh vắng và Vi phạm quy chế (.csv)!', 'success');
     };
 
@@ -10472,6 +10545,9 @@ ${(state.pdfBuilder.keyText || '').slice(0, 12000)}`;
     // 14. TRỢ LÝ AI XÂY DỰNG CÂU HỎI TỪ TÀI LIỆU (SGK, CHƯƠNG TRÌNH) & NGÂN HÀNG
     // =========================================================================
     window.switchBankSubTab = function(sub) {
+      if (sub === 'ai' && !checkTeacherFeatureAccess('bank_ai', 0).allowed) return;
+      if (sub === 'list' && !checkTeacherFeatureAccess('bank_repo', 0).allowed) return;
+      if (sub === 'matrix' && !checkTeacherFeatureAccess('matrix_7991', 0).allowed) return;
       const panels = {
         curriculum: document.getElementById('bank-subpanel-curriculum'),
         ai: document.getElementById('bank-subpanel-ai'),
@@ -10634,6 +10710,10 @@ ${(state.pdfBuilder.keyText || '').slice(0, 12000)}`;
 
     // Gọi Gemini AI để xây dựng câu hỏi trực tiếp từ tài liệu SGK / Chương trình
     window.generateQuestionsFromDocsWithAI = async function() {
+      const estCount = (parseInt(document.getElementById('ai-gen-count-mcq')?.value || 0, 10)
+        + parseInt(document.getElementById('ai-gen-count-tf')?.value || 0, 10)
+        + parseInt(document.getElementById('ai-gen-count-short')?.value || 0, 10)) || 1;
+      if (!checkTeacherFeatureAccess('bank_ai', estCount).allowed) return;
       const sourceText = (document.getElementById('ai-source-text-area')?.value || '').trim();
       if (sourceText.length < 30) {
         showToast('Vui lòng nạp file SGK/tài liệu hoặc dán nội dung bài học (ít nhất 30 ký tự) trước!', 'warning');
@@ -10911,12 +10991,15 @@ ${sourceText.slice(0, 32000)}`;
     window.saveAiGeneratedToBank = async function() {
       const selected = state.aiGeneratedQuestions.filter(q => q.selected);
       if (selected.length === 0) return showToast('Vui lòng tích chọn ít nhất 1 câu hỏi để lưu!', 'warning');
+      if (!checkTeacherFeatureAccess('bank_ai', selected.length).allowed) return;
+      if (!checkTeacherFeatureAccess('bank_repo', selected.length).allowed) return;
 
       let saved = 0;
       for (const q of selected) {
         const docId = 'qb-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7);
         const record = {
           id: docId,
+          source: 'ai',
           type: q.type,
           subject: q.subject,
           grade: q.grade,
@@ -10955,6 +11038,7 @@ ${sourceText.slice(0, 32000)}`;
     };
 
     function pushQuestionsToExamBuilder(list, suggestedTitle) {
+      if (!checkTeacherFeatureAccess('exam_word', 0).allowed) return;
       state.editingExamId = null;
       state.builderQuestions = list.map((q, idx) => {
         const base = {
@@ -11477,6 +11561,8 @@ ${sourceText.slice(0, 32000)}`;
         const text = await file.text();
         const arr = JSON.parse(text);
         if (!Array.isArray(arr)) throw new Error('Định dạng JSON không phải mảng câu hỏi.');
+        const validItems = arr.filter(item => item && item.promptHtml);
+        if (!checkTeacherFeatureAccess('bank_repo', validItems.length).allowed) return;
         let imported = 0;
         for (const item of arr) {
           if (!item || !item.promptHtml) continue;
@@ -11537,6 +11623,8 @@ ${sourceText.slice(0, 32000)}`;
     if (annForm) {
       annForm.addEventListener('submit', async (e) => {
         e.preventDefault();
+        const isNewAnn = !state.editingAnnouncementId;
+        if (!checkTeacherFeatureAccess('announcements', isNewAnn ? 1 : 0).allowed) return;
         const title = document.getElementById('ann-title').value.trim();
         const content = document.getElementById('ann-content').value.trim();
         const targetClass = document.getElementById('ann-target-class').value || 'ALL';
@@ -11938,6 +12026,7 @@ ${sourceText.slice(0, 32000)}`;
     };
 
     window.exportSingleStudentDetailCSV = function(examId, studentUsername) {
+      if (!checkTeacherFeatureAccess('reports_export', 1).allowed) return;
       const exam = state.exams.find(e => e.id === examId);
       const stu = state.students.find(s => s.username === studentUsername) || { name: studentUsername, className: '', username: studentUsername };
       const sess = state.sessions.find(s => s.examId === examId && s.studentUsername === studentUsername);
@@ -11981,6 +12070,7 @@ ${sourceText.slice(0, 32000)}`;
       a.download = `ChiTiet_${stu.username}_${exam.id}.csv`;
       a.click();
       URL.revokeObjectURL(url);
+      incrementTeacherActionQuota('reports_export', 1);
       showToast(`Đã xuất chi tiết bài làm của ${stu.name}!`, 'success');
     };
 
@@ -12543,6 +12633,7 @@ ${sourceText.slice(0, 32000)}`;
 
     // Xuất dữ liệu phân tích tổng hợp (Bảng đáp án HS + Phân tích từng câu & Gợi ý điều tiết dạy học) ra CSV
     window.exportPedagogicalAnalysisCSV = function() {
+      if (!checkTeacherFeatureAccess('reports_export', 1).allowed) return;
       const ctx = getReportContext();
       if (!ctx || !ctx.exam) return showToast('Chưa chọn đề thi!', 'warning');
       const { exam, cls, students } = ctx;
@@ -12605,6 +12696,7 @@ ${sourceText.slice(0, 32000)}`;
       a.download = `PhanTich_DayHoc_${exam.title.replace(/[^a-zA-Z0-9\u00C0-\u024F\u1E00-\u1EFF]+/g, '_').slice(0, 35)}.csv`;
       a.click();
       URL.revokeObjectURL(url);
+      incrementTeacherActionQuota('reports_export', 1);
       showToast('Đã xuất file Phân tích và Bảng đáp án học sinh (.csv) thành công!', 'success');
     };
 
@@ -12814,6 +12906,629 @@ ${sourceText.slice(0, 32000)}`;
       lucide.createIcons();
     };
 
+    
+    // =========================================================================
+    // HỆ THỐNG PHÂN QUYỀN, ĐỊNH MỨC SỐ LƯỢNG & HẸN GIỜ TỰ TẮT CHO TỪNG GIÁO VIÊN (v57)
+    // Mỗi mục đều có: Bật/Tắt (enabled) + Chế độ KGH/Giới hạn SL + Hẹn giờ tự tắt (expiresAt)
+    // Hỗ trợ đặt lại bộ đếm đã dùng (reset quota) mà không xóa dữ liệu đã tạo của GV
+    // =========================================================================
+    const TEACHER_FEATURE_DEFS = [
+      {
+        key: 'exam_word',
+        label: '1. Nạp đề Word / HTML & Xuất bản',
+        shortLabel: 'Đề Word',
+        unit: 'đề',
+        defaultLimit: 10,
+        desc: 'Tạo đề từ Word/HTML/Ngân hàng và xuất bản thi'
+      },
+      {
+        key: 'exam_pdf',
+        label: '2. Nạp đề PDF + Phiếu trả lời AI',
+        shortLabel: 'Đề PDF',
+        unit: 'đề PDF',
+        defaultLimit: 5,
+        desc: 'Tải đề PDF chia đôi màn hình và chấm AI'
+      },
+      {
+        key: 'bank_ai',
+        label: '3. AI Tạo câu hỏi từ SGK / Tài liệu',
+        shortLabel: 'AI Câu hỏi',
+        unit: 'câu NH',
+        defaultLimit: 100,
+        desc: 'Dùng AI sinh câu hỏi tự động & lưu Ngân hàng'
+      },
+      {
+        key: 'bank_repo',
+        label: '4. Truy cập Kho Ngân hàng câu hỏi',
+        shortLabel: 'Kho NH',
+        unit: 'câu lưu',
+        defaultLimit: 200,
+        desc: 'Xem, lọc, sử dụng & quản lý câu hỏi trong Ngân hàng'
+      },
+      {
+        key: 'matrix_7991',
+        label: '5. Ma trận Công văn 7991 & Xuất Word',
+        shortLabel: 'Ma trận 7991',
+        unit: 'ma trận',
+        defaultLimit: 10,
+        desc: 'Thiết kế ma trận 7991, sinh đề và xuất file Word'
+      },
+      {
+        key: 'student_mgmt',
+        label: '6. Quản lý Tài khoản Học sinh',
+        shortLabel: 'Học sinh',
+        unit: 'học sinh',
+        defaultLimit: 150,
+        desc: 'Cấp mới, nhập Excel/CSV hàng loạt, sửa/xóa HS'
+      },
+      {
+        key: 'announcements',
+        label: '7. Phát Thông báo & Xem Phản hồi HS',
+        shortLabel: 'Thông báo',
+        unit: 'thông báo',
+        defaultLimit: 20,
+        desc: 'Đăng thông báo cho lớp và xử lý báo lỗi của HS'
+      },
+      {
+        key: 'reports_export',
+        label: '8. Báo cáo Thống kê & Xuất Excel/CSV',
+        shortLabel: 'Xuất BC',
+        unit: 'lượt xuất',
+        defaultLimit: 30,
+        desc: 'Xem báo cáo chi tiết và xuất bảng điểm CSV'
+      }
+    ];
+
+    function formatDateTimeLocalInput(ts) {
+      if (!ts) return '';
+      const d = new Date(Number(ts));
+      if (isNaN(d.getTime())) return '';
+      const pad = (n) => String(n).padStart(2, '0');
+      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    }
+
+    function formatShortExpiryVi(ts) {
+      if (!ts) return '';
+      const d = new Date(Number(ts));
+      if (isNaN(d.getTime())) return '';
+      const pad = (n) => String(n).padStart(2, '0');
+      return `${pad(d.getHours())}:${pad(d.getMinutes())} ${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`;
+    }
+
+    function isRuleExpired(rule) {
+      if (!rule || !rule.expiresAt) return false;
+      const exp = Number(rule.expiresAt);
+      return Number.isFinite(exp) && exp > 0 && Date.now() >= exp;
+    }
+
+    function getDefaultTeacherPermissions(preset = 'unlimited') {
+      const perms = {};
+      const trialExpireTs = Date.now() + 7 * 24 * 60 * 60 * 1000;
+      TEACHER_FEATURE_DEFS.forEach(def => {
+        if (preset === 'basic') {
+          const enabled = ['exam_word', 'bank_repo', 'student_mgmt', 'reports_export'].includes(def.key);
+          perms[def.key] = {
+            enabled,
+            unlimited: false,
+            limit: def.defaultLimit,
+            expiresAt: null
+          };
+        } else if (preset === 'trial7d') {
+          perms[def.key] = {
+            enabled: true,
+            unlimited: false,
+            limit: def.defaultLimit,
+            expiresAt: trialExpireTs
+          };
+        } else {
+          perms[def.key] = {
+            enabled: true,
+            unlimited: true,
+            limit: def.defaultLimit,
+            expiresAt: null
+          };
+        }
+      });
+      return perms;
+    }
+
+    function normalizeTeacherPermissions(raw) {
+      const base = getDefaultTeacherPermissions('unlimited');
+      if (!raw || typeof raw !== 'object') return base;
+      TEACHER_FEATURE_DEFS.forEach(def => {
+        const item = raw[def.key];
+        if (item && typeof item === 'object') {
+          const expNum = item.expiresAt ? Number(item.expiresAt) : null;
+          base[def.key] = {
+            enabled: item.enabled !== false,
+            unlimited: item.unlimited !== false,
+            limit: Math.max(1, parseInt(item.limit, 10) || def.defaultLimit),
+            expiresAt: (expNum && Number.isFinite(expNum) && expNum > 0) ? expNum : null
+          };
+        }
+      });
+      return base;
+    }
+
+    const TEACHER_USAGE_LS_KEY = 'hctt_teacher_usage_v1';
+
+    function getLocalTeacherActionCount(username, featureKey) {
+      try {
+        const map = JSON.parse(localStorage.getItem(TEACHER_USAGE_LS_KEY) || '{}');
+        return Number(map?.[username]?.[featureKey] || 0);
+      } catch (e) {
+        return 0;
+      }
+    }
+
+    function setLocalTeacherActionCount(username, featureKey, val) {
+      try {
+        const map = JSON.parse(localStorage.getItem(TEACHER_USAGE_LS_KEY) || '{}');
+        if (!map[username]) map[username] = {};
+        map[username][featureKey] = val;
+        localStorage.setItem(TEACHER_USAGE_LS_KEY, JSON.stringify(map));
+      } catch (e) {}
+    }
+
+    function getRawTeacherFeatureCount(featureKey, username) {
+      const u = (username || state.currentUser?.username || '').toLowerCase();
+      if (!u) return 0;
+      if (featureKey === 'exam_word') {
+        return (state.exams || []).filter(e => (e.createdBy || 'admin').toLowerCase() === u && e.mode !== 'pdf').length;
+      }
+      if (featureKey === 'exam_pdf') {
+        return (state.exams || []).filter(e => (e.createdBy || 'admin').toLowerCase() === u && e.mode === 'pdf').length;
+      }
+      if (featureKey === 'bank_ai') {
+        return (state.question_bank || []).filter(q => (q.createdBy || 'admin').toLowerCase() === u && q.source === 'ai').length;
+      }
+      if (featureKey === 'bank_repo') {
+        return (state.question_bank || []).filter(q => (q.createdBy || 'admin').toLowerCase() === u).length;
+      }
+      if (featureKey === 'student_mgmt') {
+        return (state.students || []).filter(s => (s.ownerUsername || 'admin').toLowerCase() === u).length;
+      }
+      if (featureKey === 'announcements') {
+        return (state.announcements || []).filter(a => (a.createdBy || 'admin').toLowerCase() === u).length;
+      }
+      if (featureKey === 'matrix_7991' || featureKey === 'reports_export') {
+        const admObj = (state.admins || []).find(a => (a.username || '').toLowerCase() === u);
+        const cloudVal = Number(admObj?.usageStats?.[featureKey] || (state.currentUser?.username?.toLowerCase() === u ? state.currentUser?.usageStats?.[featureKey] : 0) || 0);
+        const localVal = getLocalTeacherActionCount(u, featureKey);
+        return Math.max(cloudVal, localVal);
+      }
+      return 0;
+    }
+
+    function getTeacherFeatureQuotaUsage(featureKey, username) {
+      const u = (username || state.currentUser?.username || '').toLowerCase();
+      if (!u) return 0;
+      const raw = getRawTeacherFeatureCount(featureKey, u);
+      if (featureKey === 'matrix_7991' || featureKey === 'reports_export') {
+        return raw;
+      }
+      const admObj = (state.admins || []).find(a => (a.username || '').toLowerCase() === u);
+      const offset = Number(
+        admObj?.quotaOffsets?.[featureKey] ??
+        (state.currentUser?.username?.toLowerCase() === u ? state.currentUser?.quotaOffsets?.[featureKey] : 0) ??
+        0
+      );
+      return Math.max(0, raw - offset);
+    }
+
+    window.incrementTeacherActionQuota = async function(featureKey, delta = 1) {
+      if (isSystemAdmin() || !state.currentUser?.username) return;
+      const u = state.currentUser.username.toLowerCase();
+      const admObj = (state.admins || []).find(a => (a.username || '').toLowerCase() === u);
+      const curCloud = Number(admObj?.usageStats?.[featureKey] || state.currentUser?.usageStats?.[featureKey] || 0);
+      const curLocal = getLocalTeacherActionCount(u, featureKey);
+      const nextVal = Math.max(curCloud, curLocal) + Math.max(1, Number(delta) || 1);
+
+      setLocalTeacherActionCount(u, featureKey, nextVal);
+      if (!state.currentUser.usageStats) state.currentUser.usageStats = {};
+      state.currentUser.usageStats[featureKey] = nextVal;
+
+      if (admObj) {
+        const nextStats = { ...(admObj.usageStats || {}), [featureKey]: nextVal };
+        admObj.usageStats = nextStats;
+        try {
+          await saveDocData('admins', admObj.id, { ...admObj, usageStats: nextStats });
+        } catch (e) {}
+      }
+      renderTeacherLiveQuotaStrip();
+    };
+
+    window.resetTeacherFeatureUsageQuota = async function(admId, featureKey = 'ALL') {
+      if (!canManageAdminAccounts()) return;
+      const adm = state.admins.find(a => a.id === admId);
+      if (!adm) return;
+      const u = (adm.username || '').toLowerCase();
+      const nextStats = { ...(adm.usageStats || {}) };
+      const nextOffsets = { ...(adm.quotaOffsets || {}) };
+
+      const targetDefs = featureKey === 'ALL'
+        ? TEACHER_FEATURE_DEFS
+        : TEACHER_FEATURE_DEFS.filter(d => d.key === featureKey);
+
+      targetDefs.forEach(def => {
+        if (def.key === 'matrix_7991' || def.key === 'reports_export') {
+          nextStats[def.key] = 0;
+          setLocalTeacherActionCount(u, def.key, 0);
+        } else {
+          nextOffsets[def.key] = getRawTeacherFeatureCount(def.key, u);
+        }
+      });
+
+      adm.usageStats = nextStats;
+      adm.quotaOffsets = nextOffsets;
+      await saveDocData('admins', adm.id, { ...adm, usageStats: nextStats, quotaOffsets: nextOffsets });
+
+      // Giữ lại các thiết lập quyền hiện đang chỉnh trên form modal
+      const currentDraftPerms = collectTeacherPermissionsFromUI('edit');
+      renderTeacherPermissionsEditor('edit', currentDraftPerms, adm.username, adm.id);
+      renderAdminAccountsTable();
+      lucide.createIcons();
+
+      const labelMsg = featureKey === 'ALL'
+        ? 'toàn bộ 8 tính năng'
+        : `"${targetDefs[0]?.label.replace(/^\d+\.\s*/, '') || featureKey}"`;
+      showToast(`Đã đặt lại bộ đếm đã dùng về 0 cho ${labelMsg}!`, 'success');
+    };
+
+    // Kiểm tra quyền sử dụng tính năng (addCount = số lượng sắp thêm mới, 0 nếu chỉ truy cập/sửa)
+    window.checkTeacherFeatureAccess = function(featureKey, addCount = 0, silent = false) {
+      if (isSystemAdmin()) return { allowed: true };
+      const perms = normalizeTeacherPermissions(state.currentUser?.permissions);
+      const rule = perms[featureKey];
+      const def = TEACHER_FEATURE_DEFS.find(d => d.key === featureKey);
+      const label = def ? def.label.replace(/^\d+\.\s*/, '') : featureKey;
+
+      if (!rule || !rule.enabled) {
+        if (!silent) {
+          showToast(`Tính năng "${label}" đang bị Quản trị viên tắt đối với tài khoản của bạn!`, 'warning');
+        }
+        return { allowed: false, reason: 'disabled' };
+      }
+
+      if (isRuleExpired(rule)) {
+        if (!silent) {
+          showToast(`Tính năng "${label}" đã hết hạn sử dụng lúc ${formatShortExpiryVi(rule.expiresAt)}! Liên hệ Admin để gia hạn.`, 'warning');
+        }
+        return { allowed: false, reason: 'expired', expiresAt: rule.expiresAt };
+      }
+
+      if (!rule.unlimited && addCount > 0) {
+        const used = getTeacherFeatureQuotaUsage(featureKey);
+        if (used + addCount > rule.limit) {
+          if (!silent) {
+            showToast(`Bạn đã đạt giới hạn tối đa ${rule.limit} ${def?.unit || 'mục'} cho tính năng "${label}" (đã dùng ${used}/${rule.limit}). Liên hệ Admin để mở thêm!`, 'warning');
+          }
+          return { allowed: false, reason: 'limit_exceeded', used, limit: rule.limit };
+        }
+      }
+      return { allowed: true, rule };
+    };
+
+    window.renderTeacherPermissionsEditor = function(prefix, permsObj, username = null, admId = null) {
+      const container = document.getElementById(`${prefix}-adm-permissions-matrix`);
+      if (!container) return;
+      container.dataset.targetUsername = username || '';
+      if (admId) container.dataset.targetAdmId = admId;
+      const resolvedAdmId = admId || container.dataset.targetAdmId || '';
+      const perms = normalizeTeacherPermissions(permsObj);
+
+      container.innerHTML = TEACHER_FEATURE_DEFS.map(def => {
+        const r = perms[def.key];
+        const expired = r.enabled && isRuleExpired(r);
+        const used = username ? getTeacherFeatureQuotaUsage(def.key, username) : null;
+        const pct = (!r.unlimited && r.limit > 0 && used !== null) ? Math.min(100, Math.round((used / r.limit) * 100)) : 0;
+        const pillColor = !r.unlimited && used !== null && used >= r.limit
+          ? 'bg-rose-100 text-rose-800 border-rose-200'
+          : (!r.unlimited && pct >= 80 ? 'bg-amber-100 text-amber-800 border-amber-200' : 'bg-slate-100 text-slate-700 border-slate-200');
+
+        const usagePill = username
+          ? `<span class="px-1.5 py-0.5 rounded border ${pillColor} text-[10px] font-bold">Đã dùng: ${used}${!r.unlimited ? '/' + r.limit : ''} ${escapeHtml(def.unit)}</span>`
+          : '';
+
+        const resetBtn = (username && resolvedAdmId)
+          ? `<button type="button" onclick="resetTeacherFeatureUsageQuota('${escapeHtml(resolvedAdmId)}', '${def.key}')" title="Đặt lại bộ đếm đã dùng về 0 (không xóa dữ liệu đã tạo)" class="px-1.5 py-0.5 rounded bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 text-[10px] font-bold transition inline-flex items-center gap-0.5">
+              <i data-lucide="rotate-ccw" class="w-2.5 h-2.5"></i> Đặt lại 0
+            </button>`
+          : '';
+
+        const expiryVal = formatDateTimeLocalInput(r.expiresAt);
+        const rowBorder = !r.enabled
+          ? 'border-rose-200 bg-rose-50/40'
+          : (expired ? 'border-amber-300 bg-amber-50/50' : 'border-slate-200 bg-white');
+
+        return `
+          <div class="p-2.5 rounded-xl border ${rowBorder} text-xs transition space-y-1.5" id="${prefix}-perm-row-${def.key}">
+            <div class="flex flex-wrap items-center justify-between gap-1.5">
+              <div class="space-y-0.5 min-w-0">
+                <div class="flex flex-wrap items-center gap-1.5">
+                  <label class="inline-flex items-center gap-2 cursor-pointer font-bold text-slate-800 select-none">
+                    <input type="checkbox" id="${prefix}-perm-en-${def.key}" ${r.enabled ? 'checked' : ''} onchange="onTeacherPermRowChange('${prefix}', '${def.key}')" class="w-3.5 h-3.5 accent-brand-700 rounded">
+                    <span>${escapeHtml(def.label)}</span>
+                  </label>
+                  ${usagePill}
+                  ${resetBtn}
+                  ${expired ? `<span class="px-1.5 py-0.5 rounded bg-rose-600 text-white text-[9.5px] font-extrabold">Đã hết hạn</span>` : ''}
+                </div>
+                <div class="text-[10.5px] text-slate-500 pl-5">${escapeHtml(def.desc)}</div>
+              </div>
+              <div class="flex items-center gap-1 ${r.enabled ? '' : 'opacity-40 pointer-events-none'}" id="${prefix}-perm-controls-${def.key}">
+                <select id="${prefix}-perm-mode-${def.key}" onchange="onTeacherPermRowChange('${prefix}', '${def.key}')" class="px-2 py-1 rounded-lg border border-slate-300 bg-slate-50 text-[11px] font-bold text-slate-700 outline-none">
+                  <option value="unlimited" ${r.unlimited ? 'selected' : ''}>Không giới hạn</option>
+                  <option value="limited" ${!r.unlimited ? 'selected' : ''}>Giới hạn SL</option>
+                </select>
+                <div id="${prefix}-perm-limit-wrap-${def.key}" class="${r.unlimited ? 'hidden' : 'inline-flex'} items-center gap-1">
+                  <input type="number" min="1" max="99999" id="${prefix}-perm-limit-${def.key}" value="${r.limit}" class="w-16 px-1.5 py-1 rounded-lg border border-amber-300 bg-amber-50 text-[11px] font-extrabold text-amber-900 text-center outline-none">
+                  <span class="text-[10px] font-semibold text-slate-500">${escapeHtml(def.unit)}</span>
+                </div>
+              </div>
+            </div>
+            <div class="pl-5 flex flex-wrap items-center gap-1.5 ${r.enabled ? '' : 'opacity-40 pointer-events-none'}" id="${prefix}-perm-expiry-wrap-${def.key}">
+              <span class="text-[10px] font-semibold text-slate-500 inline-flex items-center gap-1">
+                <i data-lucide="clock" class="w-3 h-3 text-indigo-500"></i> Hẹn giờ tự tắt:
+              </span>
+              <input type="datetime-local" id="${prefix}-perm-exp-${def.key}" value="${expiryVal}" onchange="onTeacherPermRowChange('${prefix}', '${def.key}')" class="px-2 py-0.5 rounded-lg border border-slate-300 bg-slate-50 text-[10.5px] font-semibold text-slate-700 outline-none focus:border-indigo-500">
+              ${expiryVal ? `<button type="button" onclick="clearTeacherPermExpiry('${prefix}', '${def.key}')" class="text-[10px] font-bold text-rose-600 hover:underline">Xóa hẹn giờ</button>` : '<span class="text-[10px] text-slate-400 italic">Để trống = Không hẹn giờ</span>'}
+            </div>
+          </div>
+        `;
+      }).join('');
+      lucide.createIcons({ nodes: [container] });
+    };
+
+    window.clearTeacherPermExpiry = function(prefix, key) {
+      const inp = document.getElementById(`${prefix}-perm-exp-${key}`);
+      if (inp) {
+        inp.value = '';
+        onTeacherPermRowChange(prefix, key);
+      }
+    };
+
+    window.onTeacherPermRowChange = function(prefix, key) {
+      const en = !!document.getElementById(`${prefix}-perm-en-${key}`)?.checked;
+      const mode = document.getElementById(`${prefix}-perm-mode-${key}`)?.value || 'unlimited';
+      const expStr = document.getElementById(`${prefix}-perm-exp-${key}`)?.value || '';
+      const expTs = expStr ? new Date(expStr).getTime() : null;
+      const expired = en && expTs && Number.isFinite(expTs) && Date.now() >= expTs;
+
+      const row = document.getElementById(`${prefix}-perm-row-${key}`);
+      const ctrls = document.getElementById(`${prefix}-perm-controls-${key}`);
+      const expWrap = document.getElementById(`${prefix}-perm-expiry-wrap-${key}`);
+      const limWrap = document.getElementById(`${prefix}-perm-limit-wrap-${key}`);
+      if (row) {
+        row.classList.toggle('border-slate-200', en && !expired);
+        row.classList.toggle('bg-white', en && !expired);
+        row.classList.toggle('border-rose-200', !en);
+        row.classList.toggle('bg-rose-50/40', !en);
+        row.classList.toggle('border-amber-300', expired);
+        row.classList.toggle('bg-amber-50/50', expired);
+      }
+      if (ctrls) {
+        ctrls.classList.toggle('opacity-40', !en);
+        ctrls.classList.toggle('pointer-events-none', !en);
+      }
+      if (expWrap) {
+        expWrap.classList.toggle('opacity-40', !en);
+        expWrap.classList.toggle('pointer-events-none', !en);
+      }
+      if (limWrap) {
+        limWrap.classList.toggle('hidden', mode !== 'limited');
+        limWrap.classList.toggle('inline-flex', mode === 'limited');
+      }
+    };
+
+    window.applyTeacherPermPreset = function(prefix, preset) {
+      const container = document.getElementById(`${prefix}-adm-permissions-matrix`);
+      const targetUser = container?.dataset?.targetUsername || null;
+      const targetAdmId = container?.dataset?.targetAdmId || null;
+      renderTeacherPermissionsEditor(prefix, getDefaultTeacherPermissions(preset), targetUser, targetAdmId);
+      const msg = preset === 'unlimited'
+        ? 'Đã bật toàn bộ tính năng (Không giới hạn).'
+        : (preset === 'trial7d' ? 'Đã áp dụng gói Dùng thử 7 ngày (tự động khóa sau 7 ngày).' : 'Đã áp dụng gói Giáo viên cơ bản (Có giới hạn).');
+      showToast(msg, 'info');
+    };
+
+    window.collectTeacherPermissionsFromUI = function(prefix) {
+      const result = {};
+      TEACHER_FEATURE_DEFS.forEach(def => {
+        const enEl = document.getElementById(`${prefix}-perm-en-${def.key}`);
+        const modeEl = document.getElementById(`${prefix}-perm-mode-${def.key}`);
+        const limEl = document.getElementById(`${prefix}-perm-limit-${def.key}`);
+        const expEl = document.getElementById(`${prefix}-perm-exp-${def.key}`);
+        const expRaw = expEl?.value ? new Date(expEl.value).getTime() : null;
+        result[def.key] = {
+          enabled: enEl ? !!enEl.checked : true,
+          unlimited: modeEl ? modeEl.value === 'unlimited' : true,
+          limit: Math.max(1, parseInt(limEl?.value, 10) || def.defaultLimit),
+          expiresAt: (expRaw && Number.isFinite(expRaw) && expRaw > 0) ? expRaw : null
+        };
+      });
+      return result;
+    };
+
+    function summarizeTeacherPermissionsBadge(adm) {
+      if (adm.isRoot || adm.isSuperAdmin) {
+        return '<span class="inline-block mt-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-800">Toàn quyền (Không giới hạn)</span>';
+      }
+      const perms = normalizeTeacherPermissions(adm.permissions);
+      let enabledCount = 0;
+      let limitedCount = 0;
+      let expiredCount = 0;
+      let scheduledCount = 0;
+      const tipLines = [];
+      const miniTags = [];
+      TEACHER_FEATURE_DEFS.forEach(def => {
+        const r = perms[def.key];
+        const shortName = def.shortLabel || def.label.replace(/^\d+\.\s*/, '');
+        if (r?.enabled) {
+          if (isRuleExpired(r)) {
+            expiredCount++;
+            tipLines.push(`⏰ ${shortName}: Đã hết hạn (${formatShortExpiryVi(r.expiresAt)})`);
+            miniTags.push(`<span class="px-1.5 py-0.5 rounded bg-rose-100 text-rose-800 border border-rose-300 text-[9.5px] font-bold">⏰ ${escapeHtml(shortName)} Hết hạn</span>`);
+          } else {
+            enabledCount++;
+            const expTag = r.expiresAt ? ` • Hẹn tắt ${formatShortExpiryVi(r.expiresAt)}` : '';
+            if (r.expiresAt) scheduledCount++;
+            if (!r.unlimited) {
+              limitedCount++;
+              const used = getTeacherFeatureQuotaUsage(def.key, adm.username);
+              tipLines.push(`• ${shortName}: Giới hạn (${used}/${r.limit} ${def.unit})${expTag}`);
+              miniTags.push(`<span class="px-1.5 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200 text-[9.5px] font-semibold">${escapeHtml(shortName)} ${used}/${r.limit}</span>`);
+            } else {
+              tipLines.push(`✓ ${shortName}: Không giới hạn${expTag}`);
+              if (r.expiresAt) {
+                miniTags.push(`<span class="px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-200 text-[9.5px] font-semibold">⏰ ${escapeHtml(shortName)}</span>`);
+              }
+            }
+          }
+        } else {
+          tipLines.push(`✕ ${shortName}: Đã tắt`);
+          miniTags.push(`<span class="px-1.5 py-0.5 rounded bg-rose-50 text-rose-700 border border-rose-200 text-[9.5px] font-semibold line-through">${escapeHtml(shortName)}</span>`);
+        }
+      });
+      const total = TEACHER_FEATURE_DEFS.length;
+      const tipAttr = escapeHtml(tipLines.join('&#10;'));
+      if (enabledCount === total && limitedCount === 0 && scheduledCount === 0 && expiredCount === 0) {
+        return `<span title="${tipAttr}" class="inline-block mt-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 cursor-help">${total}/${total} tính năng • Không giới hạn</span>`;
+      }
+      const statusPieces = [`Bật ${enabledCount}/${total}`];
+      if (limitedCount > 0) statusPieces.push(`${limitedCount} giới hạn`);
+      if (scheduledCount > 0) statusPieces.push(`${scheduledCount} hẹn giờ`);
+      if (expiredCount > 0) statusPieces.push(`${expiredCount} hết hạn`);
+      return `
+        <div class="mt-1 space-y-1">
+          <span title="${tipAttr}" class="inline-block text-[10px] font-bold px-2 py-0.5 rounded-full ${expiredCount > 0 ? 'bg-rose-50 text-rose-800 border border-rose-200' : 'bg-amber-50 text-amber-800 border border-amber-200'} cursor-help">${statusPieces.join(' • ')}</span>
+          ${miniTags.length ? `<div class="flex flex-wrap gap-1">${miniTags.slice(0, 4).join('')}${miniTags.length > 4 ? `<span class="text-[9.5px] text-slate-400 font-bold">+${miniTags.length - 4}</span>` : ''}</div>` : ''}
+        </div>
+      `;
+    }
+
+    window.renderTeacherLiveQuotaStrip = function() {
+      const strip = document.getElementById('teacher-live-quota-strip');
+      if (!strip) return;
+      if (isSystemAdmin() || !state.currentUser) {
+        strip.innerHTML = '';
+        return;
+      }
+      const perms = normalizeTeacherPermissions(state.currentUser.permissions);
+      const chips = [];
+      TEACHER_FEATURE_DEFS.forEach(def => {
+        const r = perms[def.key];
+        if (!r || !r.enabled || isRuleExpired(r)) return;
+        if (!r.unlimited) {
+          const used = getTeacherFeatureQuotaUsage(def.key);
+          const rem = Math.max(0, r.limit - used);
+          const isLow = rem === 0 || (rem / r.limit) <= 0.2;
+          chips.push(`
+            <span title="${escapeHtml(def.label.replace(/^\d+\.\s*/, ''))}: Đã dùng ${used}/${r.limit} ${escapeHtml(def.unit)}${r.expiresAt ? ' • Tự tắt lúc ' + formatShortExpiryVi(r.expiresAt) : ''}" class="px-2 py-1 rounded-lg ${isLow ? 'bg-rose-500/25 text-rose-100 border-rose-300/40' : 'bg-white/10 text-blue-100 border-white/15'} border text-[10.5px] font-bold whitespace-nowrap">
+              ${escapeHtml(def.shortLabel)}: <b>${rem}/${r.limit}</b>
+            </span>
+          `);
+        } else if (r.expiresAt) {
+          chips.push(`
+            <span title="${escapeHtml(def.label.replace(/^\d+\.\s*/, ''))} tự động tắt lúc ${formatShortExpiryVi(r.expiresAt)}" class="px-2 py-1 rounded-lg bg-amber-400/20 text-amber-200 border border-amber-300/30 text-[10.5px] font-bold whitespace-nowrap">
+              ⏰ ${escapeHtml(def.shortLabel)}
+            </span>
+          `);
+        }
+      });
+      strip.innerHTML = chips.slice(0, 4).join('');
+    };
+
+    let teacherPermExpiryInterval = null;
+    function startTeacherPermExpiryWatcher() {
+      if (teacherPermExpiryInterval) clearInterval(teacherPermExpiryInterval);
+      if (isSystemAdmin()) return;
+      teacherPermExpiryInterval = setInterval(() => {
+        if (!state.currentUser || isSystemAdmin()) return;
+        const perms = normalizeTeacherPermissions(state.currentUser.permissions);
+        const hasAnyExpiry = TEACHER_FEATURE_DEFS.some(d => perms[d.key]?.enabled && perms[d.key]?.expiresAt);
+        if (!hasAnyExpiry) return;
+        applyTeacherFeatureRestrictionsUI();
+        const activePanel = document.querySelector('.admin-tab-panel:not(.hidden)');
+        const activeTabName = activePanel ? activePanel.id.replace('admin-tab-', '') : '';
+        if (activeTabName && activeTabName !== 'dashboard' && !isAdminTabAllowedForCurrentUser(activeTabName)) {
+          showToast('Một tính năng bạn đang mở vừa đến giờ tự tắt theo cấu hình của Quản trị viên.', 'warning');
+          switchAdminTab('dashboard');
+        }
+      }, 15000);
+    }
+
+    function stopTeacherPermExpiryWatcher() {
+      if (teacherPermExpiryInterval) {
+        clearInterval(teacherPermExpiryInterval);
+        teacherPermExpiryInterval = null;
+      }
+    }
+
+    window.applyTeacherFeatureRestrictionsUI = function() {
+      const isAdm = isSystemAdmin();
+      const can = (k) => isAdm || checkTeacherFeatureAccess(k, 0, true).allowed;
+
+      // 1. Điều hướng Tab chính
+      const allowAnyExam = can('exam_word') || can('exam_pdf');
+      const allowAnyBank = can('bank_ai') || can('bank_repo') || can('matrix_7991');
+      const allowStudents = can('student_mgmt');
+      const allowAnnouncements = can('announcements');
+
+      document.querySelectorAll('[data-admin-tab="exams"]').forEach(b => b.classList.toggle('hidden', !allowAnyExam));
+      document.querySelectorAll('[data-admin-tab="bank"]').forEach(b => b.classList.toggle('hidden', !allowAnyBank));
+      document.querySelectorAll('[data-admin-tab="students"]').forEach(b => b.classList.toggle('hidden', !allowStudents));
+      document.querySelectorAll('[data-admin-tab="announcements"]').forEach(b => b.classList.toggle('hidden', !allowAnnouncements));
+
+      const fbMenuBtn = document.getElementById('admin-settings-fb-menu-btn');
+      if (fbMenuBtn) fbMenuBtn.classList.toggle('hidden', !allowAnnouncements);
+
+      // 2. Sub-tabs Nạp đề (Word vs PDF)
+      const wordBtn = document.getElementById('builder-mode-btn-word');
+      const pdfBtn = document.getElementById('builder-mode-btn-pdf');
+      if (wordBtn) wordBtn.classList.toggle('hidden', !can('exam_word'));
+      if (pdfBtn) pdfBtn.classList.toggle('hidden', !can('exam_pdf'));
+      if (!isAdm && allowAnyExam) {
+        if (!can('exam_word') && can('exam_pdf')) switchBuilderMode('pdf');
+        else if (can('exam_word')) switchBuilderMode('word');
+      }
+
+      // 3. Sub-tabs Ngân hàng câu hỏi
+      const aiBtn = document.getElementById('bank-subtab-btn-ai');
+      const repoBtn = document.getElementById('bank-subtab-btn-list');
+      const matBtn = document.getElementById('bank-subtab-btn-matrix');
+      if (aiBtn) aiBtn.classList.toggle('hidden', !can('bank_ai'));
+      if (repoBtn) repoBtn.classList.toggle('hidden', !can('bank_repo'));
+      if (matBtn) matBtn.classList.toggle('hidden', !can('matrix_7991'));
+      if (!isAdm && allowAnyBank) {
+        const activeSub = document.querySelector('[id^="bank-subpanel-"]:not(.hidden)')?.id?.replace('bank-subpanel-', '');
+        const isCurrentSubValid =
+          (activeSub === 'ai' && can('bank_ai')) ||
+          (activeSub === 'list' && can('bank_repo')) ||
+          (activeSub === 'matrix' && can('matrix_7991')) ||
+          activeSub === 'curriculum';
+        if (!isCurrentSubValid) {
+          if (can('bank_ai')) switchBankSubTab('ai');
+          else if (can('bank_repo')) switchBankSubTab('list');
+          else if (can('matrix_7991')) switchBankSubTab('matrix');
+          else switchBankSubTab('curriculum');
+        }
+      }
+
+      // 4. Toàn bộ nút xuất báo cáo Excel/CSV (kể cả trên Tab Giám sát & Tab Báo cáo)
+      const allowExport = can('reports_export');
+      document.querySelectorAll('#admin-tab-reports button[onclick*="export"], #admin-tab-dashboard button[onclick*="exportDashboardCSV"]').forEach(btn => {
+        btn.classList.toggle('hidden', !allowExport);
+      });
+
+      // 5. Cập nhật dải nhãn định mức trực quan cho Giáo viên
+      renderTeacherLiveQuotaStrip();
+      if (!isAdm) startTeacherPermExpiryWatcher();
+    };
+
+    // Khởi tạo bảng quyền mặc định trên form tạo mới
+    setTimeout(() => renderTeacherPermissionsEditor('add', getDefaultTeacherPermissions('unlimited')), 0);
+
     function canManageAdminAccounts() {
       return state.currentUser?.role === 'admin' && (state.currentUser.username === 'admin' || !!state.currentUser.isSuperAdmin);
     }
@@ -12850,6 +13565,9 @@ ${sourceText.slice(0, 32000)}`;
           educationLevel,
           assignedGrades: getGradesForEducationLevel(educationLevel),
           isSuperAdmin,
+          permissions: collectTeacherPermissionsFromUI('add'),
+          usageStats: {},
+          quotaOffsets: {},
           active: true,
           createdBy: state.currentUser?.username || 'admin',
           createdAt: Date.now()
@@ -12857,6 +13575,7 @@ ${sourceText.slice(0, 32000)}`;
         const prov = await provisionCurriculumForTeacher(subject, educationLevel);
         document.getElementById('add-admin-form').reset();
         document.getElementById('adm-password').value = '123456';
+        renderTeacherPermissionsEditor('add', getDefaultTeacherPermissions('unlimited'));
         const provMsg = prov.total > 0 ? ` — Đã cấp sẵn ${prov.total} tiểu chủ đề CT 2018 (${educationLevel})!` : ` (${educationLevel})!`;
         showToast(`Đã cấp tài khoản Giáo viên cho ${name} (${username} • ${subject})${provMsg}`, 'success');
       } catch (err) {
@@ -12910,6 +13629,9 @@ ${sourceText.slice(0, 32000)}`;
           educationLevel,
           assignedGrades: getGradesForEducationLevel(educationLevel),
           isSuperAdmin: false,
+          permissions: getDefaultTeacherPermissions('unlimited'),
+          usageStats: {},
+          quotaOffsets: {},
           active: true,
           createdBy: state.currentUser?.username || 'admin',
           createdAt: Date.now() + added
@@ -12977,7 +13699,7 @@ ${sourceText.slice(0, 32000)}`;
                 <button onclick="toggleAdminAccountActive('${escapeHtml(a.id)}')" class="p-1.5 rounded-lg ${isActive ? 'text-amber-600 hover:bg-amber-50' : 'text-emerald-600 hover:bg-emerald-50'} transition mr-0.5" title="${isActive ? 'Khóa tài khoản' : 'Mở khóa tài khoản'}">
                   <i data-lucide="${isActive ? 'lock' : 'unlock'}" class="w-4 h-4"></i>
                 </button>
-                <button onclick="openEditAdminAccountModal('${escapeHtml(a.id)}')" class="p-1.5 rounded-lg text-brand-600 hover:bg-brand-50 transition mr-0.5" title="Sửa">
+                <button onclick="openEditAdminAccountModal('${escapeHtml(a.id)}')" class="p-1.5 rounded-lg text-brand-600 hover:bg-brand-50 transition mr-0.5" title="Phân quyền & Sửa tài khoản">
                   <i data-lucide="pencil" class="w-4 h-4"></i>
                 </button>
                 <button onclick="confirmDeleteAdminAccount('${escapeHtml(a.id)}', '${escapeHtml(a.name)}')" class="p-1.5 rounded-lg text-rose-600 hover:bg-rose-50 transition" title="Xóa">
@@ -12992,7 +13714,7 @@ ${sourceText.slice(0, 32000)}`;
             <td class="py-3 px-4">
               <div class="font-semibold text-slate-800">${escapeHtml(a.name)}</div>
               ${a.unit ? `<div class="text-[11px] text-slate-500 mt-0.5 flex items-center gap-1"><i data-lucide="school" class="w-3 h-3 text-brand-600 shrink-0"></i><span>${escapeHtml(a.unit)}</span></div>` : ''}
-              ${a.isSuperAdmin && !a.isRoot ? '<span class="inline-block mt-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-800">Toàn quyền</span>' : ''}
+              ${summarizeTeacherPermissionsBadge(a)}
             </td>
             <td class="py-3 px-4">
               <div class="flex flex-wrap items-center gap-1">
@@ -13037,7 +13759,7 @@ ${sourceText.slice(0, 32000)}`;
       if (!adm) return;
 
       openModal({
-        title: `Chỉnh sửa tài khoản Giáo viên: ${adm.username}`,
+        title: `Phân quyền & Chỉnh sửa tài khoản Giáo viên: ${adm.username}`,
         bodyHtml: `
           <div class="space-y-3">
             <div>
@@ -13070,6 +13792,18 @@ ${sourceText.slice(0, 32000)}`;
               <input id="edit-adm-super" type="checkbox" ${adm.isSuperAdmin ? 'checked' : ''} class="w-4 h-4 accent-brand-700 rounded" />
               <span class="text-xs font-semibold text-slate-700">Cấp quyền Quản trị viên (được tạo/xóa tài khoản GV khác)</span>
             </label>
+            <div class="rounded-2xl border border-indigo-200 bg-indigo-50/40 p-3 space-y-2">
+              <div class="flex flex-wrap items-center justify-between gap-1.5">
+                <span class="text-xs font-extrabold text-indigo-950">Phân quyền • Định mức SL • Hẹn giờ tự tắt</span>
+                <div class="flex flex-wrap items-center gap-1">
+                  <button type="button" onclick="applyTeacherPermPreset('edit', 'unlimited')" class="px-2 py-0.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-bold">Mở hết (KGH)</button>
+                  <button type="button" onclick="applyTeacherPermPreset('edit', 'basic')" class="px-2 py-0.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-white text-[10px] font-bold">Cơ bản</button>
+                  <button type="button" onclick="applyTeacherPermPreset('edit', 'trial7d')" class="px-2 py-0.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] font-bold">Dùng thử 7N</button>
+                  <button type="button" onclick="resetTeacherFeatureUsageQuota('${escapeHtml(adm.id)}', 'ALL')" class="px-2 py-0.5 rounded-lg bg-slate-700 hover:bg-slate-800 text-white text-[10px] font-bold">Đặt lại tất cả 0</button>
+                </div>
+              </div>
+              <div id="edit-adm-permissions-matrix" class="space-y-1.5 max-h-[290px] overflow-y-auto pr-0.5"></div>
+            </div>
           </div>
         `,
         buttons: [
@@ -13085,7 +13819,19 @@ ${sourceText.slice(0, 32000)}`;
               const password = document.getElementById('edit-adm-pass').value.trim();
               const isSuperAdmin = !!document.getElementById('edit-adm-super').checked;
               if (!name || !subject || !password) return;
-              await saveDocData('admins', adm.id, { ...adm, name, unit, subject, educationLevel, assignedGrades: getGradesForEducationLevel(educationLevel), password, isSuperAdmin });
+              const latestAdm = state.admins.find(a => a.id === adm.id) || adm;
+              const permissions = collectTeacherPermissionsFromUI('edit');
+              await saveDocData('admins', adm.id, {
+                ...latestAdm,
+                name,
+                unit,
+                subject,
+                educationLevel,
+                assignedGrades: getGradesForEducationLevel(educationLevel),
+                password,
+                isSuperAdmin,
+                permissions
+              });
               const prov = await provisionCurriculumForTeacher(subject, educationLevel);
               closeModal();
               showToast(`Đã cập nhật tài khoản Giáo viên (${subject} • ${educationLevel})${prov.added > 0 ? ` và cấp thêm ${prov.added} tiểu chủ đề CT 2018` : ''}!`, 'success');
@@ -13093,6 +13839,10 @@ ${sourceText.slice(0, 32000)}`;
           }
         ]
       });
+      setTimeout(() => {
+        renderTeacherPermissionsEditor('edit', adm.permissions, adm.username, adm.id);
+        lucide.createIcons();
+      }, 0);
     };
 
     window.confirmDeleteAdminAccount = function(admId, name) {
@@ -14051,6 +14801,7 @@ ${sourceText.slice(0, 32000)}`;
         if (parsed.length === 0) {
           return showToast('Không tìm thấy câu hỏi hợp lệ trong tệp!', 'error');
         }
+        if (!checkTeacherFeatureAccess('bank_repo', parsed.length).allowed) return;
 
         let classifiedCount = 0;
         for (let i = 0; i < parsed.length; i++) {
@@ -14385,6 +15136,7 @@ ${sourceText.slice(0, 32000)}`;
     }
 
     async function publishMultiCodePdfExam() {
+      if (!checkTeacherFeatureAccess('exam_pdf', 1).allowed) return;
       const title = document.getElementById('pdf-builder-title').value.trim();
       const duration = Math.max(1, parseInt(document.getElementById('pdf-builder-duration').value) || 90);
       const scoringMode = document.getElementById('pdf-builder-scoring-mode').value || 'thpt2025';
@@ -14689,6 +15441,7 @@ ${sourceText.slice(0, 32000)}`;
 
     // ----- BÁO CÁO 1: XUẤT FILE ĐIỂM CỦA HỌC SINH THEO LỚP CỦA TỪNG BÀI -----
     window.exportReportScoresByClassCSV = function() {
+      if (!checkTeacherFeatureAccess('reports_export', 1).allowed) return;
       const ctx = getReportContext();
       if (!ctx || !ctx.exam) return showToast('Vui lòng chọn một bài thi trước!', 'warning');
       const { exam, students } = ctx;
@@ -14778,6 +15531,7 @@ ${sourceText.slice(0, 32000)}`;
       a.download = `Diem_Theo_Lop_${exam.title.replace(/[^a-zA-Z0-9\u00C0-\u024F\u1E00-\u1EFF]+/g, '_').slice(0, 35)}.csv`;
       a.click();
       URL.revokeObjectURL(url);
+      incrementTeacherActionQuota('reports_export', 1);
       showToast(`Đã xuất file Điểm theo từng lớp (${classNames.length} lớp) thành công!`, 'success');
     };
 
@@ -14856,6 +15610,7 @@ ${sourceText.slice(0, 32000)}`;
     }
 
     window.exportStatsByExamCSV = function() {
+      if (!checkTeacherFeatureAccess('reports_export', 1).allowed) return;
       const rows = computeStatsByExam();
       if (rows.length === 0) return showToast('Chưa có bài thi nào để xuất thống kê!', 'warning');
       const qCsv = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
@@ -14886,6 +15641,7 @@ ${sourceText.slice(0, 32000)}`;
       a.download = `ThongKe_Diem_Theo_BaiThi_${new Date().toISOString().slice(0, 10)}.csv`;
       a.click();
       URL.revokeObjectURL(url);
+      incrementTeacherActionQuota('reports_export', 1);
       showToast('Đã xuất file Thống kê điểm theo từng bài thi (.csv)!', 'success');
     };
 
@@ -14994,6 +15750,7 @@ ${sourceText.slice(0, 32000)}`;
     }
 
     window.exportTopWrongQuestionsCSV = function() {
+      if (!checkTeacherFeatureAccess('reports_export', 1).allowed) return;
       const ctx = getReportContext();
       if (!ctx || !ctx.exam) return showToast('Vui lòng chọn đề thi trước!', 'warning');
       const { exam, students } = ctx;
@@ -15029,6 +15786,7 @@ ${sourceText.slice(0, 32000)}`;
       a.download = `CauHoi_SaiNhieu_${exam.title.replace(/[^a-zA-Z0-9\u00C0-\u024F\u1E00-\u1EFF]+/g, '_').slice(0, 35)}.csv`;
       a.click();
       URL.revokeObjectURL(url);
+      incrementTeacherActionQuota('reports_export', 1);
       showToast('Đã xuất danh sách Câu hỏi học sinh sai nhiều nhất (.csv)!', 'success');
     };
 
@@ -15251,6 +16009,7 @@ ${sourceText.slice(0, 32000)}`;
     };
 
     window.replyFeedbackAsAnnouncement = function(id) {
+      if (!checkTeacherFeatureAccess('announcements', 1).allowed) return;
       const fb = (state.feedbacks || []).find(x => x.id === id);
       if (!fb) return;
       switchAnnSubTab('publish');
@@ -16108,6 +16867,7 @@ Giải đáp của Giáo viên: `;
 
     // Sinh Đề thi ngẫu nhiên từ Ngân hàng câu hỏi theo đúng Ma trận 7991
     window.generateExamFromMatrix7991 = function() {
+      if (!checkTeacherFeatureAccess('matrix_7991', 1).allowed) return;
       const subject = document.getElementById('matrix-subject-select')?.value || '';
       const grade = document.getElementById('matrix-grade-select')?.value || '';
       const usedIds = new Set();
@@ -16228,6 +16988,7 @@ Giải đáp của Giáo viên: `;
       matrixState.generatedExam = picked;
       generateOfficialMatrixPreview(false);
       renderMatrixGeneratedExamPreview(warnings);
+      incrementTeacherActionQuota('matrix_7991', 1);
       showToast(`Đã sinh đề thi gồm ${picked.length} câu từ Ngân hàng theo Ma trận 7991!`, 'success');
     };
 
@@ -16312,6 +17073,7 @@ Giải đáp của Giáo viên: `;
 
     // Đưa đề thi vừa sinh từ Ma trận vào trình xuất bản Thi Online
     window.sendMatrixExamToOnlineBuilder = function() {
+      if (!checkTeacherFeatureAccess('exam_word', 0).allowed) return;
       const qs = (matrixState.generatedExam || []).filter(q => q.type !== 'essay');
       if (qs.length === 0) return showToast('Chưa có câu hỏi trắc nghiệm nào để đưa vào Thi Online!', 'warning');
       state.editingExamId = null;
@@ -16633,6 +17395,7 @@ Giải đáp của Giáo viên: `;
     }
 
     window.exportMatrix7991WordDoc = function(includeExam = false) {
+      if (!checkTeacherFeatureAccess('matrix_7991', 1).allowed) return;
       if (getSelectedMatrixRows().length === 0) return showToast('Ma trận chưa có chủ đề nào được chọn!', 'warning');
       if (includeExam && (!matrixState.generatedExam || matrixState.generatedExam.length === 0)) {
         generateExamFromMatrix7991();
@@ -16644,16 +17407,19 @@ Giải đáp của Giáo viên: `;
       }
       const fname = includeExam ? `TronBo_MaTran7991_DeThi_${subject}.doc` : `MaTran_7991_${subject}.doc`;
       downloadWordHtmlDocument(body, fname);
+      incrementTeacherActionQuota('matrix_7991', 1);
       showToast(`Đã xuất file Word "${fname}" thành công!`, 'success');
     };
 
     window.exportGeneratedExamWordDoc = function() {
+      if (!checkTeacherFeatureAccess('matrix_7991', 1).allowed) return;
       if (!matrixState.generatedExam || matrixState.generatedExam.length === 0) {
         return showToast('Vui lòng bấm "Sinh Đề thi từ Ngân hàng theo Ma trận" trước!', 'warning');
       }
       const subject = (document.getElementById('matrix-subject-select')?.value || 'CongNghe').replace(/[^a-zA-Z0-9\u00C0-\u024F\u1E00-\u1EFF]+/g, '_');
       const fname = `DeThi_DapAn_${subject}.doc`;
       downloadWordHtmlDocument(buildGeneratedExamWordHtmlSection(), fname);
+      incrementTeacherActionQuota('matrix_7991', 1);
       showToast(`Đã xuất file Word Đề thi và Đáp án "${fname}" thành công!`, 'success');
     };
 
@@ -17567,6 +18333,7 @@ Giải đáp của Giáo viên: `;
     };
 
     window.exportProgressReportCSV = function() {
+      if (!checkTeacherFeatureAccess('reports_export', 1).allowed) return;
       const { exams, students, sessions, clsVal } = getProgressData();
       if (exams.length === 0 || students.length === 0) {
         showToast('Không có dữ liệu để xuất!', 'warning');
@@ -17588,7 +18355,8 @@ Giải đáp của Giáo viên: `;
           ]);
         });
         downloadCsvRows(csvRows, `ThongKe_CaLop_${clsVal}_${Date.now()}.csv`);
-        showToast('Đã xuất file Excel (CSV) kết quả cả lớp qua các lần làm đề!', 'success');
+        incrementTeacherActionQuota('reports_export', 1);
+      showToast('Đã xuất file Excel (CSV) kết quả cả lớp qua các lần làm đề!', 'success');
       } else {
         const stuUser = document.getElementById('prog-student-select')?.value;
         const stu = students.find(s => s.username === stuUser) || students[0];
@@ -17607,7 +18375,8 @@ Giải đáp của Giáo viên: `;
           ]);
         });
         downloadCsvRows(csvRows, `HoSo_TienBo_${stu.username}_${Date.now()}.csv`);
-        showToast(`Đã xuất hồ sơ tiến bộ của ${stu.name}!`, 'success');
+        incrementTeacherActionQuota('reports_export', 1);
+      showToast(`Đã xuất hồ sơ tiến bộ của ${stu.name}!`, 'success');
       }
     };
 
